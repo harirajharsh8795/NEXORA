@@ -1,0 +1,377 @@
+{
+  "Freud Inc (2435)": {
+    "raw": "Freud Inc (2435)",
+    "canonical_name": "Freud Inc",
+    "code": "2435"
+  },
+  "Jam Industrial Supply LLC (JAMIN)": {
+    "raw": "Jam Industrial Supply LLC (JAMIN)",
+    "canonical_name": "Jam Industrial Supply LLC",
+    "code": "JAMIN"
+  },
+  "Mirka Abrasives Inc (MIRUS)": {
+    "raw": "Mirka Abrasives Inc (MIRUS)",
+    "canonical_name": "Mirka Abrasives Inc",
+    "code": "MIRUS"
+  },
+  "Milwaukee Accessory (4031)": {
+    "raw": "Milwaukee Accessory (4031)",
+    "canonical_name": "Milwaukee Accessory",
+    "code": "4031"
+  },
+  "3 M Co (5293)": {
+    "raw": "3 M Co (5293)",
+    "canonical_name": "3 M Co",
+    "code": "5293"
+  },
+  "Emseal Joint Systems Ltd (EMSJO)": {
+    "raw": "Emseal Joint Systems Ltd (EMSJO)",
+    "canonical_name": "Emseal Joint Systems Ltd",
+    "code": "EMSJO"
+  },
+  "Appliance Dealers Cooperative (APPDE)": {
+    "raw": "Appliance Dealers Cooperative (APPDE)",
+    "canonical_name": "Appliance Dealers Cooperative",
+    "code": "APPDE"
+  },
+  "V & V Appliance Parts Inc (VVAPP)": {
+    "raw": "V & V Appliance Parts Inc (VVAPP)",
+    "canonical_name": "V & V Appliance Parts Inc",
+    "code": "VVAPP"
+  },
+  "Wera Tools NA Inc (WERTO)": {
+    "raw": "Wera Tools NA Inc (WERTO)",
+    "canonical_name": "Wera Tools NA Inc",
+    "code": "WERTO"
+  },
+  "Rees Cast Stone Company (REECA)": {
+    "raw": "Rees Cast Stone Company (REECA)",
+    "canonical_name": "Rees Cast Stone Company",
+    "code": "REECA"
+  },
+  "U S Lumber (3073)": {
+    "raw": "U S Lumber (3073)",
+    "canonical_name": "U S Lumber",
+    "code": "3073"
+  },
+  "Boise Cascade Building Materials (BOICA)": {
+    "raw": "Boise Cascade Building Materials (BOICA)",
+    "canonical_name": "Boise Cascade Building Materials",
+    "code": "BOICA"
+  },
+  "Parksite (6151)": {
+    "raw": "Parksite (6151)",
+    "canonical_name": "Parksite",
+    "code": "6151"
+  },
+  "Palmer Donavin Mfg Company (PALDO)": {
+    "raw": "Palmer Donavin Mfg Company (PALDO)",
+    "canonical_name": "Palmer Donavin Mfg Company",
+    "code": "PALDO"
+  },
+  "A J Manufacturing Inc (AJMAN)": {
+    "raw": "A J Manufacturing Inc (AJMAN)",
+    "canonical_name": "A J Manufacturing Inc",
+    "code": "AJMAN"
+  },
+  "United Window & Door Manufacturing (UNIWI)": {
+    "raw": "United Window & Door Manufacturing (UNIWI)",
+    "canonical_name": "United Window & Door Manufacturing",
+    "code": "UNIWI"
+  },
+  "Velux America Inc (VELAM)": {
+    "raw": "Velux America Inc (VELAM)",
+    "canonical_name": "Velux America Inc",
+    "code": "VELAM"
+  },
+  "ProVia (PRODO)": {
+    "raw": "ProVia (PRODO)",
+    "canonical_name": "ProVia",
+    "code": "PRODO"
+  },
+  "Certainteed Gypsum (2765)": {
+    "raw": "Certainteed Gypsum (2765)",
+    "canonical_name": "Certainteed Gypsum",
+    "code": "2765"
+  },
+  "Hager Hinge Co (4189)": {
+    "raw": "Hager Hinge Co (4189)",
+    "canonical_name": "Hager Hinge Co",
+    "code": "4189"
+  },
+  "Huber Eng Wood LLC (3158)": {
+    "raw": "Huber Eng Wood LLC (3158)",
+    "canonical_name": "Huber Eng Wood LLC",
+    "code": "3158"
+  },
+  "Westwood Lumber Sales (WESLU)": {
+    "raw": "Westwood Lumber Sales (WESLU)",
+    "canonical_name": "Westwood Lumber Sales",
+    "code": "WESLU"
+  },
+  "Premier Metals (PREME)": {
+    "raw": "Premier Metals (PREME)",
+    "canonical_name": "Premier Metals",
+    "code": "PREME"
+  },
+  "MillerTech Energy Solutions (MILTE)": {
+    "raw": "MillerTech Energy Solutions (MILTE)",
+    "canonical_name": "MillerTech Energy Solutions",
+    "code": "MILTE"
+  },
+  "Metalmark Industrial Inc (METIN)": {
+    "raw": "Metalmark Industrial Inc (METIN)",
+    "canonical_name": "Metalmark Industrial Inc",
+    "code": "METIN"
+  },
+  "Southwire/g Turner (6603)": {
+    "raw": "Southwire/g Turner (6603)",
+    "canonical_name": "Southwire/g Turner",
+    "code": "6603"
+  },
+  "Thomas & Betts (7405)": {
+    "raw": "Thomas & Betts (7405)",
+    "canonical_name": "Thomas & Betts",
+    "code": "7405"
+  },
+  "Cooper Wiring Devices (3560)": {
+    "raw": "Cooper Wiring Devices (3560)",
+    "canonical_name": "Cooper Wiring Devices",
+    "code": "3560"
+  },
+  "Fenton Bros Electric Inc (FENBR)": {
+    "raw": "Fenton Bros Electric Inc (FENBR)",
+    "canonical_name": "Fenton Bros Electric Inc",
+    "code": "FENBR"
+  },
+  "Leviton Mfg Co (4927)": {
+    "raw": "Leviton Mfg Co (4927)",
+    "canonical_name": "Leviton Mfg Co",
+    "code": "4927"
+  },
+  "Prime Wire & Cable (3562)": {
+    "raw": "Prime Wire & Cable (3562)",
+    "canonical_name": "Prime Wire & Cable",
+    "code": "3562"
+  },
+  "Satco Prod Inc (5573)": {
+    "raw": "Satco Prod Inc (5573)",
+    "canonical_name": "Satco Prod Inc",
+    "code": "5573"
+  },
+  "Kichler Lighting (KICLI)": {
+    "raw": "Kichler Lighting (KICLI)",
+    "canonical_name": "Kichler Lighting",
+    "code": "KICLI"
+  },
+  "Cooper Lighting (7638)": {
+    "raw": "Cooper Lighting (7638)",
+    "canonical_name": "Cooper Lighting",
+    "code": "7638"
+  },
+  "Phillips Lighting (5831)": {
+    "raw": "Phillips Lighting (5831)",
+    "canonical_name": "Phillips Lighting",
+    "code": "5831"
+  },
+  "Lithonia Lighting (2776)": {
+    "raw": "Lithonia Lighting (2776)",
+    "canonical_name": "Lithonia Lighting",
+    "code": "2776"
+  },
+  "Feit Electric (3468)": {
+    "raw": "Feit Electric (3468)",
+    "canonical_name": "Feit Electric",
+    "code": "3468"
+  },
+  "Keystone (5702)": {
+    "raw": "Keystone (5702)",
+    "canonical_name": "Keystone",
+    "code": "5702"
+  },
+  "Maxsa Innovations (MAXIN)": {
+    "raw": "Maxsa Innovations (MAXIN)",
+    "canonical_name": "Maxsa Innovations",
+    "code": "MAXIN"
+  },
+  "Black & Decker/dewlt (2585)": {
+    "raw": "Black & Decker/dewlt (2585)",
+    "canonical_name": "Black & Decker/dewlt",
+    "code": "2585"
+  },
+  "Streamlight (7277)": {
+    "raw": "Streamlight (7277)",
+    "canonical_name": "Streamlight",
+    "code": "7277"
+  },
+  "ACG Brands (1154)": {
+    "raw": "ACG Brands (1154)",
+    "canonical_name": "ACG Brands",
+    "code": "1154"
+  },
+  "Police Security (9470)": {
+    "raw": "Police Security (9470)",
+    "canonical_name": "Police Security",
+    "code": "9470"
+  },
+  "Square D Con Prod Dv (6825)": {
+    "raw": "Square D Con Prod Dv (6825)",
+    "canonical_name": "Square D Con Prod Dv",
+    "code": "6825"
+  },
+  "Woods Wire Southwire (7579)": {
+    "raw": "Woods Wire Southwire (7579)",
+    "canonical_name": "Woods Wire Southwire",
+    "code": "7579"
+  },
+  "Senco Products Inc (4650)": {
+    "raw": "Senco Products Inc (4650)",
+    "canonical_name": "Senco Products Inc",
+    "code": "4650"
+  },
+  "National Nail Corp (7439)": {
+    "raw": "National Nail Corp (7439)",
+    "canonical_name": "National Nail Corp",
+    "code": "7439"
+  },
+  "Prebena (PREBE)": {
+    "raw": "Prebena (PREBE)",
+    "canonical_name": "Prebena",
+    "code": "PREBE"
+  },
+  "Hunter Fan Co (4381)": {
+    "raw": "Hunter Fan Co (4381)",
+    "canonical_name": "Hunter Fan Co",
+    "code": "4381"
+  },
+  "Makita Usa Inc (5142)": {
+    "raw": "Makita Usa Inc (5142)",
+    "canonical_name": "Makita Usa Inc",
+    "code": "5142"
+  },
+  "Sabre (9195)": {
+    "raw": "Sabre (9195)",
+    "canonical_name": "Sabre",
+    "code": "9195"
+  },
+  "Marshalltown Trowel (5155)": {
+    "raw": "Marshalltown Trowel (5155)",
+    "canonical_name": "Marshalltown Trowel",
+    "code": "5155"
+  },
+  "Edge Eyewear Inc (EDGSA)": {
+    "raw": "Edge Eyewear Inc (EDGSA)",
+    "canonical_name": "Edge Eyewear Inc",
+    "code": "EDGSA"
+  },
+  "Ohio Firewatch Protection Inc (HOLFS)": {
+    "raw": "Ohio Firewatch Protection Inc (HOLFS)",
+    "canonical_name": "Ohio Firewatch Protection Inc",
+    "code": "HOLFS"
+  },
+  "First Alert - B R K Brands (2754)": {
+    "raw": "First Alert - B R K Brands (2754)",
+    "canonical_name": "First Alert - B R K Brands",
+    "code": "2754"
+  },
+  "Tech Gear 5.7 Inc (TECGE)": {
+    "raw": "Tech Gear 5.7 Inc (TECGE)",
+    "canonical_name": "Tech Gear 5.7 Inc",
+    "code": "TECGE"
+  },
+  "Radians (7363)": {
+    "raw": "Radians (7363)",
+    "canonical_name": "Radians",
+    "code": "7363"
+  },
+  "Woodpeckers Inc (WOODP)": {
+    "raw": "Woodpeckers Inc (WOODP)",
+    "canonical_name": "Woodpeckers Inc",
+    "code": "WOODP"
+  },
+  "Robt Bosch Tool Corp (6564)": {
+    "raw": "Robt Bosch Tool Corp (6564)",
+    "canonical_name": "Robt Bosch Tool Corp",
+    "code": "6564"
+  },
+  "U S Tape Company (6694)": {
+    "raw": "U S Tape Company (6694)",
+    "canonical_name": "U S Tape Company",
+    "code": "6694"
+  },
+  "Amana Tool Corp (AMATO)": {
+    "raw": "Amana Tool Corp (AMATO)",
+    "canonical_name": "Amana Tool Corp",
+    "code": "AMATO"
+  },
+  "Whiteside Machine & Repair Co (WHIMA)": {
+    "raw": "Whiteside Machine & Repair Co (WHIMA)",
+    "canonical_name": "Whiteside Machine & Repair Co",
+    "code": "WHIMA"
+  },
+  "Vessel Tools USA Inc (VESTO)": {
+    "raw": "Vessel Tools USA Inc (VESTO)",
+    "canonical_name": "Vessel Tools USA Inc",
+    "code": "VESTO"
+  },
+  "Malco Prod (2370)": {
+    "raw": "Malco Prod (2370)",
+    "canonical_name": "Malco Prod",
+    "code": "2370"
+  },
+  "Irwin Industrial Tools (5863)": {
+    "raw": "Irwin Industrial Tools (5863)",
+    "canonical_name": "Irwin Industrial Tools",
+    "code": "5863"
+  },
+  "Kreg Tool Company (KRETO)": {
+    "raw": "Kreg Tool Company (KRETO)",
+    "canonical_name": "Kreg Tool Company",
+    "code": "KRETO"
+  },
+  "King Canada Inc (KINCA)": {
+    "raw": "King Canada Inc (KINCA)",
+    "canonical_name": "King Canada Inc",
+    "code": "KINCA"
+  },
+  "Festool USA (FESTO)": {
+    "raw": "Festool USA (FESTO)",
+    "canonical_name": "Festool USA",
+    "code": "FESTO"
+  },
+  "CMT USA Inc (CMTUS)": {
+    "raw": "CMT USA Inc (CMTUS)",
+    "canonical_name": "CMT USA Inc",
+    "code": "CMTUS"
+  },
+  "JPW Industries (JPWIN)": {
+    "raw": "JPW Industries (JPWIN)",
+    "canonical_name": "JPW Industries",
+    "code": "JPWIN"
+  },
+  "Woodstock Intl (3658)": {
+    "raw": "Woodstock Intl (3658)",
+    "canonical_name": "Woodstock Intl",
+    "code": "3658"
+  },
+  "Bow Products (BOWPR)": {
+    "raw": "Bow Products (BOWPR)",
+    "canonical_name": "Bow Products",
+    "code": "BOWPR"
+  },
+  "Saw Stop LLC (SAWST)": {
+    "raw": "Saw Stop LLC (SAWST)",
+    "canonical_name": "Saw Stop LLC",
+    "code": "SAWST"
+  },
+  "Oliver Machinery Company (OLIMA)": {
+    "raw": "Oliver Machinery Company (OLIMA)",
+    "canonical_name": "Oliver Machinery Company",
+    "code": "OLIMA"
+  },
+  "J&G Machinery (JGMAC)": {
+    "raw": "J&G Machinery (JGMAC)",
+    "canonical_name": "J&G Machinery",
+    "code": "JGMAC"
+  }
+}

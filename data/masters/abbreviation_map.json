@@ -1,0 +1,20 @@
+{
+  "CPLG": "Coupling",
+  "COUP": "Coupling",
+  "BRS": "Brass",
+  "BR": "Brass",
+  "BRZ": "Bronze",
+  "SST": "Stainless Steel",
+  "SS": "Stainless Steel",
+  "DKO": "Depressed Center",
+  "MILW": "Milwaukee",
+  "LED": "LED",
+  "MED": "Medium",
+  "CAND": "Candelabra",
+  "CIRC": "Circular",
+  "FRMING": "Framing",
+  "CCT": "Color Temperature",
+  "SHAPER": "Shaper",
+  "JOINTER": "Jointer",
+  "PLANER": "Planer"
+}
