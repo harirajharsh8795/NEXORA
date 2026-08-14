@@ -1,12 +1,12 @@
-# Ignore root backend Python files for Vercel static Vite deployment
-api/
-autronous.ai/
-data/
-docs/
-evaluation/
-src/
-tests/
-requirements.txt
-requirements_uv.txt
-*.csv
-*.md
+# Ignore only root-level Python backend directories and files
+/api/
+/autronous.ai/
+/data/
+/docs/
+/evaluation/
+/src/
+/tests/
+/requirements.txt
+/requirements_uv.txt
+/*.csv
+/*.md
