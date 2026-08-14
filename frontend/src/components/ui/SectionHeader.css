@@ -1,0 +1,62 @@
+.section-header {
+  margin-bottom: var(--space-3xl);
+}
+
+.section-header--center {
+  text-align: center;
+}
+
+.section-header--left {
+  text-align: left;
+}
+
+/* Uppercase tag label */
+.section-header__tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--nexora-purple);
+  margin-bottom: var(--space-md);
+}
+
+/* Main serif heading */
+.section-header__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text-main);
+  margin-bottom: var(--space-lg);
+}
+
+/* Italic accent portion */
+.section-header__accent {
+  color: var(--nexora-purple);
+  font-style: italic;
+}
+
+/* Subtitle paragraph */
+.section-header__subtitle {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 640px;
+}
+
+.section-header--center .section-header__subtitle {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 768px) {
+  .section-header__title {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-header__title {
+    font-size: 1.875rem;
+  }
+}

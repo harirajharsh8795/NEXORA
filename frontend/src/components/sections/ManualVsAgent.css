@@ -1,0 +1,88 @@
+.comparison-section {
+  padding: var(--space-4xl) var(--space-lg);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.comparison-table-card {
+  padding: 0;
+  overflow: hidden;
+  margin-top: var(--space-2xl);
+  border: 1px solid var(--border-card);
+}
+
+.comparison-table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  min-width: 540px;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1.4fr 1.4fr;
+  background: rgba(15, 23, 42, 0.05);
+  border-bottom: 1px solid var(--border-card);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.dark .table-header {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.th-cell {
+  padding: var(--space-lg);
+}
+
+.th-cell--manual {
+  color: var(--color-error);
+}
+
+.th-cell--agent {
+  color: var(--nexora-cyan);
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.4fr 1.4fr;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.875rem;
+  transition: background var(--transition-fast);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:hover {
+  background: rgba(168, 85, 247, 0.02);
+}
+
+.td-cell {
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+}
+
+.td-cell--metric {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.td-cell--manual {
+  color: var(--text-muted);
+}
+
+.td-cell--agent {
+  color: var(--text-main);
+  font-weight: 600;
+  background: rgba(6, 182, 212, 0.03);
+}
+
+.winner-check {
+  color: var(--color-success);
+  margin-right: var(--space-xs);
+  font-weight: 800;
+}

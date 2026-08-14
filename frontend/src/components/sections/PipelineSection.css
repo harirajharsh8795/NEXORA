@@ -1,0 +1,124 @@
+.pipeline-section {
+  padding: var(--space-4xl) var(--space-lg);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.pipeline-stages-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--space-md);
+  margin-top: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+}
+
+@media (min-width: 640px) {
+  .pipeline-stages-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pipeline-stages-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.pipeline-inspection-panel {
+  padding: var(--space-2xl);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: var(--shadow-glow);
+}
+
+.inspection-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: var(--space-md);
+}
+
+.inspection-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--nexora-purple);
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.inspection-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.inspection-status-pill {
+  font-size: 0.725rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+  border-radius: var(--radius-sm);
+}
+
+.inspection-explanation {
+  font-size: 0.9down;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: var(--space-xl);
+}
+
+.inspection-data-comparison {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .inspection-data-comparison {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.data-box {
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--border-subtle);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.dark .data-box {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.data-box--output {
+  background: rgba(6, 182, 212, 0.05);
+  border-color: rgba(6, 182, 212, 0.2);
+}
+
+.data-box-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-subtle);
+  margin-bottom: var(--space-xs);
+}
+
+.data-box-label--accent {
+  color: var(--nexora-cyan);
+}
+
+.data-box-code {
+  font-family: var(--font-mono);
+  font-size: 0.775rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

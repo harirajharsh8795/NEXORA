@@ -1,0 +1,30 @@
+.nexora-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-base);
+}
+
+.nexora-card:hover {
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.nexora-card--no-hover:hover {
+  border-color: var(--border-card);
+  box-shadow: var(--shadow-lg);
+  transform: none;
+}
+
+.nexora-card--clickable {
+  cursor: pointer;
+}
+
+.nexora-card--clickable:focus-visible {
+  outline: 2px solid var(--nexora-purple);
+  outline-offset: 2px;
+}

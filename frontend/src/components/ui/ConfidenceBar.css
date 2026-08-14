@@ -1,0 +1,66 @@
+.confidence-bar {
+  width: 100%;
+}
+
+.confidence-bar__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.375rem;
+}
+
+.confidence-bar__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.confidence-bar__value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* Track */
+.confidence-bar__track {
+  width: 100%;
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.confidence-bar--sm .confidence-bar__track { height: 4px; }
+.confidence-bar--md .confidence-bar__track { height: 6px; }
+.confidence-bar--lg .confidence-bar__track { height: 10px; }
+
+/* Fill bar */
+.confidence-bar__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Color variants */
+.confidence-bar__fill.confidence-bar--high {
+  background: linear-gradient(90deg, var(--nexora-cyan), var(--nexora-purple));
+}
+
+.confidence-bar__value.confidence-bar--high {
+  color: var(--nexora-cyan);
+}
+
+.confidence-bar__fill.confidence-bar--medium {
+  background: linear-gradient(90deg, #f59e0b, #f97316);
+}
+
+.confidence-bar__value.confidence-bar--medium {
+  color: #f59e0b;
+}
+
+.confidence-bar__fill.confidence-bar--low {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.confidence-bar__value.confidence-bar--low {
+  color: #ef4444;
+}

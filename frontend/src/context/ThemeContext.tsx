@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
-type Theme = 'dark' | 'light';
+type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
   theme: Theme;
@@ -12,20 +11,19 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('nexora_theme');
-    return (saved as Theme) || 'dark';
+    const stored = localStorage.getItem('nexora-theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
   useEffect(() => {
-    localStorage.setItem('nexora_theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
+    const root = document.documentElement;
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
+      root.classList.add('dark');
     } else {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
     }
+    localStorage.setItem('nexora-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {

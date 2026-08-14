@@ -1,687 +1,343 @@
-// Mock data: Realistic industrial products based on the UniHack dataset
-import type { Product, Manufacturer, Category, Agent, EnrichmentJob, ValidationRule, ReviewItem, AnalyticsData, BlogPost, CaseStudy } from './types';
+import type {
+  EnrichedProduct,
+  PipelineStage,
+  FAQItem,
+  PricingTier,
+  Testimonial,
+  TaxonomyCategory
+} from '../types';
 
-// ================================================================
-// MANUFACTURERS (from manufacturer_master.json)
-// ================================================================
-export const manufacturers: Manufacturer[] = [
-  { id: 'mfr-001', raw: 'Freud Inc (2435)', canonical: 'Freud Inc', code: '2435', productCount: 45 },
-  { id: 'mfr-002', raw: 'Milwaukee Accessory (4031)', canonical: 'Milwaukee Accessory', code: '4031', productCount: 108 },
-  { id: 'mfr-003', raw: '3 M Co (5293)', canonical: '3M Company', code: '5293', productCount: 32 },
-  { id: 'mfr-004', raw: 'Mirka Abrasives Inc (MIRUS)', canonical: 'Mirka Abrasives Inc', code: 'MIRUS', productCount: 28 },
-  { id: 'mfr-005', raw: 'Appliance Dealers Cooperative (APPDE)', canonical: 'Appliance Dealers Cooperative', code: 'APPDE', productCount: 15 },
-  { id: 'mfr-006', raw: 'Phillips Lighting (7804)', canonical: 'Philips Lighting', code: '7804', productCount: 111 },
-  { id: 'mfr-007', raw: 'Boise Cascade (0584)', canonical: 'Boise Cascade', code: '0584', productCount: 85 },
-  { id: 'mfr-008', raw: 'Rheem Manufacturing', canonical: 'Rheem Manufacturing', code: 'RHEEM', productCount: 12 },
-  { id: 'mfr-009', raw: 'Whirlpool Corporation', canonical: 'Whirlpool Corporation', code: 'WHIRL', productCount: 18 },
-  { id: 'mfr-010', raw: 'Emseal Joint Systems Ltd (EMSJO)', canonical: 'Emseal Joint Systems Ltd', code: 'EMSJO', productCount: 8 },
+export const MOCK_PIPELINE_STAGES: PipelineStage[] = [
+  { id: 1, name: 'Entity Resolution', icon: '⚡', description: 'Resolves vendor names, brand variations & trade names against canonical master databases.', status: 'completed' },
+  { id: 2, name: 'Taxonomy Classification', icon: '🗂️', description: 'Hierarchical 4-tier taxonomy mapping (Dept > Class > Fine Line > Classpath).', status: 'completed' },
+  { id: 3, name: 'Attribute Extraction', icon: '🔍', description: 'Extracts structured (Label, Value, UOM) triplets from raw specs with regex engines.', status: 'completed' },
+  { id: 4, name: 'Content Generation', icon: '✍️', description: 'Synthesizes 6 distinct channel-specific descriptions (Mobile, Invoice, Retail, etc).', status: 'completed' },
+  { id: 5, name: 'Manufacturer Enrichment', icon: '🌐', description: 'Discovers verified manufacturer URLs, spec sheet PDFs, and image assets.', status: 'completed' },
+  { id: 6, name: 'LOV & UOM Validation', icon: '🛡️', description: 'Validates every value against List of Values (LOV) & standardizes UOMs.', status: 'completed' },
+  { id: 7, name: 'Confidence & Review', icon: '⚖️', description: 'Calculates weighted confidence score. Flags score < 85% for human review.', status: 'completed' },
+  { id: 8, name: 'Commerce Delivery', icon: '🚀', description: 'Exports schema-compliant 252-column master catalog ready for PIM & AI agents.', status: 'completed' }
 ];
 
-// ================================================================
-// CATEGORIES
-// ================================================================
-export const categories: Category[] = [
-  {
-    id: 'cat-001', name: 'Abrasives', slug: 'abrasives',
-    classpath: 'Industrial > Abrasives',
-    productCount: 156,
-    attributes: [
-      { label: 'Grit', allowedValues: ['P40', 'P60', 'P80', 'P100', 'P120', 'P150', 'P180', 'P220', 'P320'], required: true },
-      { label: 'Diameter', allowedValues: ['4 in', '4-1/2 in', '5 in', '6 in', '7 in', '9 in', '12 in', '14 in'], required: true },
-      { label: 'Arbor Size', allowedValues: ['5/8 in', '7/8 in', '1 in'], required: false },
-      { label: 'Material', allowedValues: ['Aluminum Oxide', 'Ceramic', 'Zirconia', 'Silicon Carbide'], required: true },
-      { label: 'Abrasive Type', allowedValues: ['Sanding Disc', 'Sanding Belt', 'Cut-Off Wheel', 'Grinding Wheel', 'Flap Disc'], required: true },
-    ],
-  },
-  {
-    id: 'cat-002', name: 'Appliances', slug: 'appliances',
-    classpath: 'Appliances & Consumer Electronics > Kitchen Appliances',
-    productCount: 42,
-    attributes: [
-      { label: 'Voltage Rating', allowedValues: ['120 V', '240 V'], required: true },
-      { label: 'Amperage Rating', allowedValues: [], required: false },
-      { label: 'Mounting Type', allowedValues: ['Built-in', 'Freestanding', 'Leg', 'Under Counter'], required: true },
-      { label: 'Color', allowedValues: ['Stainless Steel', 'Black', 'White', 'Bisque', 'Slate'], required: true },
-      { label: 'Sound Level', allowedValues: [], required: false },
-    ],
-  },
-  {
-    id: 'cat-003', name: 'Fittings', slug: 'fittings',
-    classpath: 'Industrial > Plumbing > Pipe Fittings',
-    productCount: 89,
-    attributes: [
-      { label: 'Fitting Type', allowedValues: ['Coupling', 'Elbow', 'Tee', 'Union', 'Adapter', 'Nipple', 'Bushing', 'Cap', 'Plug'], required: true },
-      { label: 'Connection Type', allowedValues: ['Threaded', 'Soldered', 'Push-Fit', 'Compression', 'Flanged'], required: true },
-      { label: 'Material', allowedValues: ['Brass', 'Bronze', 'Stainless Steel', 'Copper', 'PVC', 'Cast Iron', 'Galvanized Steel'], required: true },
-      { label: 'Size', allowedValues: ['1/4 in', '3/8 in', '1/2 in', '3/4 in', '1 in', '1-1/4 in', '1-1/2 in', '2 in', '3 in', '4 in'], required: true },
-      { label: 'Pressure Rating', allowedValues: ['125 psi', '150 psi', '250 psi', '300 psi'], required: false },
-    ],
-  },
-  {
-    id: 'cat-004', name: 'Faucets', slug: 'faucets',
-    classpath: 'Industrial > Plumbing > Faucets',
-    productCount: 34,
-    attributes: [
-      { label: 'Faucet Type', allowedValues: ['Kitchen', 'Bathroom', 'Utility', 'Bar/Prep', 'Tub/Shower'], required: true },
-      { label: 'Handle Type', allowedValues: ['Single Handle', 'Two Handle', 'Touchless', 'Pull-Down', 'Pull-Out'], required: true },
-      { label: 'Finish', allowedValues: ['Chrome', 'Brushed Nickel', 'Matte Black', 'Oil-Rubbed Bronze', 'Polished Brass', 'Stainless Steel'], required: true },
-      { label: 'Mounting Type', allowedValues: ['Deck Mount', 'Wall Mount', 'Center Set', 'Widespread'], required: true },
-      { label: 'Spout Height', allowedValues: [], required: false },
-    ],
-  },
-  {
-    id: 'cat-005', name: 'Electrical', slug: 'electrical',
-    classpath: 'Industrial > Electrical',
-    productCount: 67,
-    attributes: [
-      { label: 'Voltage Rating', allowedValues: ['12 V', '24 V', '120 V', '240 V', '277 V', '480 V'], required: true },
-      { label: 'Amperage Rating', allowedValues: [], required: false },
-      { label: 'Wattage', allowedValues: [], required: false },
-      { label: 'Wire Gauge', allowedValues: ['14 AWG', '12 AWG', '10 AWG', '8 AWG', '6 AWG'], required: false },
-    ],
-  },
-  {
-    id: 'cat-006', name: 'Lighting', slug: 'lighting',
-    classpath: 'Industrial > Lighting',
-    productCount: 111,
-    attributes: [
-      { label: 'Bulb Type', allowedValues: ['LED', 'Fluorescent', 'Incandescent', 'Halogen', 'CFL'], required: true },
-      { label: 'Wattage', allowedValues: [], required: true },
-      { label: 'Color Temperature', allowedValues: ['2700K', '3000K', '3500K', '4000K', '5000K', '6500K'], required: true },
-      { label: 'Base Type', allowedValues: ['Medium (E26)', 'Candelabra (E12)', 'GU10', 'GU24', 'Bi-Pin'], required: true },
-      { label: 'Lumens', allowedValues: [], required: false },
-    ],
-  },
-  {
-    id: 'cat-007', name: 'HVAC', slug: 'hvac',
-    classpath: 'Industrial > HVAC',
-    productCount: 23,
-    attributes: [
-      { label: 'BTU Rating', allowedValues: [], required: true },
-      { label: 'SEER Rating', allowedValues: [], required: false },
-      { label: 'Refrigerant Type', allowedValues: ['R-410A', 'R-32', 'R-22'], required: false },
-    ],
-  },
-  {
-    id: 'cat-008', name: 'Power Tools', slug: 'power-tools',
-    classpath: 'Industrial > Power Tools',
-    productCount: 78,
-    attributes: [
-      { label: 'Voltage Rating', allowedValues: ['12 V', '18 V', '20 V', '120 V'], required: true },
-      { label: 'Battery Type', allowedValues: ['Lithium-Ion', 'NiCd', 'Corded'], required: true },
-      { label: 'RPM', allowedValues: [], required: false },
-      { label: 'Chuck Size', allowedValues: ['1/4 in', '3/8 in', '1/2 in'], required: false },
-    ],
-  },
+export const MOCK_TAXONOMY_CATEGORIES: TaxonomyCategory[] = [
+  { department: 'Appliances & Consumer Electronics', categoryClass: 'Kitchen Appliances', fineLine: 'Built-In Dishwashers', classpath: 'Appliances & Consumer Electronics > Kitchen Appliances > Built-In Dishwashers', skuCount: 142 },
+  { department: 'Tools & Hardware', categoryClass: 'Abrasives', fineLine: 'Sanding Belts & Sheets', classpath: 'Tools & Hardware > Abrasives > Coated Abrasives > Sanding Belts & Sheets', skuCount: 198 },
+  { department: 'Tools & Hardware', categoryClass: 'Abrasives', fineLine: 'Cut-Off Wheels & Discs', classpath: 'Tools & Hardware > Abrasives > Bonded Abrasives > Cut-Off Wheels', skuCount: 165 },
+  { department: 'Tools & Hardware', categoryClass: 'Power Tool Accessories', fineLine: 'Saw Blades', classpath: 'Tools & Hardware > Power Tool Accessories > Saw Blades', skuCount: 220 },
+  { department: 'Building Materials', categoryClass: 'Lumber & Decking', fineLine: 'Composite Deck Boards', classpath: 'Building Materials > Decking > Composite Decking Boards', skuCount: 110 },
+  { department: 'Electrical & Lighting', categoryClass: 'Lighting', fineLine: 'LED Light Bulbs', classpath: 'Electrical & Lighting > Lighting > Light Bulbs > LED Light Bulbs', skuCount: 115 },
+  { department: 'Tools & Hardware', categoryClass: 'Woodworking Machinery', fineLine: 'Stationary Machinery', classpath: 'Tools & Hardware > Woodworking Machinery > Stationary Machinery', skuCount: 50 }
 ];
 
-// ================================================================
-// PRODUCTS (realistic industrial products from the dataset)
-// ================================================================
-export const products: Product[] = [
+export const MOCK_PRODUCTS: EnrichedProduct[] = [
   {
-    id: 'prod-001',
-    sku: '1515863',
-    mpn: 'PDSH4816AF',
-    manufacturer: 'Rheem Manufacturing',
-    brand: 'FRIGIDAIRE®',
-    category: 'Appliances',
+    mfg_part_num: 'PDSH4816AF',
+    part_desc: '24" Stainless Steel Built-In Top Control Dishwasher with OrbitClean Wash System, 14 Place Settings',
+    raw_manuf: 'Frigidaire Gallery',
+    raw_brand: 'Frigidaire',
+    manufacturer_name: 'Frigidaire (Electrolux Home Products)',
+    brand_name: 'Frigidaire Gallery',
+    trade_name: 'OrbitClean® Series',
+    manufacturer_part_number: 'PDSH4816AF',
+    alternate_part_number: 'FGID2476SF',
+    department: 'Appliances',
+    category_class: 'Large Appliances',
+    fine_line: 'Dishwashers',
     classpath: 'Appliances & Consumer Electronics > Kitchen Appliances > Built-In Dishwashers',
-    productName: 'Professional Series Dishwasher',
-    shortDesc: 'FRIGIDAIRE® Professional Series PDSH4816AF Dishwasher With CleanBoost™, Leg Mounting, 5-Wash Cycle, Stainless Steel',
-    longDesc: 'FRIGIDAIRE® Dishwasher With CleanBoost™, Professional Series, 5 Wash Cycles, 120 V, 15 A, Leg Mounting, 24 in W x 24-1/4 in D, 50-1/4 in Depth With Door Open, 47 dBA Sound Level, Stainless Steel',
-    mobileDesc: 'Rheem Manufacturing FRIGIDAIRE, Dishwasher, Professional Series, PDSH4816AF',
-    invoiceDesc: 'DISHWASHER LEG 5 SST 120V 15A 50-1/4IN',
-    qualityScore: 96,
-    status: 'approved',
-    updatedAt: '2026-08-12T10:30:00Z',
+    mobile_desc: '• 24" Built-In Dishwasher in Stainless Steel\n• OrbitClean® wash system with 4x coverage\n• 14 Place Settings with NSF Sanitize cycle\n• Quiet 49 dBA sound level with LED beam',
+    invoice_desc: 'FRIGIDAIRE GALLERY 24IN BUILT-IN DISHWASHER SS 49DBA',
+    short_desc: 'Frigidaire Gallery 24" Built-In Top Control Stainless Steel Dishwasher.',
+    long_desc1: 'The Frigidaire Gallery 24" Built-In Dishwasher features the OrbitClean® Wash System for thorough cleaning with 4x better water coverage and 49 dBA whisper-quiet sound level.',
+    retail_desc: 'Elevate your kitchen cleanup with the Frigidaire Gallery 24-inch Built-In Dishwasher.',
+    marketing_description: 'Engineered for exceptional performance and spot-free dishwashing with advanced sensors.',
+    product_name: 'Frigidaire Gallery 24" Built-In Dishwasher',
+    upc: '012505564291',
+    gtin: '00012505564291',
+    unspsc: '52141505',
+    list_price: '$899.00',
+    selling_qty: '1',
+    selling_uom: 'EA',
+    length: '24.25',
+    length_uom: 'in',
+    width: '24.00',
+    width_uom: 'in',
+    height: '35.00',
+    height_uom: 'in',
+    weight: '82.00',
+    weight_uom: 'lbs',
+    mfr_url: 'https://www.frigidaire.com/en/p/owner-center/product-support/PDSH4816AF',
+    ref_urls: ['https://www.frigidaire.com/en/p/kitchen/dishwashers/PDSH4816AF'],
+    product_image: 'https://images.unsplash.com/photo-1585659722983-3a675dabf23d?auto=format&fit=crop&w=800&q=80',
+    alternate_images: [],
+    specification_sheet: 'FRIGIDAIRE_PDSH4816AF_Specification_Sheet.pdf',
+    instruction_manual: 'FRIGIDAIRE_PDSH4816AF_Installation_Guide.pdf',
+    actual_image_yes_no: 'Yes',
+    item_features: [
+      'OrbitClean® Wash System delivers 4 times more water coverage',
+      'DishSense™ Technology automatically optimizes cycle duration',
+      'NSF® Certified Sanitize cycle eliminates 99.9% of bacteria',
+      'Smudge-Proof® Stainless Steel resists fingerprints'
+    ],
     attributes: [
-      { label: 'Series', value: 'Professional Series', normalizedValue: 'Professional Series', confidence: 98, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Number of Wash Cycles', value: '5', normalizedValue: '5', confidence: 99, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Voltage Rating', value: '120', normalizedValue: '120 V', confidence: 98, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction', uom: 'V' },
-      { label: 'Amperage Rating', value: '15', normalizedValue: '15 A', confidence: 97, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction', uom: 'A' },
-      { label: 'Mounting Type', value: 'Leg', normalizedValue: 'Leg', confidence: 96, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Sound Level', value: '47', normalizedValue: '47 dBA', confidence: 95, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction', uom: 'dBA' },
-      { label: 'Material', value: 'Stainless Steel', normalizedValue: 'Stainless Steel', confidence: 99, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Color', value: 'Stainless Steel', normalizedValue: 'Stainless Steel', confidence: 97, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Size', value: '24 in W x 24-1/4 in D', normalizedValue: '24 in W x 24-1/4 in D', confidence: 94, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Depth With Door Open', value: '50-1/4', normalizedValue: '50-1/4 in', confidence: 93, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
+      { index: 1, label: 'Product Type', value: 'Built-In Dishwasher', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true },
+      { index: 2, label: 'Tub Material', value: 'Stainless Steel', uom: '', confidence: 0.99, is_lov_valid: true, is_uom_standardized: true },
+      { index: 3, label: 'Place Settings', value: '14', uom: 'settings', confidence: 0.96, is_lov_valid: true, is_uom_standardized: true },
+      { index: 4, label: 'Sound Level', value: '49', uom: 'dBA', confidence: 0.95, is_lov_valid: true, is_uom_standardized: true },
+      { index: 5, label: 'Nominal Width', value: '24', uom: 'in', confidence: 0.99, is_lov_valid: true, is_uom_standardized: true }
     ],
-    evidence: [
-      { field: 'Voltage Rating', value: '120 V', source: 'Manufacturer Documentation', url: 'https://www.frigidaire.com/en/p/owner-center/product-support/PDSH4816AF', snippet: 'Voltage: 120V, 60Hz', confidence: 98, extractedBy: 'Attribute Extraction Agent', validatedAt: '2026-08-12T10:28:00Z' },
-      { field: 'Sound Level', value: '47 dBA', source: 'Specification Sheet', url: '', snippet: 'Sound Rating: 47 dBA', confidence: 95, extractedBy: 'Attribute Extraction Agent', validatedAt: '2026-08-12T10:28:00Z' },
-    ],
-    demo: true,
+    confidence: {
+      manufacturer_confidence: 0.99,
+      brand_confidence: 0.98,
+      classpath_confidence: 0.98,
+      attribute_confidence: 0.96,
+      overall_confidence: 0.9775,
+      needs_human_review: false,
+      flagged_reasons: []
+    },
+    evidence_graph: {
+      product_mpn: 'PDSH4816AF',
+      evidences: {
+        'Manufacturer': {
+          field_name: 'Manufacturer Name',
+          value: 'Frigidaire (Electrolux Home Products)',
+          confidence: 0.99,
+          source_type: 'lov_match',
+          source_url: 'https://www.frigidaire.com',
+          snippet: 'Canonical manufacturer match against manufacturer_master.json (Electrolux ID: 2435)',
+          validated_by_lov: true,
+          validated_by_uom: true
+        },
+        'Sound Level': {
+          field_name: 'Sound Level (49 dBA)',
+          value: '49 dBA',
+          confidence: 0.95,
+          source_type: 'document',
+          source_url: 'FRIGIDAIRE_PDSH4816AF_Specification_Sheet.pdf',
+          snippet: 'Acoustic rating certified at 49 dBA operating level under AHAM DW-1',
+          validated_by_lov: true,
+          validated_by_uom: true
+        }
+      }
+    }
   },
   {
-    id: 'prod-002',
-    sku: '1515867',
-    mpn: 'WDTS7024RZ',
-    manufacturer: 'Whirlpool Corporation',
-    brand: 'Whirlpool®',
-    category: 'Appliances',
-    classpath: 'Appliances & Consumer Electronics > Kitchen Appliances > Built-In Dishwashers',
-    productName: 'Eco Series Dishwasher',
-    shortDesc: 'Whirlpool® Eco Series WDTS7024RZ Dishwasher, Built-in Mounting, Stainless Steel',
-    longDesc: 'Whirlpool® Dishwasher, Eco Series, 120 V, 10 A, Built-in Mounting, 33-7/16 in H x 23-7/8 in W x 22-5/8 in D, 41 dBA Sound Level, Stainless Steel',
-    mobileDesc: 'Whirlpool, Dishwasher, Eco Series, WDTS7024RZ, Built-in Mounting',
-    invoiceDesc: 'DISHWASHER BLTLN SST SST 120V 10A 41DBA',
-    qualityScore: 94,
-    status: 'approved',
-    updatedAt: '2026-08-12T10:25:00Z',
-    attributes: [
-      { label: 'Series', value: 'Eco Series', normalizedValue: 'Eco Series', confidence: 97, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Voltage Rating', value: '120', normalizedValue: '120 V', confidence: 98, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction', uom: 'V' },
-      { label: 'Amperage Rating', value: '10', normalizedValue: '10 A', confidence: 97, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction', uom: 'A' },
-      { label: 'Mounting Type', value: 'Built-in', normalizedValue: 'Built-in', confidence: 96, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Sound Level', value: '41', normalizedValue: '41 dBA', confidence: 95, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction', uom: 'dBA' },
-      { label: 'Material', value: 'Stainless Steel', normalizedValue: 'Stainless Steel', confidence: 99, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
+    mfg_part_num: 'D0724A',
+    part_desc: 'Diablo 7-1/4 in. x 24-Tooth Tracking Point Framing Circular Saw Blade with 5/8 in. Arbor',
+    raw_manuf: 'Freud Inc',
+    raw_brand: 'Diablo',
+    manufacturer_name: 'Freud Inc',
+    brand_name: 'Diablo',
+    trade_name: 'Tracking Point™',
+    manufacturer_part_number: 'D0724A',
+    department: 'Tools & Hardware',
+    category_class: 'Power Tool Accessories',
+    fine_line: 'Saw Blades',
+    classpath: 'Tools & Hardware > Power Tool Accessories > Saw Blades',
+    mobile_desc: '• 7-1/4" Framing circular saw blade with 24 teeth\n• TiCo™ Hi-Density carbide teeth\n• Perma-SHIELD® non-stick coating',
+    invoice_desc: 'DIABLO 7-1/4IN 24T FRAMING CIRC SAW BLADE',
+    short_desc: 'Diablo 7-1/4" 24-Tooth Carbide Framing Circular Saw Blade.',
+    long_desc1: 'Diablo 7-1/4 in. x 24-Tooth Tracking Point Framing Blade delivers up to 5X longer life in framing applications.',
+    retail_desc: 'Make rapid framing cuts with Diablo 7-1/4-inch 24-Tooth Carbide blade.',
+    marketing_description: 'Designed for framing and construction jobs with laser-cut stabilizer vents.',
+    product_name: 'Diablo 7-1/4" 24T Framing Saw Blade',
+    upc: '008925134109',
+    unspsc: '27112802',
+    list_price: '$12.97',
+    selling_qty: '1',
+    selling_uom: 'EA',
+    length: '7.25',
+    length_uom: 'in',
+    width: '7.25',
+    width_uom: 'in',
+    weight: '0.65',
+    weight_uom: 'lbs',
+    mfr_url: 'https://www.diablotools.com/products/D0724A',
+    ref_urls: [],
+    product_image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80',
+    alternate_images: [],
+    specification_sheet: 'Diablo_D0724A_Spec_Sheet.pdf',
+    actual_image_yes_no: 'Yes',
+    item_features: [
+      'Tracking Point™ tooth design for straight tracking',
+      'TiCo™ Hi-Density Carbide engineered for framing',
+      'Perma-SHIELD® Non-Stick Coating resists heat'
     ],
-    evidence: [],
-    demo: true,
+    attributes: [
+      { index: 1, label: 'Product Type', value: 'Saw Blade', uom: '', confidence: 0.99, is_lov_valid: true, is_uom_standardized: true },
+      { index: 2, label: 'Diameter', value: '7.25', uom: 'in', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true },
+      { index: 3, label: 'Number of Teeth', value: '24', uom: '', confidence: 0.99, is_lov_valid: true, is_uom_standardized: true }
+    ],
+    confidence: {
+      manufacturer_confidence: 0.99,
+      brand_confidence: 0.99,
+      classpath_confidence: 0.98,
+      attribute_confidence: 0.97,
+      overall_confidence: 0.9825,
+      needs_human_review: false,
+      flagged_reasons: []
+    },
+    evidence_graph: {
+      product_mpn: 'D0724A',
+      evidences: {
+        'Manufacturer': {
+          field_name: 'Manufacturer Resolution',
+          value: 'Freud Inc (Diablo Tools)',
+          confidence: 0.99,
+          source_type: 'lov_match',
+          source_url: 'https://www.diablotools.com',
+          snippet: 'Matched brand "Diablo" to parent corporation Freud Inc (Code 2435)',
+          validated_by_lov: true,
+          validated_by_uom: true
+        }
+      }
+    }
   },
   {
-    id: 'prod-003',
-    sku: 'SKU-FIT-001',
-    mpn: '3/8-CPLG-BRS-150',
-    manufacturer: 'Industrial Fittings Corp',
-    brand: 'ProFit',
-    category: 'Fittings',
-    classpath: 'Industrial > Plumbing > Pipe Fittings > Couplings',
-    productName: '3/8 in Brass Coupling',
-    shortDesc: 'ProFit 3/8 in Brass Threaded Coupling, 150 psi Pressure Rating',
-    longDesc: 'ProFit Brass Threaded Coupling, 3/8 in Size, 150 psi Pressure Rating, Lead-Free, ASTM B584 Compliant, For Residential and Commercial Plumbing Applications',
-    mobileDesc: 'ProFit, Coupling, 3/8 in, Brass, 150 psi',
-    invoiceDesc: 'CPLG BRS 3/8 150# THRD',
-    qualityScore: 97,
-    status: 'approved',
-    updatedAt: '2026-08-12T09:15:00Z',
+    mfg_part_num: 'SKU-FLAGGED-018',
+    part_desc: 'Generic 1/2 in. brass replacement valve fitting with unknown thread spec',
+    raw_manuf: 'Acme Hardware Dist',
+    raw_brand: 'Unbranded',
+    manufacturer_name: 'Acme Hardware Distributors',
+    brand_name: 'Unbranded',
+    manufacturer_part_number: 'SKU-FLAGGED-018',
+    department: 'Tools & Hardware',
+    category_class: 'General Hardware',
+    fine_line: 'Industrial Hardware',
+    classpath: 'Tools & Hardware > General Hardware > Industrial Supplies',
+    mobile_desc: '• 1/2" Brass replacement valve fitting',
+    invoice_desc: 'ACME BRASS VALVE FITTING 1/2IN REPL',
+    short_desc: 'Brass replacement valve fitting 1/2".',
+    long_desc1: 'General industrial brass replacement valve fitting for maintenance applications.',
+    retail_desc: 'Brass replacement valve fitting 1/2 in.',
+    marketing_description: 'Quality replacement plumbing component.',
+    product_name: 'Brass Replacement Valve Fitting 1/2"',
     attributes: [
-      { label: 'Fitting Type', value: 'Coupling', normalizedValue: 'Coupling', confidence: 99, source: 'AI Entity Resolution', validation: 'passed', agent: 'Entity Resolution', originalValue: 'CPLG' },
-      { label: 'Material', value: 'Brass', normalizedValue: 'Brass', confidence: 99, source: 'AI Entity Resolution', validation: 'passed', agent: 'Entity Resolution', originalValue: 'BRS' },
-      { label: 'Size', value: '3/8', normalizedValue: '3/8 in', confidence: 98, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Pressure Rating', value: '150', normalizedValue: '150 psi', confidence: 97, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'psi', originalValue: '150#' },
-      { label: 'Connection Type', value: 'Threaded', normalizedValue: 'Threaded', confidence: 92, source: 'AI Inference', validation: 'passed', agent: 'Classification Agent' },
+      { index: 1, label: 'Product Type', value: 'Hardware Item', uom: '', confidence: 0.70, is_lov_valid: false, is_uom_standardized: true },
+      { index: 2, label: 'Diameter', value: '0.5', uom: 'in', confidence: 0.85, is_lov_valid: true, is_uom_standardized: true }
     ],
-    evidence: [
-      { field: 'Fitting Type', value: 'Coupling', source: 'Abbreviation Map', url: '', snippet: 'CPLG → Coupling (abbreviation_map.json)', confidence: 99, extractedBy: 'Entity Resolution Agent', validatedAt: '2026-08-12T09:14:00Z' },
-      { field: 'Material', value: 'Brass', source: 'Abbreviation Map', url: '', snippet: 'BRS → Brass (abbreviation_map.json)', confidence: 99, extractedBy: 'Entity Resolution Agent', validatedAt: '2026-08-12T09:14:00Z' },
-    ],
-    demo: true,
-  },
-  {
-    id: 'prod-004',
-    sku: 'SKU-ABR-001',
-    mpn: 'DCB518ASTS06G',
-    manufacturer: 'Freud Inc',
-    brand: 'Diablo',
-    category: 'Abrasives',
-    classpath: 'Industrial > Abrasives > Sanding Belts',
-    productName: '1/2 in x 18 in Sanding Belt 6-Pack',
-    shortDesc: 'Diablo DCB518ASTS06G 1/2 in x 18 in Sanding Belt, 6-Pack',
-    longDesc: 'Diablo Sanding Belt, 1/2 in W x 18 in L, Aluminum Oxide, For General Purpose Sanding, 6 Per Package',
-    mobileDesc: 'Diablo, Sanding Belt, 1/2 x 18 in, 6-Pack',
-    invoiceDesc: 'SANDING BELT 1/2X18 6PK',
-    qualityScore: 88,
-    status: 'validated',
-    updatedAt: '2026-08-12T08:45:00Z',
-    attributes: [
-      { label: 'Abrasive Type', value: 'Sanding Belt', normalizedValue: 'Sanding Belt', confidence: 96, source: 'Part Description', validation: 'passed', agent: 'Classification Agent' },
-      { label: 'Width', value: '1/2', normalizedValue: '1/2 in', confidence: 95, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Length', value: '18', normalizedValue: '18 in', confidence: 95, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Pack Quantity', value: '6', normalizedValue: '6 pc', confidence: 97, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'pc' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-005',
-    sku: 'SKU-LGT-001',
-    mpn: '549469',
-    manufacturer: 'Philips Lighting',
-    brand: 'Philips',
-    category: 'Lighting',
-    classpath: 'Industrial > Lighting > LED Bulbs',
-    productName: 'LED A19 Bulb',
-    shortDesc: 'Philips 549469 LED A19 Bulb, 8.5 W, Medium (E26) Base, 2700K Warm White',
-    longDesc: 'Philips LED A19 Bulb, 8.5 W, 800 Lumens, Medium (E26) Base, 2700K Warm White Color Temperature, Dimmable, 10,000 Hour Rated Life, Energy Star Qualified',
-    mobileDesc: 'Philips, LED A19, 8.5W, 2700K, E26',
-    invoiceDesc: 'LED A19 8.5W 2700K MED E26 DIM',
-    qualityScore: 92,
-    status: 'approved',
-    updatedAt: '2026-08-12T07:30:00Z',
-    attributes: [
-      { label: 'Bulb Type', value: 'LED', normalizedValue: 'LED', confidence: 99, source: 'Part Description', validation: 'passed', agent: 'Classification Agent' },
-      { label: 'Wattage', value: '8.5', normalizedValue: '8.5 W', confidence: 98, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'W' },
-      { label: 'Color Temperature', value: '2700K', normalizedValue: '2700K', confidence: 97, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Base Type', value: 'Medium (E26)', normalizedValue: 'Medium (E26)', confidence: 96, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Lumens', value: '800', normalizedValue: '800 lm', confidence: 94, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Enrichment Agent', uom: 'lm' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-006',
-    sku: 'SKU-ELC-001',
-    mpn: '1700-1PK-BB40',
-    manufacturer: '3M Company',
-    brand: '3M',
-    category: 'Electrical',
-    classpath: 'Industrial > Electrical > Tapes',
-    productName: 'Vinyl Electrical Tape',
-    shortDesc: '3M 1700 3/4 in x 60 ft Vinyl Electrical Tape, Black',
-    longDesc: '3M 1700 Series Vinyl Electrical Tape, 3/4 in W x 60 ft L, Black, 7 mil Thickness, UL Listed, CSA Certified, For General Purpose Electrical Insulation',
-    mobileDesc: '3M, Vinyl Electrical Tape, 3/4 x 60 ft, Black',
-    invoiceDesc: 'TAPE ELEC VINYL 3/4X60 BLK',
-    qualityScore: 85,
-    status: 'validated',
-    updatedAt: '2026-08-12T06:00:00Z',
-    attributes: [
-      { label: 'Width', value: '3/4', normalizedValue: '3/4 in', confidence: 97, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Length', value: '60', normalizedValue: '60 ft', confidence: 96, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'ft' },
-      { label: 'Color', value: 'Black', normalizedValue: 'Black', confidence: 95, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-007',
-    sku: 'SKU-ABR-002',
-    mpn: '49-94-1920',
-    manufacturer: 'Milwaukee Accessory',
-    brand: 'Milwaukee',
-    category: 'Abrasives',
-    classpath: 'Industrial > Abrasives > Cut-Off Wheels',
-    productName: 'Metal Cut-Off Disc',
-    shortDesc: 'Milwaukee 49-94-1920 7 in x 1/8 in x 5/8 in Metal Cut-Off Disc',
-    longDesc: 'Milwaukee Metal Cut-Off Disc, 7 in Diameter, 1/8 in Thickness, 5/8 in Arbor Size, Aluminum Oxide, For Metal Cutting Applications',
-    mobileDesc: 'Milwaukee, Cut-Off Disc, 7 in, Metal',
-    invoiceDesc: 'CUT-OFF 7X1/8X5/8 MTL',
-    qualityScore: 90,
-    status: 'approved',
-    updatedAt: '2026-08-12T09:00:00Z',
-    attributes: [
-      { label: 'Abrasive Type', value: 'Cut-Off Wheel', normalizedValue: 'Cut-Off Wheel', confidence: 98, source: 'Part Description', validation: 'passed', agent: 'Classification Agent' },
-      { label: 'Diameter', value: '7', normalizedValue: '7 in', confidence: 97, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Thickness', value: '1/8', normalizedValue: '1/8 in', confidence: 96, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Arbor Size', value: '5/8', normalizedValue: '5/8 in', confidence: 95, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Material', value: 'Aluminum Oxide', normalizedValue: 'Aluminum Oxide', confidence: 88, source: 'AI Inference', validation: 'passed', agent: 'Enrichment Agent' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-008',
-    sku: 'SKU-FCT-001',
-    mpn: 'KS-8200',
-    manufacturer: 'Delta Faucet Company',
-    brand: 'Delta',
-    category: 'Faucets',
-    classpath: 'Industrial > Plumbing > Faucets > Kitchen Faucets',
-    productName: 'Single Handle Kitchen Faucet',
-    shortDesc: 'Delta KS-8200 Single Handle Kitchen Faucet, Pull-Down Sprayer, Chrome Finish',
-    longDesc: 'Delta Single Handle Kitchen Faucet With Pull-Down Sprayer, Chrome Finish, Deck Mount, 1.8 GPM Flow Rate, ADA Compliant, WaterSense Certified',
-    mobileDesc: 'Delta, Kitchen Faucet, Single Handle, Chrome',
-    invoiceDesc: 'FAUCET KTCHN SNGL HNDL CHRM PD',
-    qualityScore: 91,
-    status: 'approved',
-    updatedAt: '2026-08-12T08:00:00Z',
-    attributes: [
-      { label: 'Faucet Type', value: 'Kitchen', normalizedValue: 'Kitchen', confidence: 99, source: 'Part Description', validation: 'passed', agent: 'Classification Agent' },
-      { label: 'Handle Type', value: 'Single Handle', normalizedValue: 'Single Handle', confidence: 98, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Finish', value: 'Chrome', normalizedValue: 'Chrome', confidence: 97, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Mounting Type', value: 'Deck Mount', normalizedValue: 'Deck Mount', confidence: 94, source: 'AI Inference', validation: 'passed', agent: 'Enrichment Agent' },
-      { label: 'Flow Rate', value: '1.8', normalizedValue: '1.8 GPM', confidence: 89, source: 'Manufacturer Documentation', validation: 'passed', agent: 'Enrichment Agent', uom: 'GPM' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-009',
-    sku: 'SKU-ABR-003',
-    mpn: '3MABR-7100075678',
-    manufacturer: '3M Company',
-    brand: 'Cubitron II',
-    category: 'Abrasives',
-    classpath: 'Industrial > Abrasives > Sanding Discs',
-    productName: '775L Stikit Film Disc P150',
-    shortDesc: '3M Cubitron II 775L Stikit Film Disc, P150 Grit, 50 Discs Per Box',
-    longDesc: '3M Cubitron II 775L Stikit Film Sanding Disc, P150 Grit, Precision-Shaped Ceramic Grain, Consistent Cut Rate, 50 Discs Per Box',
-    mobileDesc: '3M, Cubitron II, 775L, P150, 50/Box',
-    invoiceDesc: 'SANDING DISC 775L P150 CUBITRON 50/BX',
-    qualityScore: 87,
-    status: 'validated',
-    updatedAt: '2026-08-12T07:00:00Z',
-    attributes: [
-      { label: 'Abrasive Type', value: 'Sanding Disc', normalizedValue: 'Sanding Disc', confidence: 97, source: 'Part Description', validation: 'passed', agent: 'Classification Agent' },
-      { label: 'Grit', value: 'P150', normalizedValue: 'P150', confidence: 99, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction' },
-      { label: 'Material', value: 'Ceramic', normalizedValue: 'Ceramic', confidence: 93, source: 'AI Inference', validation: 'passed', agent: 'Enrichment Agent' },
-      { label: 'Pack Quantity', value: '50', normalizedValue: '50 pc', confidence: 98, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'pc' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-010',
-    sku: 'SKU-ABR-004',
-    mpn: '5B-332-080',
-    manufacturer: 'Mirka Abrasives Inc',
-    brand: 'Mirka',
-    category: 'Abrasives',
-    classpath: 'Industrial > Abrasives > Sanding Discs',
-    productName: 'HIOLIT 5 in Sanding Disc P80',
-    shortDesc: 'Mirka HIOLIT 5B-332-080 5 in Sanding Disc, P80 Grit',
-    longDesc: 'Mirka HIOLIT Sanding Disc, 5 in Diameter, P80 Grit, Hook and Loop Attachment, Aluminum Oxide, For Wood and Metal Sanding',
-    mobileDesc: 'Mirka, HIOLIT, 5 in, P80',
-    invoiceDesc: 'SANDING DISC HIOLIT 5 P80',
-    qualityScore: 82,
-    status: 'enriched',
-    updatedAt: '2026-08-12T06:30:00Z',
-    attributes: [
-      { label: 'Abrasive Type', value: 'Sanding Disc', normalizedValue: 'Sanding Disc', confidence: 96, source: 'Part Description', validation: 'passed', agent: 'Classification Agent' },
-      { label: 'Diameter', value: '5', normalizedValue: '5 in', confidence: 98, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Grit', value: 'P80', normalizedValue: 'P80', confidence: 99, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-011',
-    sku: 'SKU-GRD-001',
-    mpn: '49-94-0501',
-    manufacturer: 'Milwaukee Accessory',
-    brand: 'Milwaukee',
-    category: 'Abrasives',
-    classpath: 'Industrial > Abrasives > Grinding Wheels',
-    productName: '4 in Metal Grinding Wheel',
-    shortDesc: 'Milwaukee 49-94-0501 4 in x 1/4 in x 5/8 in Metal Grinding Wheel',
-    longDesc: 'Milwaukee Metal Grinding Wheel, 4 in Diameter, 1/4 in Thickness, 5/8 in Arbor Size, Aluminum Oxide Grain, For Metal Grinding Applications, Maximum RPM 15,200',
-    mobileDesc: 'Milwaukee, Grinding Wheel, 4 in, Metal',
-    invoiceDesc: 'GRINDING WHL 4X1/4X5/8 MTL',
-    qualityScore: 89,
-    status: 'approved',
-    updatedAt: '2026-08-12T05:45:00Z',
-    attributes: [
-      { label: 'Abrasive Type', value: 'Grinding Wheel', normalizedValue: 'Grinding Wheel', confidence: 98, source: 'Part Description', validation: 'passed', agent: 'Classification Agent' },
-      { label: 'Diameter', value: '4', normalizedValue: '4 in', confidence: 99, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Thickness', value: '1/4', normalizedValue: '1/4 in', confidence: 97, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-      { label: 'Arbor Size', value: '5/8', normalizedValue: '5/8 in', confidence: 96, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-012',
-    sku: 'SKU-MSN-001',
-    mpn: '49-94-1955',
-    manufacturer: 'Milwaukee Accessory',
-    brand: 'Milwaukee',
-    category: 'Abrasives',
-    classpath: 'Industrial > Abrasives > Grinding Wheels',
-    productName: '4-1/2 in Masonry Grinding Wheel',
-    shortDesc: 'Milwaukee 49-94-1955 4-1/2 in x 1/4 in x 7/8 in Masonry Grinding Wheel',
-    longDesc: 'Milwaukee Masonry Grinding Wheel, 4-1/2 in Diameter, 1/4 in Thickness, 7/8 in Arbor Size, Silicon Carbide, For Masonry and Concrete Grinding',
-    mobileDesc: 'Milwaukee, Grinding Wheel, 4-1/2 in, Masonry',
-    invoiceDesc: 'GRINDING WHL 4-1/2X1/4X7/8 MASONRY',
-    qualityScore: 86,
-    status: 'validated',
-    updatedAt: '2026-08-12T05:30:00Z',
-    attributes: [
-      { label: 'Abrasive Type', value: 'Grinding Wheel', normalizedValue: 'Grinding Wheel', confidence: 97, source: 'Part Description', validation: 'passed', agent: 'Classification Agent' },
-      { label: 'Diameter', value: '4-1/2', normalizedValue: '4-1/2 in', confidence: 98, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  // Additional products for needs-review and processing states
-  {
-    id: 'prod-013',
-    sku: 'SKU-FIT-002',
-    mpn: 'BR-COUP-1/2',
-    manufacturer: 'Unknown Supplier',
-    brand: '',
-    category: 'Fittings',
-    classpath: 'Industrial > Plumbing > Pipe Fittings',
-    productName: '1/2 in Brass Coupling',
-    shortDesc: 'Brass Coupling, 1/2 in',
-    longDesc: '',
-    mobileDesc: '',
-    invoiceDesc: 'BR COUP 1/2',
-    qualityScore: 42,
-    status: 'needs-review',
-    updatedAt: '2026-08-12T11:00:00Z',
-    attributes: [
-      { label: 'Fitting Type', value: 'Coupling', normalizedValue: 'Coupling', confidence: 95, source: 'AI Entity Resolution', validation: 'passed', agent: 'Entity Resolution', originalValue: 'COUP' },
-      { label: 'Material', value: 'Brass', normalizedValue: 'Brass', confidence: 88, source: 'AI Entity Resolution', validation: 'passed', agent: 'Entity Resolution', originalValue: 'BR' },
-      { label: 'Size', value: '1/2', normalizedValue: '1/2 in', confidence: 96, source: 'Part Description', validation: 'passed', agent: 'Attribute Extraction', uom: 'in' },
-    ],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-014',
-    sku: 'SKU-UNK-001',
-    mpn: 'XYZ-WIDGET-A1',
-    manufacturer: '',
-    brand: '',
-    category: '',
-    classpath: '',
-    productName: 'Unknown Product',
-    shortDesc: '',
-    longDesc: '',
-    mobileDesc: '',
-    invoiceDesc: 'XYZ WIDGET A1',
-    qualityScore: 15,
-    status: 'failed',
-    updatedAt: '2026-08-12T11:30:00Z',
-    attributes: [],
-    evidence: [],
-    demo: true,
-  },
-  {
-    id: 'prod-015',
-    sku: 'SKU-SPG-001',
-    mpn: 'DFBLBLOMFN01G',
-    manufacturer: 'Freud Inc',
-    brand: 'Diablo',
-    category: 'Abrasives',
-    classpath: 'Industrial > Abrasives > Sanding Sponges',
-    productName: '220 Grit Flat Edge Sanding Sponge',
-    shortDesc: 'Diablo DFBLBLOMFN01G 220 Grit Flat Edge Sanding Sponge',
-    longDesc: 'Diablo Flat Edge Sanding Sponge, 220 Grit, For Fine Finishing, Flexible Foam Core, Dual-Sided',
-    mobileDesc: 'Diablo, Sanding Sponge, 220 Grit, Flat Edge',
-    invoiceDesc: 'SANDING SPONGE 220 FLAT EDGE',
-    qualityScore: 78,
-    status: 'enriched',
-    updatedAt: '2026-08-12T08:15:00Z',
-    attributes: [
-      { label: 'Abrasive Type', value: 'Sanding Sponge', normalizedValue: 'Sanding Sponge', confidence: 95, source: 'Part Description', validation: 'passed', agent: 'Classification Agent' },
-      { label: 'Grit', value: '220', normalizedValue: 'P220', confidence: 91, source: 'AI Inference', validation: 'warning', agent: 'Attribute Extraction' },
-    ],
-    evidence: [],
-    demo: true,
-  },
+    confidence: {
+      manufacturer_confidence: 0.72,
+      brand_confidence: 0.50,
+      classpath_confidence: 0.70,
+      attribute_confidence: 0.75,
+      overall_confidence: 0.6675,
+      needs_human_review: true,
+      flagged_reasons: [
+        'Overall confidence below threshold (85%)',
+        'Brand resolution low confidence (50%)',
+        'Taxonomy classified via fallback rule'
+      ]
+    },
+    evidence_graph: {
+      product_mpn: 'SKU-FLAGGED-018',
+      evidences: {
+        'Flagged Reason': {
+          field_name: 'Human Review Trigger',
+          value: 'Confidence 66.8% < 85.0% threshold',
+          confidence: 0.67,
+          source_type: 'deterministic',
+          snippet: 'Input description lacked explicit manufacturer code and certified standard approvals',
+          validated_by_lov: false,
+          validated_by_uom: true
+        }
+      }
+    },
+    actual_image_yes_no: 'No',
+    item_features: [],
+    ref_urls: [],
+    alternate_images: []
+  }
 ];
 
-// ================================================================
-// AGENTS
-// ================================================================
-export const agents: Agent[] = [
-  { id: 'agent-001', name: 'Product Understanding', description: 'Parses raw product descriptions to extract initial entities', status: 'active', executions: 1847, avgLatency: 1.2, successRate: 98.3, lastRun: '2026-08-12T14:58:00Z', icon: 'brain' },
-  { id: 'agent-002', name: 'Entity Resolution', description: 'Resolves abbreviations and maps to canonical entities', status: 'active', executions: 1847, avgLatency: 0.8, successRate: 97.1, lastRun: '2026-08-12T14:58:00Z', icon: 'link' },
-  { id: 'agent-003', name: 'Classification', description: 'Assigns products to taxonomy categories and classpaths', status: 'active', executions: 1847, avgLatency: 1.5, successRate: 95.8, lastRun: '2026-08-12T14:58:00Z', icon: 'layers' },
-  { id: 'agent-004', name: 'Attribute Extraction', description: 'Extracts structured attributes from descriptions and documents', status: 'active', executions: 1847, avgLatency: 2.1, successRate: 96.4, lastRun: '2026-08-12T14:58:00Z', icon: 'tags' },
-  { id: 'agent-005', name: 'Enrichment', description: 'Retrieves missing information from manufacturer sources', status: 'active', executions: 1203, avgLatency: 3.4, successRate: 91.2, lastRun: '2026-08-12T14:55:00Z', icon: 'sparkles' },
-  { id: 'agent-006', name: 'Content Generation', description: 'Generates descriptions, titles, and marketing content', status: 'active', executions: 1847, avgLatency: 2.8, successRate: 94.6, lastRun: '2026-08-12T14:58:00Z', icon: 'file-text' },
-  { id: 'agent-007', name: 'Validation', description: 'Validates against LOV, UOM, taxonomy, and business rules', status: 'active', executions: 1847, avgLatency: 0.5, successRate: 99.1, lastRun: '2026-08-12T14:58:00Z', icon: 'shield-check' },
-  { id: 'agent-008', name: 'Review', description: 'Flags low-confidence records for human review', status: 'active', executions: 342, avgLatency: 0.3, successRate: 100, lastRun: '2026-08-12T14:58:00Z', icon: 'user-check' },
+export const MOCK_PRICING_TIERS: PricingTier[] = [
+  {
+    name: 'Prototype / Evaluation',
+    tag: 'Free Trial',
+    features: [
+      'Up to 1,000 SKUs batch processing',
+      '8-Agent Multi-Agent Orchestration',
+      'Entity Resolution & Canonical Matching',
+      'Standard 4-tier Taxonomy Classification',
+      'Regex & LLM Attribute Triplet Extraction',
+      'Evidence Graph & Provenance Audit Trail',
+      'Interactive Web Dashboard with Review Queue',
+      'CSV & JSON catalog export formats'
+    ],
+    cta: 'Start Free Evaluation'
+  },
+  {
+    name: 'Team / Growth',
+    tag: 'Popular',
+    highlighted: true,
+    features: [
+      'Up to 50,000 SKUs per month',
+      'Everything in Prototype, plus:',
+      'Custom LOV & UOM dictionary ingestion',
+      'Multi-source manufacturer PDF spec scraping',
+      'Automated Confidence scoring & human review routing',
+      'REST API access with webhook callbacks',
+      'Dedicated category rules engine tuning',
+      'Priority email and Slack support',
+      '99.5% uptime SLA'
+    ],
+    cta: 'Request Growth Access'
+  },
+  {
+    name: 'Enterprise / Custom',
+    tag: 'Custom Scale',
+    features: [
+      'Unlimited SKUs & real-time streaming ingestion',
+      'Everything in Team, plus:',
+      'Private VPC or on-prem air-gapped deployment',
+      'Direct PIM / ERP bi-directional sync (Akeneo, Salsify, SAP)',
+      'Custom LLM fine-tuning on proprietary master catalogs',
+      'SOC 2 Type II compliance & role-based access control',
+      'Custom 250+ column export format mapping',
+      '24/7 dedicated solutions architect & enterprise SLA'
+    ],
+    cta: 'Contact Enterprise Solutions'
+  }
 ];
 
-// ================================================================
-// ENRICHMENT JOBS
-// ================================================================
-export const enrichmentJobs: EnrichmentJob[] = [
-  { id: 'job-001', name: 'Appliance Enrichment Batch', products: 42, source: 'Manufacturer Websites', attributesAdded: 186, successRate: 94, startedAt: '2026-08-12T08:00:00Z', duration: '12m 34s', status: 'completed' },
-  { id: 'job-002', name: 'Abrasives Full Enrichment', products: 156, source: 'Manufacturer Documentation', attributesAdded: 624, successRate: 91, startedAt: '2026-08-12T09:00:00Z', duration: '28m 12s', status: 'completed' },
-  { id: 'job-003', name: 'Lighting Catalog Update', products: 111, source: 'Philips Product Database', attributesAdded: 0, successRate: 0, startedAt: '2026-08-12T14:00:00Z', duration: '—', status: 'running' },
-  { id: 'job-004', name: 'Fittings Attribute Fill', products: 89, source: 'Manufacturer Websites', attributesAdded: 312, successRate: 88, startedAt: '2026-08-11T22:00:00Z', duration: '18m 45s', status: 'completed' },
+export const MOCK_FAQS: FAQItem[] = [
+  {
+    question: 'How is Nexora different from a traditional PIM (Product Information Management) system?',
+    answer: 'Traditional PIMs are static repositories where catalog managers must manually key in attributes, write descriptions, and cross-reference spreadsheets. Nexora is an autonomous intelligence layer that sits upstream: our multi-agent AI pipeline takes messy, incomplete supplier data, enriches and standardizes it with full evidence provenance, and pushes clean, audit-ready data directly into your PIM or ERP.'
+  },
+  {
+    question: 'How does the 8-agent pipeline ensure zero hallucinations on critical product specs?',
+    answer: 'Nexora enforces deterministic guardrails at every stage. Numbers, dimensions, and electrical ratings are extracted using strict regex parsers and validated against canonical List of Values (LOV) dictionaries and standard UOM mappings. Every extracted attribute generates an Evidence Item linking back to exact source text, spec sheet PDFs, or manufacturer URLs with cryptographic traceability.'
+  },
+  {
+    question: 'What happens when a product falls below the 85% confidence threshold?',
+    answer: 'Any product with a composite confidence score under 85% is automatically flagged and routed to the Human-in-the-Loop (HITL) Review Queue. The reviewer is shown the exact flagged reasons, raw inputs, proposed values, and side-by-side evidence snippets to approve or edit with one click.'
+  },
+  {
+    question: 'Can Nexora handle large catalogs with hundreds of thousands of SKUs?',
+    answer: 'Yes. Our pipeline is architected for asynchronous horizontal batch processing. In our production benchmark, 1,000 complex industrial SKUs were fully resolved, classified, enriched with 3,400+ attribute triplets, and validated in under 30 seconds with 100% manufacturer resolution.'
+  },
+  {
+    question: 'What input data formats and sources are supported?',
+    answer: 'Nexora ingests CSV, Excel (.xlsx), raw JSON payloads, vendor spec PDFs, high-res product renders, and live REST API feeds. The pipeline automatically normalizes field name variations across suppliers.'
+  }
 ];
 
-// ================================================================
-// VALIDATION RULES
-// ================================================================
-export const validationRules: ValidationRule[] = [
-  { id: 'val-001', name: 'LOV Validation', description: 'Attribute values must match List of Values for the category', passed: 892, failed: 34, warning: 18, skipped: 56, total: 1000 },
-  { id: 'val-002', name: 'UOM Validation', description: 'Units of measure must use standardized abbreviations', passed: 978, failed: 12, warning: 8, skipped: 2, total: 1000 },
-  { id: 'val-003', name: 'Manufacturer Validation', description: 'Manufacturer must exist in the master manufacturer list', passed: 945, failed: 55, warning: 0, skipped: 0, total: 1000 },
-  { id: 'val-004', name: 'Brand Validation', description: 'Brand must be resolved from unbranded to a valid brand', passed: 834, failed: 112, warning: 54, skipped: 0, total: 1000 },
-  { id: 'val-005', name: 'Taxonomy Validation', description: 'Product must be classified in a valid classpath', passed: 912, failed: 23, warning: 65, skipped: 0, total: 1000 },
-  { id: 'val-006', name: 'Character Limits', description: 'Descriptions must not exceed field-specific character limits', passed: 987, failed: 8, warning: 5, skipped: 0, total: 1000 },
-  { id: 'val-007', name: 'Required Fields', description: 'All required fields for the category must be populated', passed: 876, failed: 67, warning: 57, skipped: 0, total: 1000 },
-  { id: 'val-008', name: 'Source Verification', description: 'Enriched attributes must have traceable source evidence', passed: 756, failed: 89, warning: 155, skipped: 0, total: 1000 },
-  { id: 'val-009', name: 'Consistency Checks', description: 'Cross-field consistency (e.g., brand matches manufacturer)', passed: 901, failed: 45, warning: 54, skipped: 0, total: 1000 },
-];
-
-// ================================================================
-// REVIEW ITEMS
-// ================================================================
-export const reviewItems: ReviewItem[] = [
-  { id: 'rev-001', productId: 'prod-013', productName: '1/2 in Brass Coupling', issue: 'Low manufacturer confidence', field: 'Manufacturer', currentValue: 'Unknown Supplier', suggestedValue: 'Industrial Fittings Corp', evidence: 'Multiple brand matches found in manufacturer database', confidence: 61, status: 'pending' },
-  { id: 'rev-002', productId: 'prod-015', productName: '220 Grit Flat Edge Sanding Sponge', issue: 'Grit normalization uncertain', field: 'Grit', currentValue: '220', suggestedValue: 'P220', evidence: 'Grit value "220" may map to either P220 (FEPA) or 220 (CAMI)', confidence: 72, status: 'pending' },
-  { id: 'rev-003', productId: 'prod-014', productName: 'Unknown Product', issue: 'Classification failed', field: 'Category', currentValue: '', suggestedValue: '', evidence: 'Insufficient information to classify product', confidence: 15, status: 'pending' },
-  { id: 'rev-004', productId: 'prod-004', productName: '1/2 in x 18 in Sanding Belt 6-Pack', issue: 'Missing material specification', field: 'Material', currentValue: '', suggestedValue: 'Aluminum Oxide', evidence: 'Diablo sanding belts typically use aluminum oxide grain', confidence: 78, status: 'pending' },
-];
-
-// ================================================================
-// ANALYTICS
-// ================================================================
-export const analyticsData: AnalyticsData = {
-  productsProcessed: 1000,
-  attributesExtracted: 12847,
-  avgQualityScore: 87,
-  validatedRecords: 834,
-  humanReviewQueue: 42,
-  sourceCoverage: 76,
-  qualityTrend: [
-    { date: 'Week 1', score: 62 },
-    { date: 'Week 2', score: 71 },
-    { date: 'Week 3', score: 78 },
-    { date: 'Week 4', score: 83 },
-    { date: 'Week 5', score: 87 },
-  ],
-  processingVolume: [
-    { date: 'Mon', count: 120 },
-    { date: 'Tue', count: 185 },
-    { date: 'Wed', count: 210 },
-    { date: 'Thu', count: 175 },
-    { date: 'Fri', count: 230 },
-    { date: 'Sat', count: 80 },
-    { date: 'Sun', count: 0 },
-  ],
-  categoryDistribution: [
-    { name: 'Abrasives', count: 156, percentage: 15.6 },
-    { name: 'Lighting', count: 111, percentage: 11.1 },
-    { name: 'Power Tools', count: 108, percentage: 10.8 },
-    { name: 'Lumber', count: 85, percentage: 8.5 },
-    { name: 'Fittings', count: 89, percentage: 8.9 },
-    { name: 'Electrical', count: 67, percentage: 6.7 },
-    { name: 'Appliances', count: 42, percentage: 4.2 },
-    { name: 'Faucets', count: 34, percentage: 3.4 },
-    { name: 'HVAC', count: 23, percentage: 2.3 },
-    { name: 'Other', count: 285, percentage: 28.5 },
-  ],
-  validationFailures: [
-    { rule: 'Brand Validation', count: 112 },
-    { rule: 'Source Verification', count: 89 },
-    { rule: 'Required Fields', count: 67 },
-    { rule: 'Manufacturer Validation', count: 55 },
-    { rule: 'Consistency Checks', count: 45 },
-    { rule: 'LOV Validation', count: 34 },
-    { rule: 'Taxonomy Validation', count: 23 },
-  ],
-};
-
-// ================================================================
-// BLOG POSTS
-// ================================================================
-export const blogPosts: BlogPost[] = [
+export const MOCK_TESTIMONIALS: Testimonial[] = [
   {
-    id: 'blog-001',
-    slug: 'what-is-product-data-intelligence',
-    title: 'What Is Product Data Intelligence and Why Does It Matter?',
-    excerpt: 'Industrial product data is the backbone of B2B commerce. Learn how Product Data Intelligence transforms raw SKU records into structured, commerce-ready product content.',
-    category: 'Product Intelligence',
-    author: 'NEXORA Research',
-    publishedAt: '2026-08-01',
-    readTime: '8 min read',
-    featured: true,
+    quote: 'Nexora cut our catalog onboarding time from 3 weeks to under 2 hours. The evidence graph gives our enterprise retail partners total confidence in the data accuracy.',
+    name: 'Marcus Vance',
+    title: 'VP of eCommerce & Catalog Operations',
+    company: 'Industrial Supply Direct'
   },
   {
-    id: 'blog-002',
-    slug: 'lov-constrained-ai-generation',
-    title: 'LOV-Constrained AI: Why Controlled Vocabularies Prevent Hallucinations',
-    excerpt: 'AI models can generate fluent text, but fluency is not accuracy. Learn how List of Values (LOV) constraints ensure generated product attributes are factually correct.',
-    category: 'AI & Validation',
-    author: 'NEXORA Research',
-    publishedAt: '2026-07-28',
-    readTime: '6 min read',
-    featured: false,
+    quote: 'The automated attribute triplet extraction and LOV validation resolved over 15,000 legacy compliance errors without our merchandising team having to touch a spreadsheet.',
+    name: 'Elena Rostova',
+    title: 'Director of Product Data Governance',
+    company: 'Apex Building Products'
   },
   {
-    id: 'blog-003',
-    slug: 'entity-resolution-industrial-products',
-    title: 'Entity Resolution for Industrial Products: From Abbreviations to Canonical Names',
-    excerpt: 'CPLG, COUP, Coupling — same product, different representations. How entity resolution creates a single source of truth for product identities.',
-    category: 'Data Quality',
-    author: 'NEXORA Research',
-    publishedAt: '2026-07-22',
-    readTime: '7 min read',
-    featured: false,
-  },
-  {
-    id: 'blog-004',
-    slug: 'rag-product-enrichment',
-    title: 'RAG for Product Data: Retrieval-Augmented Enrichment in Practice',
-    excerpt: 'How Retrieval-Augmented Generation (RAG) enables evidence-backed product enrichment by grounding AI outputs in manufacturer documentation.',
-    category: 'AI & Validation',
-    author: 'NEXORA Research',
-    publishedAt: '2026-07-15',
-    readTime: '9 min read',
-    featured: false,
-  },
-  {
-    id: 'blog-005',
-    slug: 'ai-commerce-machine-readable-products',
-    title: 'AI Commerce: Why Products Need to Be Machine-Readable',
-    excerpt: 'AI shopping agents don\'t browse — they query structured data. Preparing product catalogs for AI-native commerce requires structured, validated product intelligence.',
-    category: 'AI Commerce',
-    author: 'NEXORA Research',
-    publishedAt: '2026-07-08',
-    readTime: '5 min read',
-    featured: false,
-  },
-];
-
-// ================================================================
-// CASE STUDIES
-// ================================================================
-export const caseStudies: CaseStudy[] = [
-  {
-    id: 'cs-001',
-    slug: 'industrial-distributor-catalog-enrichment',
-    title: 'How a National Industrial Distributor Enriched 50,000 SKUs',
-    excerpt: 'A demo case study showing how NEXORA could process and enrich 50,000 raw industrial SKUs, improving data quality from 35% to 94%.',
-    industry: 'Industrial Distribution',
-    metrics: { skusProcessed: 50000, qualityBefore: 35, qualityAfter: 94, timeSaved: '6,200 hours', automationRate: 89 },
-    isDemo: true,
-  },
-  {
-    id: 'cs-002',
-    slug: 'plumbing-manufacturer-product-onboarding',
-    title: 'Accelerating Product Onboarding for a Plumbing Manufacturer',
-    excerpt: 'A demo scenario illustrating how NEXORA could reduce product onboarding time from weeks to hours for a plumbing fittings manufacturer.',
-    industry: 'Plumbing & Fittings',
-    metrics: { skusProcessed: 8500, qualityBefore: 42, qualityAfter: 96, timeSaved: '1,400 hours', automationRate: 92 },
-    isDemo: true,
-  },
+    quote: 'Being able to audit the AI reasoning step-by-step with source PDF citations makes Nexora the only enterprise-ready product enrichment solution on the market.',
+    name: 'Devin Kulkarni',
+    title: 'Chief Technology Officer',
+    company: 'Global Retail Commerce Network'
+  }
 ];

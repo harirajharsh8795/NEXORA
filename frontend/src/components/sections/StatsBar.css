@@ -1,0 +1,33 @@
+.stats-bar {
+  padding: var(--space-xl) var(--space-lg);
+  border-top: 1px solid var(--border-card);
+  border-bottom: 1px solid var(--border-card);
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.dark .stats-bar {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.stats-bar__inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

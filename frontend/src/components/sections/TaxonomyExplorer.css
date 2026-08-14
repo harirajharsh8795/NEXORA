@@ -1,0 +1,258 @@
+.taxonomy-section {
+  padding: var(--space-4xl) var(--space-lg);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.taxonomy-deepdives {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  margin-top: var(--space-2xl);
+  margin-bottom: var(--space-2xl);
+}
+
+@media (min-width: 768px) {
+  .taxonomy-deepdives {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.deepdive-card {
+  padding: var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: var(--shadow-glow);
+}
+
+.deepdive-card--lighting {
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.deepdive-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.deepdive-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--nexora-purple);
+  letter-spacing: 0.05em;
+}
+
+.deepdive-badge--cyan {
+  color: var(--nexora-cyan);
+}
+
+.deepdive-sku-pill {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--nexora-purple);
+  border-radius: var(--radius-sm);
+}
+
+.deepdive-sku-pill--cyan {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--nexora-cyan);
+}
+
+.deepdive-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.deepdive-classpath {
+  font-family: var(--font-mono);
+  font-size: 0.775rem;
+  color: var(--nexora-cyan);
+}
+
+.deepdive-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.deepdive-attributes-box {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.dark .deepdive-attributes-box {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.box-title {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-subtle);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-xs);
+}
+
+.deepdive-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.attr-tag {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.55rem;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+}
+
+.attr-tag--cyan {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.2);
+}
+
+.taxonomy-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  margin-top: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+}
+
+.filter-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-right: var(--space-xs);
+}
+
+.taxonomy-tab {
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.taxonomy-tab:hover {
+  border-color: var(--nexora-purple);
+  color: var(--nexora-purple);
+}
+
+.taxonomy-tab--active {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: var(--nexora-purple);
+  color: var(--nexora-purple);
+  font-weight: 600;
+}
+
+.taxonomy-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+  .taxonomy-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .taxonomy-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.taxonomy-card {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.taxonomy-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xs);
+}
+
+.dept-badge {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--nexora-cyan);
+}
+
+.sku-count-pill {
+  font-family: var(--font-mono);
+  font-size: 0.725rem;
+  padding: 0.15rem 0.5rem;
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--nexora-cyan);
+  border-radius: var(--radius-sm);
+}
+
+.fine-line-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.class-name {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.classpath-box {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.dark .classpath-box {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.classpath-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-subtle);
+  margin-bottom: 0.2rem;
+}
+
+.classpath-code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--nexora-purple);
+  word-break: break-all;
+}
+
+.taxonomy-footer-note {
+  margin-top: var(--space-2xl);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}

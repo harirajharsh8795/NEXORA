@@ -1,0 +1,103 @@
+.nexora-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.nexora-btn:focus-visible {
+  outline: 2px solid var(--nexora-purple);
+  outline-offset: 2px;
+}
+
+/* Sizes */
+.nexora-btn--sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+}
+
+.nexora-btn--md {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+}
+
+.nexora-btn--lg {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+}
+
+/* Full width */
+.nexora-btn--full {
+  width: 100%;
+}
+
+/* Primary — gradient from purple to pink */
+.nexora-btn--primary {
+  background: linear-gradient(135deg, var(--nexora-purple), var(--nexora-pink));
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+}
+
+.nexora-btn--primary:hover {
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
+  transform: translateY(-1px);
+}
+
+.nexora-btn--primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
+}
+
+/* Secondary — outlined with glass */
+.nexora-btn--secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-card);
+  backdrop-filter: blur(8px);
+}
+
+.nexora-btn--secondary:hover {
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Ghost — minimal, no background */
+.nexora-btn--ghost {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.nexora-btn--ghost:hover {
+  color: var(--text-main);
+  background: rgba(168, 85, 247, 0.08);
+}
+
+/* Outline — border only */
+.nexora-btn--outline {
+  background: transparent;
+  color: var(--nexora-purple);
+  border: 1.5px solid var(--nexora-purple);
+}
+
+.nexora-btn--outline:hover {
+  background: rgba(168, 85, 247, 0.1);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Icon */
+.nexora-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.1em;
+}
