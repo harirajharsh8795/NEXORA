@@ -18,7 +18,7 @@ export default function StatCard({ value, label, sublabel, icon, accentColor }: 
         </div>
       )}
       <div
-        className="stat-card__value font-serif"
+        className="stat-card__value"
         style={accentColor ? { color: accentColor } : undefined}
       >
         {value}

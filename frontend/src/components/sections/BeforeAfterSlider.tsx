@@ -18,13 +18,13 @@ export default function BeforeAfterSlider() {
           tag="BEFORE vs AFTER INTELLIGENCE"
           title="See the Transformation in"
           titleAccent="Real-Time"
-          subtitle="Drag the slider to compare messy, incomplete manufacturer rows with NEXORA's LOV-validated, evidence-backed SKU output."
+          subtitle="Compare messy, incomplete manufacturer rows with NEXORA's LOV-validated, evidence-backed SKU output."
         />
 
         <div className="slider-container glass-card">
-          <div className="slider-view">
+          <div className="slider-grid">
             {/* Raw Side (Left) */}
-            <div className="slider-side slider-side--raw" style={{ width: '100%' }}>
+            <div className="slider-card slider-card--raw" style={{ flex: `${sliderPosition}` }}>
               <div className="slider-side__badge slider-side__badge--raw">
                 ⚠️ RAW UNILOG DISTRIBUTOR INPUT
               </div>
@@ -63,11 +63,8 @@ export default function BeforeAfterSlider() {
               </div>
             </div>
 
-            {/* Enriched Side (Right - Overlay Clip) */}
-            <div
-              className="slider-side slider-side--enriched"
-              style={{ clipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)` }}
-            >
+            {/* Enriched Side (Right) */}
+            <div className="slider-card slider-card--enriched" style={{ flex: `${100 - sliderPosition}` }}>
               <div className="slider-side__badge slider-side__badge--enriched">
                 ✨ NEXORA ENRICHED COMMERCE OUTPUT
               </div>
@@ -124,26 +121,21 @@ export default function BeforeAfterSlider() {
                 </div>
               </div>
             </div>
-
-            {/* Slider Handle */}
-            <div className="slider-handle" style={{ left: `${sliderPosition}%` }}>
-              <div className="slider-handle-line" />
-              <div className="slider-handle-button">
-                <span>◀▶</span>
-              </div>
-              <div className="slider-handle-line" />
-            </div>
           </div>
 
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={sliderPosition}
-            onChange={handleSliderChange}
-            className="slider-input"
-            aria-label="Before and after transformation slider"
-          />
+          <div className="slider-control-bar">
+            <span className="control-label">Adjust Split Ratio:</span>
+            <input
+              type="range"
+              min="20"
+              max="80"
+              value={sliderPosition}
+              onChange={handleSliderChange}
+              className="slider-input-visible"
+              aria-label="Before and after split view ratio"
+            />
+            <span className="control-val">{sliderPosition}% Raw / {100 - sliderPosition}% Enriched</span>
+          </div>
         </div>
       </div>
     </section>
