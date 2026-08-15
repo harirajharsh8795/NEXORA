@@ -57,15 +57,18 @@ class EnrichmentAgent(BaseAgent):
             else:
                 p.mfr_url = f"https://www.google.com/search?q={urllib.parse.quote(p.manufacturer_name + ' ' + mpn_clean)}"
 
-            # 2. Add Evidence Record for Source URL
+            # 2. Add Evidence Record for Source URL with Honest Labeling
+            is_direct_mfr = "google" not in p.mfr_url
+            source_label = "Direct Manufacturer Portal Candidate" if is_direct_mfr else "Manufacturer Search Query Candidate"
+            
             p.evidence_graph.add_evidence(EvidenceItem(
                 field_name="MFR URL",
                 value=p.mfr_url,
-                confidence=0.98 if "google" not in p.mfr_url else 0.70,
-                source_type="manufacturer_website",
+                confidence=0.95 if is_direct_mfr else 0.65,
+                source_type="manufacturer_portal_candidate" if is_direct_mfr else "search_query_candidate",
                 source_url=p.mfr_url,
-                snippet=f"Official website listing for {p.manufacturer_name} {mpn_clean}"
+                snippet=f"{source_label} for {p.manufacturer_name} (MPN: {mpn_clean})"
             ))
 
-        self.logger.info("Manufacturer enrichment completed successfully.")
+        self.logger.info("Manufacturer enrichment & candidate source labeling completed successfully.")
         return products

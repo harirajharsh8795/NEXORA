@@ -14,23 +14,23 @@ export default function StatsBar() {
           />
 
           <StatCard
-            value="100%"
-            label="Manufacturer Resolution"
-            sublabel="Zero unmapped vendor entities across 77 mfrs"
+            value="384.9 / sec"
+            label="Measured Processing Speed"
+            sublabel="2.6ms per SKU • Scalable to 500M+ SKUs/mo"
             accentColor="var(--nexora-cyan)"
           />
 
           <StatCard
             value="3,462"
             label="LOV Attributes Extracted"
-            sublabel="Standardized triplets with UOM normalization"
+            sublabel="100% LOV compliant with UOM standardization"
             accentColor="var(--nexora-pink)"
           />
 
           <StatCard
-            value="68.4%"
+            value="68.0%"
             label="Auto-Approved Split"
-            sublabel="Confidence ≥ 85% passed without human intervention"
+            sublabel="Conf ≥ 85% auto-passed; 32% routed to HITL triage"
             accentColor="var(--color-success)"
           />
         </div>
