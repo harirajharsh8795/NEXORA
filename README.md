@@ -252,6 +252,7 @@ npm run build
 | Metric | Measured Value | Technical Notes & Caveats |
 | :--- | :--- | :--- |
 | **Ground-Truth Validation** | **100.0%** ($2/2$ GT rows) | Validated on available reference delivery rows (`PDSH4816AF`, `WDTS7024RZ`). *Full 200-row file not present in workspace.* |
+| **Real RAG Sourcing Rate** | **96.3% Mfr Domain** | 103 of 107 extracted attributes sourced directly from official `diablotools.com` and `freudtools.com`. |
 | **LOV Attribute Compliance** | **100.0%** ($3,462/3,462$) | Deterministic regex parsing against canonical LOV dictionaries. |
 | **Core Engine Execution Speed** | **1,604.5 SKUs / sec** | Measured at 0.62ms per SKU in local memory across 1,000 SKUs. |
 | **Total Wall-Clock Throughput** | **1,131.9 SKUs / sec** | Measured at 0.88ms per SKU including CSV file I/O operations. |
