@@ -49,6 +49,8 @@ export interface EnrichedProduct {
   part_desc: string;
   raw_manuf?: string;
   raw_brand?: string;
+  enrichment_type?: 'deterministic' | 'ai_enriched_batch';
+
 
   // Resolved entities
   manufacturer_name: string;

@@ -18,3 +18,10 @@ Thumbs.db
 .cache/
 __pycache__/
 *.pyc
+
+# Secrets
+.env
+.env.*
+
+# Scratch/audit scripts
+scratch/

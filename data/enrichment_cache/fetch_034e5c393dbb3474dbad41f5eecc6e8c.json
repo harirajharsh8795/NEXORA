@@ -1,0 +1,10 @@
+{
+  "url": "https://www.diablotools.com/products/D1012LF",
+  "content_type": "html",
+  "raw_text": "",
+  "fetch_timestamp": "2026-08-15T09:04:56Z",
+  "http_status": 0,
+  "success": false,
+  "error": "HTTPSConnectionPool(host='diablotools.com', port=443): Read timed out. (read timeout=10)",
+  "pdf_tables": []
+}
