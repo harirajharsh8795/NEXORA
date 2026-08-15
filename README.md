@@ -252,6 +252,7 @@ npm run build
 | Metric | Measured Value | Technical Notes & Caveats |
 | :--- | :--- | :--- |
 | **Ground-Truth Validation** | **100.0%** ($2/2$ GT rows) | Validated on available reference delivery rows (`PDSH4816AF`, `WDTS7024RZ`). *Full 200-row file not present in workspace.* |
+| **Real RAG Enriched SKUs** | **32 / 46 SKUs** (69.6% Success) | 32 of 46 Freud SKUs enriched with 107 attributes extracted via **Gemini Flash**. |
 | **Real RAG Sourcing Rate** | **96.3% Mfr Domain** | 103 of 107 extracted attributes sourced directly from official `diablotools.com` and `freudtools.com`. |
 | **LOV Attribute Compliance** | **100.0%** ($3,462/3,462$) | Deterministic regex parsing against canonical LOV dictionaries. |
 | **Core Engine Execution Speed** | **1,604.5 SKUs / sec** | Measured at 0.62ms per SKU in local memory across 1,000 SKUs. |
