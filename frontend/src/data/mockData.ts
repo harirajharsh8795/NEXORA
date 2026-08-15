@@ -305,7 +305,7 @@ export const MOCK_FAQS: FAQItem[] = [
   },
   {
     question: 'How does the 8-agent pipeline ensure zero hallucinations on critical product specs?',
-    answer: 'Nexora enforces deterministic guardrails at every stage. Numbers, dimensions, and electrical ratings are extracted using strict regex parsers and validated against canonical List of Values (LOV) dictionaries and standard UOM mappings. Every extracted attribute generates an Evidence Item linking back to exact source text, spec sheet PDFs, or manufacturer URLs with cryptographic traceability.'
+    answer: 'Nexora enforces deterministic guardrails at every stage. Numbers, dimensions, and electrical ratings are extracted using strict regex parsers and validated against canonical List of Values (LOV) dictionaries and standard UOM mappings. Every extracted attribute generates an Evidence Item linking back to exact source text, spec sheet PDFs, or manufacturer URLs with auditable provenance.'
   },
   {
     question: 'What happens when a product falls below the 85% confidence threshold?',

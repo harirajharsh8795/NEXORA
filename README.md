@@ -29,14 +29,14 @@ Industrial distributors manage millions of raw manufacturer SKUs sourced from th
 - ❌ **Mixed Units of Measure (UOM)**: Inconsistent representations across imperial, metric, and electrical values.
 - ❌ **LLM Hallucination Risk**: Standard AI models frequently fabricate critical dimensions, voltage tolerances, or thread counts.
 
-**NEXORA AI** sits upstream of enterprise PIM/ERP systems. It processes raw supplier catalog rows through an autonomous, 8-stage agentic pipeline governed by strict **List of Values (LOV)** dictionaries, deterministic parsers, and cryptographic **Evidence Graphs**.
+**NEXORA AI** sits upstream of enterprise PIM/ERP systems. It processes raw supplier catalog rows through an autonomous, 8-stage agentic pipeline governed by strict **List of Values (LOV)** dictionaries, deterministic parsers, and auditable **Evidence Graphs**.
 
 ---
 
 ## ✨ Key Capabilities & Innovations
 
 - 🛡️ **Deterministic Zero-Hallucination Guardrails**: Extracted numerical values and units of measure are parsed via strict regex engines and validated against canonical LOV dictionaries.
-- 🔗 **Cryptographic Evidence Provenance**: Every enriched field contains a verifiable `EvidenceItem` linking back to exact raw source text, PDF spec sheets, or manufacturer URLs.
+- 🔗 **Verifiable Evidence Provenance**: Every enriched field contains a verifiable `EvidenceItem` linking back to exact raw source text, PDF spec sheets, or manufacturer URLs.
 - 📦 **252-Column CX1 Delivery Format**: Exports natively into enterprise delivery formats compatible with Akeneo, Syndigo, SAP, and custom distributor PIMs.
 - 🎯 **100% Manufacturer & Brand Resolution**: Maps messy strings (e.g., `Freud Inc (2435)`) to canonical entity hierarchies and brand sub-lines.
 - ⚡ **Human-in-the-Loop (HITL) Triage Dashboard**: Records scoring under 85% composite confidence are automatically routed to a 1-click manual approval queue with side-by-side evidence inspection.
@@ -132,7 +132,7 @@ NEXORA operates as an asynchronous, event-driven multi-agent framework designed 
 
 ## 🔄 Data Workflow & Provenance
 
-Every catalog item processed through NEXORA carries full cryptographic auditability:
+Every catalog item processed through NEXORA carries full auditable provenance:
 
 ```json
 {
