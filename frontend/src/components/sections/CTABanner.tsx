@@ -23,7 +23,7 @@ export default function CTABanner() {
               Explore Live Catalog Demo
             </Button>
             <Button variant="ghost" size="lg" onClick={() => {
-              window.open('https://github.com', '_blank');
+              window.open('https://github.com/harirajharsh8795/NEXORA#readme', '_blank');
             }}>
               View Documentation &amp; Architecture
             </Button>

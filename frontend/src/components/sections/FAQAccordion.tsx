@@ -5,7 +5,7 @@ import { MOCK_FAQS } from '../../data/mockData';
 import './FAQAccordion.css';
 
 export default function FAQAccordion() {
-  const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   const toggleAccordion = (idx: number) => {
     setOpenIdx(openIdx === idx ? null : idx);
