@@ -2,6 +2,12 @@
   margin-bottom: var(--space-3xl);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .section-header {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+}
+
 .section-header--center {
   text-align: center;
 }

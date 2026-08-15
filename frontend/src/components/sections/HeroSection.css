@@ -154,6 +154,15 @@
   padding: var(--space-xl);
   border: 1px solid rgba(168, 85, 247, 0.25);
   box-shadow: var(--shadow-glow);
+  transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero__card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 16px 48px 0 rgba(168, 85, 247, 0.4), 0 0 20px 0 rgba(6, 182, 212, 0.25);
+    border-color: rgba(168, 85, 247, 0.5);
+  }
 }
 
 .hero__card-header {

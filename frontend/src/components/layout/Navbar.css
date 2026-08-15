@@ -34,6 +34,18 @@
   width: auto;
 }
 
+.navbar__logo-text {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--nexora-cyan), var(--nexora-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
 /* Nav links */
 .navbar__nav {
   display: none;

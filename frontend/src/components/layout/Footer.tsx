@@ -16,7 +16,6 @@ const footerLinks = {
   ],
   company: [
     { label: 'About', href: '#' },
-    { label: 'Pricing', href: '#pricing' },
     { label: 'Contact', href: '#' },
     { label: 'Privacy Policy', href: '#' },
   ],
@@ -34,7 +33,7 @@ export default function Footer() {
             AI-powered multi-agent pipeline for enterprise product data.
           </p>
           <div className="footer__badges">
-            <span className="footer__badge">UNIHACK 2026</span>
+            <span className="footer__badge">Enterprise Edition</span>
             <span className="footer__badge">AI-Powered</span>
           </div>
         </div>
@@ -72,7 +71,7 @@ export default function Footer() {
       <div className="footer__bottom">
         <span>© {new Date().getFullYear()} Nexora AI. All rights reserved.</span>
         <span className="footer__built-with">
-          Built with ❤️ for UNIHACK
+          Built with ❤️ for Enterprise eCommerce
         </span>
       </div>
     </footer>

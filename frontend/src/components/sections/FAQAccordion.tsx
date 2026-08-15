@@ -22,7 +22,7 @@ export default function FAQAccordion() {
         />
 
         <div className="faq-list">
-          {MOCK_FAQS.map((faq, idx) => {
+          {MOCK_FAQS.slice(0, 4).map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
               <Card key={idx} className={`faq-card ${isOpen ? 'faq-card--open' : ''}`}>

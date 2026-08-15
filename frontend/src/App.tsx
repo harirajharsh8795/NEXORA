@@ -15,7 +15,6 @@ import EnterpriseGrid from './components/sections/EnterpriseGrid';
 import IntegrationsSection from './components/sections/IntegrationsSection';
 import TestimonialCards from './components/sections/TestimonialCards';
 import TaxonomyExplorer from './components/sections/TaxonomyExplorer';
-import PricingSection from './components/sections/PricingSection';
 import FAQAccordion from './components/sections/FAQAccordion';
 import CTABanner from './components/sections/CTABanner';
 
@@ -53,8 +52,7 @@ function App() {
           <TaxonomyExplorer />
           <CatalogExplorer />
 
-          {/* Pricing, FAQ, and CTA */}
-          <PricingSection />
+          {/* FAQ and CTA */}
           <FAQAccordion />
           <CTABanner />
         </main>

@@ -34,7 +34,7 @@ export default function FeatureCommerceReady() {
               <li className="feature-check-item">
                 <span className="check-icon">📦</span>
                 <div>
-                  <strong>252-Column Unilog CX1 Delivery:</strong>
+                  <strong>252-Column Enterprise CX1 Delivery:</strong>
                   <p>Matches exact column layout specification: MPN, Alt MPN, GTIN, UNSPSC, Specs, PDFs, Image URLs, and Attributes 1..50.</p>
                 </div>
               </li>

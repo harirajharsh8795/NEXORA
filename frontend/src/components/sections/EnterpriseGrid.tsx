@@ -32,7 +32,7 @@ export default function EnterpriseGrid() {
     {
       icon: '📦',
       title: '252-Column CX1 Export Schema',
-      description: 'Produces full delivery format CSV/JSON compatible with Unilog CX1, Akeneo, Syndigo, and custom enterprise PIMs.'
+      description: 'Produces full delivery format CSV/JSON compatible with Enterprise CX1, Akeneo, Syndigo, and custom enterprise PIMs.'
     }
   ];
 

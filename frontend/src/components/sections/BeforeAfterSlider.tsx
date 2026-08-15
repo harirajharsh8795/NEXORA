@@ -1,16 +1,9 @@
-import { useState } from 'react';
 import SectionHeader from '../ui/SectionHeader';
 import StatusBadge from '../ui/StatusBadge';
 import ConfidenceBar from '../ui/ConfidenceBar';
 import './BeforeAfterSlider.css';
 
 export default function BeforeAfterSlider() {
-  const [sliderPosition, setSliderPosition] = useState(50);
-
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSliderPosition(Number(e.target.value));
-  };
-
   return (
     <section id="pipeline" className="before-after-section">
       <div className="before-after-section__inner">
@@ -24,9 +17,9 @@ export default function BeforeAfterSlider() {
         <div className="slider-container glass-card">
           <div className="slider-grid">
             {/* Raw Side (Left) */}
-            <div className="slider-card slider-card--raw" style={{ flex: `${sliderPosition}` }}>
+            <div className="slider-card slider-card--raw" style={{ flex: 1 }}>
               <div className="slider-side__badge slider-side__badge--raw">
-                ⚠️ RAW UNILOG DISTRIBUTOR INPUT
+                ⚠️ RAW DISTRIBUTOR INPUT
               </div>
               <div className="raw-content">
                 <div className="raw-row">
@@ -42,8 +35,8 @@ export default function BeforeAfterSlider() {
                   <code className="raw-val raw-val--missing">-- Unbranded --</code>
                 </div>
                 <div className="raw-row">
-                  <span className="raw-label">Unilog Brand:</span>
-                  <code className="raw-val raw-val--missing">-- No Unilog Brand --</code>
+                  <span className="raw-label">Supplier Brand:</span>
+                  <code className="raw-val raw-val--missing">-- No Supplier Brand --</code>
                 </div>
                 <div className="raw-row">
                   <span className="raw-label">Part Manuf:</span>
@@ -64,7 +57,7 @@ export default function BeforeAfterSlider() {
             </div>
 
             {/* Enriched Side (Right) */}
-            <div className="slider-card slider-card--enriched" style={{ flex: `${100 - sliderPosition}` }}>
+            <div className="slider-card slider-card--enriched" style={{ flex: 1 }}>
               <div className="slider-side__badge slider-side__badge--enriched">
                 ✨ NEXORA ENRICHED COMMERCE OUTPUT
               </div>
@@ -121,20 +114,6 @@ export default function BeforeAfterSlider() {
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="slider-control-bar">
-            <span className="control-label">Adjust Split Ratio:</span>
-            <input
-              type="range"
-              min="20"
-              max="80"
-              value={sliderPosition}
-              onChange={handleSliderChange}
-              className="slider-input-visible"
-              aria-label="Before and after split view ratio"
-            />
-            <span className="control-val">{sliderPosition}% Raw / {100 - sliderPosition}% Enriched</span>
           </div>
         </div>
       </div>

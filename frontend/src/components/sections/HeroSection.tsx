@@ -14,7 +14,7 @@ export default function HeroSection() {
         <div className="hero__content">
           <div className="hero__badge">
             <span className="hero__badge-pulse" />
-            <span className="hero__badge-text">UNIHACK 2026 Submission</span>
+            <span className="hero__badge-text">Enterprise Edition 2026</span>
             <span className="hero__badge-divider">•</span>
             <span className="hero__badge-accent">LOV-Constrained Multi-Agent RAG</span>
           </div>

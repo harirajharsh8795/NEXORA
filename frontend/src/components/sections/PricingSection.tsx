@@ -9,7 +9,7 @@ export default function PricingSection() {
       name: 'Prototype / Free',
       price: 'Free',
       period: 'Open Source Demo & Proof of Concept',
-      tag: 'UNIHACK EDITION',
+      tag: 'COMMUNITY EDITION',
       description: 'Ideal for initial distributor catalog cleanup & proof-of-concept validation.',
       features: [
         'Up to 1,000 SKU batch processing',

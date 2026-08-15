@@ -6,7 +6,6 @@ const navLinks = [
   { label: 'Pipeline', href: '#pipeline' },
   { label: 'ROI Calculator', href: '#roi-calculator' },
   { label: 'Catalog', href: '#catalog' },
-  { label: 'Pricing', href: '#pricing' },
 ];
 
 export default function Navbar() {
@@ -22,6 +21,7 @@ export default function Navbar() {
             alt="Nexora AI"
             className="navbar__logo-img logo-glow"
           />
+          <span className="navbar__logo-text">NEXORA</span>
         </a>
 
         {/* Navigation Links */}
