@@ -168,10 +168,30 @@ class RealEnrichmentEngine:
         "festool": "https://www.festoolusa.com/products/{mpn}",
     }
 
+    MANUFACTURER_SITE_SEARCH_DOMAINS = {
+        "freud": ["diablotools.com", "freudtools.com"],
+        "diablo": ["diablotools.com", "freudtools.com"],
+        "milwaukee": ["milwaukeetool.com"],
+        "dewalt": ["dewalt.com"],
+        "makita": ["makitatools.com"],
+        "bosch": ["boschtools.com"],
+        "leviton": ["leviton.com"],
+        "festool": ["festoolusa.com"],
+        "whirlpool": ["whirlpool.com"],
+        "frigidaire": ["frigidaire.com"],
+    }
+
+    def _get_mfr_site_domains(self, manufacturer: str) -> List[str]:
+        mfr_lower = manufacturer.lower()
+        for key, domains in self.MANUFACTURER_SITE_SEARCH_DOMAINS.items():
+            if key in mfr_lower:
+                return domains
+        return []
+
     def search_manufacturer_sources(self, manufacturer: str, mpn: str, product_type: str = "") -> List[SearchResult]:
-        """Hybrid search: try direct manufacturer URL first, then DuckDuckGo with retry/backoff."""
+        """Hybrid search: try targeted site:{mfr_domain} search FIRST, then fall back to general search."""
         query = f"{manufacturer} {mpn} {product_type} specifications".strip()
-        cache_key = hashlib.md5(query.encode()).hexdigest()
+        cache_key = hashlib.md5(f"mfr_priority_{query}".encode()).hexdigest()
 
         # Check cache
         if cache_key in self.search_cache:
@@ -179,11 +199,12 @@ class RealEnrichmentEngine:
             return [SearchResult(**r) for r in self.search_cache[cache_key]]
 
         results: List[SearchResult] = []
+        seen_urls = set()
 
         # Strategy 1: Direct manufacturer URL construction
         direct_url = self._construct_direct_mfr_url(manufacturer, mpn)
         if direct_url:
-            results.append(SearchResult(
+            sr = SearchResult(
                 query=query, rank=0,
                 title=f"Direct Manufacturer Page: {mpn}",
                 url=direct_url,
@@ -191,31 +212,62 @@ class RealEnrichmentEngine:
                 snippet=f"Direct manufacturer product page for {mpn}",
                 is_manufacturer_domain=True,
                 excluded=False
-            ))
-            logger.info(f"[SEARCH] Direct MFR URL constructed: {direct_url}")
-
-        # Strategy 2: DuckDuckGo search with retry + exponential backoff
-        ddg_results = self._ddg_search_with_retry(query, max_retries=3)
-        for rank, r in enumerate(ddg_results, 1):
-            url = r.get("href", "")
-            domain = self._extract_domain(url)
-            excluded = any(ex in domain.lower() for ex in EXCLUDED_DOMAINS)
-            is_mfr = self._is_manufacturer_domain(manufacturer, domain)
-
-            sr = SearchResult(
-                query=query, rank=rank,
-                title=r.get("title", ""),
-                url=url, domain=domain,
-                snippet=r.get("body", ""),
-                is_manufacturer_domain=is_mfr,
-                excluded=excluded,
-                exclusion_reason="marketplace/retailer domain" if excluded else ""
             )
             results.append(sr)
+            seen_urls.add(direct_url)
+            logger.info(f"[SEARCH] Direct MFR URL constructed: {direct_url}")
+
+        # Strategy 2: Targeted site:{mfr_domain} search FIRST
+        mfr_domains = self._get_mfr_site_domains(manufacturer)
+        for domain_name in mfr_domains:
+            site_query = f"site:{domain_name} {mpn}"
+            logger.info(f"[SEARCH MFR SITE] Running targeted query: '{site_query}'")
+            site_results = self._ddg_search_with_retry(site_query, max_retries=2)
+            for rank, r in enumerate(site_results, 1):
+                url = r.get("href", "")
+                if not url or url in seen_urls:
+                    continue
+                seen_urls.add(url)
+                domain = self._extract_domain(url)
+                is_mfr = self._is_manufacturer_domain(manufacturer, domain) or (domain_name in domain)
+                sr = SearchResult(
+                    query=site_query, rank=rank,
+                    title=r.get("title", ""),
+                    url=url, domain=domain,
+                    snippet=r.get("body", ""),
+                    is_manufacturer_domain=is_mfr,
+                    excluded=False,
+                    exclusion_reason=""
+                )
+                results.append(sr)
+
+        # Strategy 3: General search fallback
+        mfr_count = sum(1 for r in results if r.is_manufacturer_domain)
+        if mfr_count < 2:
+            ddg_results = self._ddg_search_with_retry(query, max_retries=3)
+            for rank, r in enumerate(ddg_results, 1):
+                url = r.get("href", "")
+                if not url or url in seen_urls:
+                    continue
+                seen_urls.add(url)
+                domain = self._extract_domain(url)
+                excluded = any(ex in domain.lower() for ex in EXCLUDED_DOMAINS)
+                is_mfr = self._is_manufacturer_domain(manufacturer, domain)
+
+                sr = SearchResult(
+                    query=query, rank=rank + len(results),
+                    title=r.get("title", ""),
+                    url=url, domain=domain,
+                    snippet=r.get("body", ""),
+                    is_manufacturer_domain=is_mfr,
+                    excluded=excluded,
+                    exclusion_reason="marketplace/retailer domain" if excluded else ""
+                )
+                results.append(sr)
 
         mfr_count = sum(1 for r in results if r.is_manufacturer_domain)
         excl_count = sum(1 for r in results if r.excluded)
-        logger.info(f"[SEARCH] Query: '{query}' -> {len(results)} results, {excl_count} excluded, {mfr_count} mfr-domain matches")
+        logger.info(f"[SEARCH] Query: '{query}' -> {len(results)} total results ({mfr_count} mfr-domain, {excl_count} excluded)")
 
         # Cache results
         self.search_cache[cache_key] = [asdict(r) for r in results]
@@ -559,21 +611,20 @@ Return ONLY the JSON array, no other text."""
 
         # Available Flash models to rotate through on 429 rate limit (Verified working model list)
         fallback_models = [
-            "gemini-3.7-flash",
-            "gemini-3.5-flash",
-            "gemini-flash-latest",
             "gemini-flash-lite-latest",
-            "gemini-3.5-flash-lite",
             "gemini-3.1-flash-lite",
-            "gemini-3-flash-preview",
+            "gemini-3.5-flash-lite",
+            "gemini-flash-latest",
             "gemma-4-26b-a4b-it",
             "gemma-4-31b-it",
+            "gemini-3.5-flash",
+            "gemini-3.7-flash",
+            "gemini-3-flash-preview",
             "gemini-3.6-flash"
         ]
 
-
         response = None
-        used_model_name = "gemini-3.6-flash"
+        used_model_name = "gemini-flash-lite-latest"
         raw_response = ""
 
         t_start = time.perf_counter()
@@ -591,7 +642,7 @@ Return ONLY the JSON array, no other text."""
                     err_str = str(e).lower()
                     if "429" in err_str or "quota" in err_str or "rate" in err_str:
                         logger.warning(f"[LLM RATELIMIT 429] Model {model_name} rate limited. Retrying/Switching model...")
-                        time.sleep(4 * (retry + 1))
+                        time.sleep(1 * (retry + 1))
                         continue
                     else:
                         logger.error(f"[LLM ERROR] Model {model_name}: {e}")
