@@ -15,8 +15,8 @@ export default function StatsBar() {
 
           <StatCard
             value="384.9 / sec"
-            label="Measured Processing Speed"
-            sublabel="2.6ms per SKU • Scalable to 500M+ SKUs/mo"
+            label="Core Pipeline Speed"
+            sublabel="2.6ms/SKU local engine • 750K SKUs in ~33 mins"
             accentColor="var(--nexora-cyan)"
           />
 
