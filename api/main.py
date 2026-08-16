@@ -1,3 +1,4 @@
+import os
 import sys
 import base64
 from pathlib import Path
@@ -15,13 +16,22 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Specific origins without wildcard *
+origins = [
+    "https://nexora-otuu.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(router)
 
@@ -740,3 +750,9 @@ RAW_HTML = """<!DOCTYPE html>
 @app.get("/", response_class=HTMLResponse)
 def get_dashboard():
     return RAW_HTML.replace("{{LOGO_DATA_URI}}", LOGO_DATA_URI)
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
