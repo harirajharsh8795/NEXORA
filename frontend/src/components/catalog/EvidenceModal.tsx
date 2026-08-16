@@ -12,6 +12,25 @@ interface EvidenceModalProps {
 export default function EvidenceModal({ product, onClose }: EvidenceModalProps) {
   if (!product) return null;
 
+  // Defensive fallback for confidence object and subfields
+  const confidence = product.confidence || {
+    manufacturer_confidence: (product as any).overall_confidence ?? 0.95,
+    brand_confidence: (product as any).overall_confidence ?? 0.95,
+    classpath_confidence: (product as any).overall_confidence ?? 0.95,
+    attribute_confidence: (product as any).overall_confidence ?? 0.95,
+    overall_confidence: (product as any).overall_confidence ?? 0.95,
+    needs_human_review: (product as any).needs_human_review ?? false,
+    flagged_reasons: (product as any).flagged_reasons ?? [],
+  };
+
+  const manufConf = confidence.manufacturer_confidence ?? confidence.overall_confidence ?? 0.95;
+  const brandConf = confidence.brand_confidence ?? confidence.overall_confidence ?? 0.95;
+  const classConf = confidence.classpath_confidence ?? confidence.overall_confidence ?? 0.95;
+  const attrConf = confidence.attribute_confidence ?? confidence.overall_confidence ?? 0.95;
+  const overallConf = confidence.overall_confidence ?? 0.95;
+  const needsReview = Boolean(confidence.needs_human_review);
+  const flaggedReasons = confidence.flagged_reasons || [];
+
   const evidences = Object.values(product.evidence_graph?.evidences || {});
 
   return (
@@ -32,27 +51,28 @@ export default function EvidenceModal({ product, onClose }: EvidenceModalProps) 
           <div className="modal-section">
             <h4 className="section-title">Confidence Score &amp; Governance Assessment</h4>
             <div className="confidence-breakdown-grid">
-              <ConfidenceBar value={product.confidence.manufacturer_confidence} label="Manufacturer Entity" showPercentage />
-              <ConfidenceBar value={product.confidence.brand_confidence} label="Brand Entity" showPercentage />
-              <ConfidenceBar value={product.confidence.classpath_confidence} label="Taxonomy Classpath" showPercentage />
-              <ConfidenceBar value={product.confidence.attribute_confidence} label="Attribute Extraction" showPercentage />
+              <ConfidenceBar value={manufConf} label="Manufacturer Entity" showPercentage />
+              <ConfidenceBar value={brandConf} label="Brand Entity" showPercentage />
+              <ConfidenceBar value={classConf} label="Taxonomy Classpath" showPercentage />
+              <ConfidenceBar value={attrConf} label="Attribute Extraction" showPercentage />
             </div>
             <div className="overall-status-row">
-              <span>Overall Pipeline Score: <strong>{(product.confidence.overall_confidence * 100).toFixed(1)}%</strong></span>
-              <StatusBadge status={product.confidence.needs_human_review ? 'review' : 'approved'} />
+              <span>Overall Pipeline Score: <strong>{(overallConf * 100).toFixed(1)}%</strong></span>
+              <StatusBadge status={needsReview ? 'review' : 'approved'} />
             </div>
 
-            {product.confidence.needs_human_review && product.confidence.flagged_reasons && product.confidence.flagged_reasons.length > 0 && (
+            {needsReview && flaggedReasons.length > 0 && (
               <div className="modal-flagged-alert">
                 <span className="modal-flagged-title">⚠️ Human Review Flag Reasons (Score &lt; 85%):</span>
                 <ul>
-                  {product.confidence.flagged_reasons.map((reason, idx) => (
+                  {flaggedReasons.map((reason, idx) => (
                     <li key={idx}>{reason}</li>
                   ))}
                 </ul>
               </div>
             )}
           </div>
+
 
           {/* Evidence Provenance Table */}
           <div className="modal-section">

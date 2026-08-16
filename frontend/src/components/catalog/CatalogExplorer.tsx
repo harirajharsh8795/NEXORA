@@ -7,6 +7,7 @@ import ConfidenceBar from '../ui/ConfidenceBar';
 import EvidenceModal from './EvidenceModal';
 import { fetchProducts } from '../../api/client';
 import { triggerLiveEnrichment, LIVE_DEMO_MPNS } from '../../api/liveEnrichment';
+import { MOCK_PRODUCTS } from '../../data/mockData';
 import type { EnrichedProduct } from '../../types';
 import './CatalogExplorer.css';
 
@@ -41,9 +42,13 @@ const getFlaggedReasons = (p: EnrichedProduct): string[] => {
 };
 
 export default function CatalogExplorer() {
-  const [products, setProducts] = useState<EnrichedProduct[]>([]);
-  const [stats, setStats] = useState({ total: 1000, approved: 680, review: 320 });
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<EnrichedProduct[]>(MOCK_PRODUCTS);
+  const [stats, setStats] = useState({
+    total: 1000,
+    approved: MOCK_PRODUCTS.filter((p) => !isNeedsReview(p)).length || 691,
+    review: MOCK_PRODUCTS.filter((p) => isNeedsReview(p)).length || 309
+  });
+  const [loading, setLoading] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'review'>('all');
@@ -61,15 +66,18 @@ export default function CatalogExplorer() {
 
   useEffect(() => {
     fetchProducts().then((res) => {
-      setProducts(res.products);
-      setStats({
-        total: res.stats.total || res.products.length,
-        approved: res.stats.approved,
-        review: res.stats.review,
-      });
+      if (res.products && res.products.length > 0) {
+        setProducts(res.products);
+        setStats({
+          total: res.stats.total || res.products.length,
+          approved: res.stats.approved,
+          review: res.stats.review,
+        });
+      }
       setLoading(false);
     });
   }, []);
+
 
   // Filtered products list
   const filteredProducts = useMemo(() => {
