@@ -49,9 +49,9 @@ export default function CatalogExplorer() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'review'>('all');
   const [selectedProduct, setSelectedProduct] = useState<EnrichedProduct | null>(null);
 
-  // Pagination state
+  // Pagination state: 6 items per page (2 rows of 3 cards each for clean alignment)
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 6;
 
   // Live Demo Modal State
   const [liveModalSku, setLiveModalSku] = useState<string | null>(null);
@@ -63,9 +63,9 @@ export default function CatalogExplorer() {
     fetchProducts().then((res) => {
       setProducts(res.products);
       setStats({
-        total: res.products.length,
-        approved: res.products.filter((p) => !isNeedsReview(p)).length,
-        review: res.products.filter((p) => isNeedsReview(p)).length,
+        total: res.stats.total || res.products.length,
+        approved: res.stats.approved,
+        review: res.stats.review,
       });
       setLoading(false);
     });
@@ -102,6 +102,42 @@ export default function CatalogExplorer() {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredProducts.slice(start, start + itemsPerPage);
   }, [filteredProducts, currentPage]);
+
+  // Windowed pagination generator
+  const paginationRange = useMemo(() => {
+    const total = totalPages;
+    const current = currentPage;
+
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    const pages: (number | string)[] = [1];
+    let start = Math.max(2, current - 1);
+    let end = Math.min(total - 1, current + 1);
+
+    if (current <= 3) {
+      end = 4;
+    } else if (current >= total - 2) {
+      start = total - 3;
+    }
+
+    if (start > 2) {
+      pages.push('...');
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (end < total - 1) {
+      pages.push('...');
+    }
+
+    pages.push(total);
+
+    return pages;
+  }, [totalPages, currentPage]);
 
   const handleLiveEnrichClick = async (mpn: string) => {
     setLiveModalSku(mpn);
@@ -329,7 +365,7 @@ export default function CatalogExplorer() {
               })}
             </div>
 
-            {/* Pagination Controls */}
+            {/* Compact Windowed Pagination Controls */}
             <div className="pagination-row">
               <span className="pagination-info">
                 Showing {(currentPage - 1) * itemsPerPage + 1}–
@@ -345,7 +381,27 @@ export default function CatalogExplorer() {
                   ← Previous
                 </button>
 
-                <span className="px-3 text-xs font-semibold text-purple-400">
+                {/* Windowed Page Number Buttons (Hidden on small mobile screens via CSS) */}
+                <div className="page-numbers-window hidden sm:flex items-center gap-1">
+                  {paginationRange.map((pg, idx) =>
+                    typeof pg === 'number' ? (
+                      <button
+                        key={idx}
+                        className={`page-btn page-num-btn ${currentPage === pg ? 'page-num-btn--active' : ''}`}
+                        onClick={() => setCurrentPage(pg)}
+                      >
+                        {pg}
+                      </button>
+                    ) : (
+                      <span key={idx} className="px-1 text-slate-500 font-bold select-none">
+                        ...
+                      </span>
+                    )
+                  )}
+                </div>
+
+                {/* Compact Page Counter on Mobile */}
+                <span className="sm:hidden px-2 text-xs font-semibold text-purple-400">
                   Page {currentPage} of {totalPages}
                 </span>
 
@@ -398,5 +454,6 @@ export default function CatalogExplorer() {
     </section>
   );
 }
+
 
 

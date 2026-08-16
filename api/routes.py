@@ -58,7 +58,7 @@ def get_products(
     status: Optional[str] = Query(None, description="approved, review, all"),
     search: Optional[str] = None,
     page: int = 1,
-    limit: int = 20
+    limit: int = 1000
 ):
     products = load_or_run_pipeline()
     filtered = products

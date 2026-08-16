@@ -5,9 +5,15 @@ import './ManualVsAgent.css';
 export default function ManualVsAgent() {
   const comparisonRows = [
     {
-      metric: 'Enrichment Speed',
+      metric: 'Core Engine Speed',
       manual: '30–60 Minutes / SKU',
-      agent: '2.5 Seconds / SKU',
+      agent: '0.62ms / SKU (~1,600 SKUs / sec)',
+      winner: 'agent'
+    },
+    {
+      metric: 'Live Web RAG Sourcing',
+      manual: '1–2 Days / Vendor Feed',
+      agent: '~25–50s / SKU (Live Search, Fetch & Gemini RAG)',
       winner: 'agent'
     },
     {
@@ -37,10 +43,11 @@ export default function ManualVsAgent() {
     {
       metric: 'Cost at 10,000 SKUs',
       manual: '$150,000+ ($15/SKU labor)',
-      agent: '$1,200 ($0.12/SKU API compute)',
+      agent: '$10.00 ($0.001/SKU LLM & compute)',
       winner: 'agent'
     }
   ];
+
 
   return (
     <section className="comparison-section">

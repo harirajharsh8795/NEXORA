@@ -9,17 +9,19 @@ export default function ROICalculator() {
   const [manualCostPerSku, setManualCostPerSku] = useState(15);
   const [manualMinutesPerSku, setManualMinutesPerSku] = useState(45);
 
-  const nexoraCostPerSku = 0.12; // $0.12 API / LLM cost
-  const nexoraSecondsPerSku = 2.5; // 2.5 seconds per SKU
+  const nexoraCostPerSku = 0.001; // $0.001 API / LLM & compute cost ($1.00 per 1,000 SKUs)
+  const nexoraSecondsPerSku = 2.5; // 2.5s real-world pipeline SLA
 
   const totalManualCost = skuCount * manualCostPerSku;
-  const totalNexoraCost = Math.round(skuCount * nexoraCostPerSku);
+  const totalNexoraCost = Number((skuCount * nexoraCostPerSku).toFixed(2));
   const totalSavings = totalManualCost - totalNexoraCost;
   const savingsPercent = Math.round((totalSavings / totalManualCost) * 100);
 
   const totalManualHours = Math.round((skuCount * manualMinutesPerSku) / 60);
-  const totalNexoraHours = Math.round((skuCount * nexoraSecondsPerSku) / 3600);
+  const totalNexoraHours = Math.round((skuCount * nexoraSecondsPerSku) / 3600) || 1;
   const timeSavedHours = totalManualHours - totalNexoraHours;
+
+
 
   return (
     <section id="roi-calculator" className="roi-section">

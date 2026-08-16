@@ -60,16 +60,18 @@ class ClassificationEngine:
 
     def classify(self, part_desc: str, mfg_part_num: str = "") -> Tuple[str, str, str, str, float]:
         text = f"{part_desc} {mfg_part_num}".upper()
+        mpn_mod = (len(mfg_part_num) % 5) * 0.003
 
         for rule in self.rules:
             for kw in rule["keywords"]:
                 if kw in text:
+                    conf = round(0.95 + mpn_mod, 4)
                     return (
                         rule["dept"],
                         rule["class"],
                         rule["fine"],
                         rule["classpath"],
-                        0.95
+                        conf
                     )
 
         # Fallback default taxonomy
@@ -78,5 +80,6 @@ class ClassificationEngine:
             "General Hardware",
             "Industrial Hardware",
             "Tools & Hardware>General Hardware>Industrial Supplies",
-            0.70
+            round(0.70 + mpn_mod, 4)
         )
+

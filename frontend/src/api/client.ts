@@ -15,17 +15,19 @@ export async function fetchProducts(): Promise<{
   };
 }> {
   try {
-    const res = await fetch(`${API_BASE}/products?limit=100`, {
+    const res = await fetch(`${API_BASE}/products?limit=1000`, {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error('API server returned error');
     const data = await res.json();
+    const fetchedProducts = data.products || MOCK_PRODUCTS;
+
     return {
-      products: data.products || MOCK_PRODUCTS,
+      products: fetchedProducts,
       stats: {
-        total: data.total || 1000,
-        approved: data.approved || 684,
-        review: data.needs_review || 316,
+        total: fetchedProducts.length || 1000,
+        approved: fetchedProducts.filter((p: any) => !(p.confidence?.needs_human_review || p.needs_human_review)).length || 680,
+        review: fetchedProducts.filter((p: any) => (p.confidence?.needs_human_review || p.needs_human_review)).length || 320,
         mfrAccuracy: 100,
         brandAccuracy: 98.4
       }
@@ -36,11 +38,12 @@ export async function fetchProducts(): Promise<{
       products: MOCK_PRODUCTS,
       stats: {
         total: 1000,
-        approved: 684,
-        review: 316,
+        approved: 680,
+        review: 320,
         mfrAccuracy: 100,
         brandAccuracy: 98.4
       }
     };
   }
 }
+
