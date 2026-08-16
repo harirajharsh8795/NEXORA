@@ -314,6 +314,37 @@
   gap: var(--space-xs);
 }
 
+.page-numbers-window {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-ellipsis {
+  padding: 0 4px;
+  color: var(--text-subtle);
+  font-weight: 700;
+  user-select: none;
+}
+
+.mobile-page-counter {
+  display: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--nexora-purple);
+  padding: 0 8px;
+}
+
+@media (max-width: 640px) {
+  .page-numbers-window {
+    display: none;
+  }
+  .mobile-page-counter {
+    display: inline-block;
+  }
+}
+
 .page-btn {
   padding: 0.45rem 0.85rem;
   border-radius: var(--radius-md);
@@ -335,6 +366,7 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
 
 /* Live Demo Elements */
 .live-demo-disclaimer {

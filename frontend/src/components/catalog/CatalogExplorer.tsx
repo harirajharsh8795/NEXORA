@@ -381,8 +381,8 @@ export default function CatalogExplorer() {
                   ← Previous
                 </button>
 
-                {/* Windowed Page Number Buttons (Hidden on small mobile screens via CSS) */}
-                <div className="page-numbers-window hidden sm:flex items-center gap-1">
+                {/* Windowed Page Number Buttons */}
+                <div className="page-numbers-window">
                   {paginationRange.map((pg, idx) =>
                     typeof pg === 'number' ? (
                       <button
@@ -393,7 +393,7 @@ export default function CatalogExplorer() {
                         {pg}
                       </button>
                     ) : (
-                      <span key={idx} className="px-1 text-slate-500 font-bold select-none">
+                      <span key={idx} className="page-ellipsis">
                         ...
                       </span>
                     )
@@ -401,9 +401,10 @@ export default function CatalogExplorer() {
                 </div>
 
                 {/* Compact Page Counter on Mobile */}
-                <span className="sm:hidden px-2 text-xs font-semibold text-purple-400">
+                <span className="mobile-page-counter">
                   Page {currentPage} of {totalPages}
                 </span>
+
 
                 <button
                   className="page-btn"
