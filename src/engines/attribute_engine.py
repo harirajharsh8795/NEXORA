@@ -59,9 +59,15 @@ class AttributeEngine:
             ))
 
         # Dimensions e.g. 5"x.045"x7/8", 1/2"x18", 1nx6-16'
-        dim_match = re.search(r"(\d+(?:\.\d+)?(?:/\d+)?)\s*(?:\"|in)?\s*[xX]\s*(\d+(?:\.\d+)?(?:/\d+)?)\s*(?:\"|in)?(?:\s*[xX]\s*(\d+(?:\.\d+)?(?:/\d+)?)\s*(?:\"|in)?)?", text)
+        dim_num_pattern = r"(\d*(?:\.\d+)|(?:\d+/\d+)|\d+)"
+        dim_match = re.search(
+            rf"{dim_num_pattern}\s*(?:\"|in)?\s*[xX]\s*{dim_num_pattern}\s*(?:\"|in)?(?:\s*[xX]\s*{dim_num_pattern}\s*(?:\"|in)?)?",
+            text
+        )
         if dim_match:
-            dims = [d for d in dim_match.groups() if d]
+            raw_dims = [d for d in dim_match.groups() if d]
+            dims = [("0" + d.strip()) if d.strip().startswith(".") else d.strip() for d in raw_dims]
+
             if len(dims) == 1:
                 triplets.append(AttributeTriplet(
                     index=len(triplets)+1,
@@ -75,7 +81,7 @@ class AttributeEngine:
                     index=len(triplets)+1,
                     label="Size",
                     value=f"{dims[0]} in x {dims[1]} in",
-                    uom="in",
+                    uom="",
                     confidence=0.90
                 ))
             elif len(dims) == 3:
@@ -83,9 +89,10 @@ class AttributeEngine:
                     index=len(triplets)+1,
                     label="Size",
                     value=f"{dims[0]} in x {dims[1]} in x {dims[2]} in",
-                    uom="in",
+                    uom="",
                     confidence=0.90
                 ))
+
 
         # Wattage (e.g. 40W, 100W, 60W, 3HP, 2HP)
         watt_match = re.search(r"\b(\d+(?:\.\d+)?)\s*(W|Watt|Watts)\b", text, re.IGNORECASE)

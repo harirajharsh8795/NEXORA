@@ -58,8 +58,11 @@ class FuzzyMatcher:
         desc_mod = (len(part_desc) % 7) * 0.004
 
         # Specific known product lines & brands embedded in description
-        if "3M" in desc_upper or "CUBITRON" in desc_upper or "STIKIT" in desc_upper or "ABRANET" in desc_upper:
+        if "MIRKA" in desc_upper or "ABRANET" in desc_upper or "AUTONET" in desc_upper or "MIROX" in desc_upper or part_desc.startswith("9A-"):
+            return "Mirka®", round(0.96 + desc_mod, 4)
+        if "3M" in desc_upper or "CUBITRON" in desc_upper or "STIKIT" in desc_upper or "SCOTCH-BRITE" in desc_upper or "TRIZACT" in desc_upper:
             return "3M®", round(0.94 + desc_mod, 4)
+
         if "FRIGIDAIRE" in desc_upper or "PDSH" in desc_upper:
             return "FRIGIDAIRE®", round(0.975 + desc_mod, 4)
         if "WHIRLPOOL" in desc_upper or "WDTS" in desc_upper:

@@ -315,11 +315,19 @@ export default function CatalogExplorer() {
                       <div className="product-attributes-preview">
                         <span className="attr-preview-heading">LOV Attributes:</span>
                         <div className="attr-pills">
-                          {product.attributes.slice(0, 4).map((attr, idx) => (
-                            <span key={idx} className="attr-pill">
-                              {attr.label}: <strong>{attr.value}{attr.uom ? ` ${attr.uom}` : ''}</strong>
-                            </span>
-                          ))}
+                          {product.attributes.slice(0, 4).map((attr, idx) => {
+                            const valStr = (attr.value || '').trim();
+                            const uomStr = (attr.uom || '').trim();
+                            const formattedVal = !uomStr || valStr.endsWith(uomStr) || valStr.includes(` ${uomStr} `)
+                              ? valStr
+                              : `${valStr} ${uomStr}`;
+
+                            return (
+                              <span key={idx} className="attr-pill">
+                                {attr.label}: <strong>{formattedVal}</strong>
+                              </span>
+                            );
+                          })}
                           {product.attributes.length > 4 && (
                             <span className="attr-pill attr-pill--more">
                               +{product.attributes.length - 4} more
@@ -328,6 +336,7 @@ export default function CatalogExplorer() {
                         </div>
                       </div>
                     )}
+
 
                     {/* Flagged Reason Alert if under 85% */}
                     {!isApproved && flaggedReasons.length > 0 && (
