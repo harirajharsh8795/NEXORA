@@ -1,7 +1,8 @@
 import { MOCK_PRODUCTS } from '../data/mockData';
 import type { EnrichedProduct } from '../types';
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'https://nexora-d7u7.onrender.com') + '/api';
+
 
 export async function fetchProducts(): Promise<{
   products: EnrichedProduct[];

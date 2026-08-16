@@ -26,7 +26,8 @@ export async function triggerLiveEnrichment(
   mpn: string,
   onProgress?: (step: string) => void
 ): Promise<LiveEnrichmentResult> {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://nexora-d7u7.onrender.com';
+
 
   onProgress?.('Waking up server...');
   await new Promise((r) => setTimeout(r, 400));
