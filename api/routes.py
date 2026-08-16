@@ -86,23 +86,9 @@ def get_products(
         "total": len(filtered),
         "page": page,
         "limit": limit,
-        "products": [
-            {
-                "mfg_part_num": p.mfg_part_num,
-                "part_desc": p.part_desc,
-                "manufacturer_name": p.manufacturer_name,
-                "brand_name": p.brand_name,
-                "classpath": p.classpath,
-                "overall_confidence": p.confidence.overall_confidence,
-                "needs_human_review": p.confidence.needs_human_review,
-                "flagged_reasons": p.confidence.flagged_reasons,
-                "attribute_count": len(p.attributes),
-                "mfr_url": p.mfr_url,
-                "short_desc": p.short_desc,
-            }
-            for p in paginated
-        ]
+        "products": [p.model_dump() for p in paginated]
     }
+
 
 @router.get("/product/{mpn}")
 def get_product_detail(mpn: str):

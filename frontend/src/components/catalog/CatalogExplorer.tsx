@@ -10,6 +10,36 @@ import { triggerLiveEnrichment, LIVE_DEMO_MPNS } from '../../api/liveEnrichment'
 import type { EnrichedProduct } from '../../types';
 import './CatalogExplorer.css';
 
+const isNeedsReview = (p: EnrichedProduct) => {
+  if (p?.confidence && typeof p.confidence.needs_human_review === 'boolean') {
+    return p.confidence.needs_human_review;
+  }
+  if (typeof (p as any)?.needs_human_review === 'boolean') {
+    return (p as any).needs_human_review;
+  }
+  return false;
+};
+
+const getOverallConfidence = (p: EnrichedProduct) => {
+  if (p?.confidence && typeof p.confidence.overall_confidence === 'number') {
+    return p.confidence.overall_confidence;
+  }
+  if (typeof (p as any)?.overall_confidence === 'number') {
+    return (p as any).overall_confidence;
+  }
+  return 0.95;
+};
+
+const getFlaggedReasons = (p: EnrichedProduct): string[] => {
+  if (p?.confidence && Array.isArray(p.confidence.flagged_reasons)) {
+    return p.confidence.flagged_reasons;
+  }
+  if (Array.isArray((p as any)?.flagged_reasons)) {
+    return (p as any).flagged_reasons;
+  }
+  return [];
+};
+
 export default function CatalogExplorer() {
   const [products, setProducts] = useState<EnrichedProduct[]>([]);
   const [stats, setStats] = useState({ total: 1000, approved: 680, review: 320 });
@@ -34,8 +64,8 @@ export default function CatalogExplorer() {
       setProducts(res.products);
       setStats({
         total: res.products.length,
-        approved: res.products.filter((p) => !p.confidence.needs_human_review).length,
-        review: res.products.filter((p) => p.confidence.needs_human_review).length,
+        approved: res.products.filter((p) => !isNeedsReview(p)).length,
+        review: res.products.filter((p) => isNeedsReview(p)).length,
       });
       setLoading(false);
     });
@@ -48,14 +78,14 @@ export default function CatalogExplorer() {
         searchQuery === '' ||
         p.mfg_part_num.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.part_desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.manufacturer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.brand_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.classpath.toLowerCase().includes(searchQuery.toLowerCase());
+        (p.manufacturer_name && p.manufacturer_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (p.brand_name && p.brand_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (p.classpath && p.classpath.toLowerCase().includes(searchQuery.toLowerCase()));
 
       const matchesStatus =
         statusFilter === 'all' ||
-        (statusFilter === 'approved' && !p.confidence.needs_human_review) ||
-        (statusFilter === 'review' && p.confidence.needs_human_review);
+        (statusFilter === 'approved' && !isNeedsReview(p)) ||
+        (statusFilter === 'review' && isNeedsReview(p));
 
       return matchesSearch && matchesStatus;
     });
@@ -172,13 +202,13 @@ export default function CatalogExplorer() {
               className={`status-tab ${statusFilter === 'approved' ? 'status-tab--active' : ''}`}
               onClick={() => setStatusFilter('approved')}
             >
-              Auto-Approved ({products.filter((p) => !p.confidence.needs_human_review).length})
+              Auto-Approved ({products.filter((p) => !isNeedsReview(p)).length})
             </button>
             <button
               className={`status-tab ${statusFilter === 'review' ? 'status-tab--active' : ''}`}
               onClick={() => setStatusFilter('review')}
             >
-              Human Review ({products.filter((p) => p.confidence.needs_human_review).length})
+              Human Review ({products.filter((p) => isNeedsReview(p)).length})
             </button>
           </div>
         </div>
@@ -200,8 +230,9 @@ export default function CatalogExplorer() {
           <>
             <div className="catalog-grid">
               {paginatedProducts.map((product) => {
-                const isApproved = !product.confidence.needs_human_review;
+                const isApproved = !isNeedsReview(product);
                 const isLiveCandidate = LIVE_DEMO_MPNS.includes(product.mfg_part_num);
+                const flaggedReasons = getFlaggedReasons(product);
 
                 return (
                   <Card key={product.mfg_part_num} className="product-card">
@@ -254,11 +285,11 @@ export default function CatalogExplorer() {
                     )}
 
                     {/* Flagged Reason Alert if under 85% */}
-                    {!isApproved && product.confidence.flagged_reasons && product.confidence.flagged_reasons.length > 0 && (
+                    {!isApproved && flaggedReasons.length > 0 && (
                       <div className="product-flagged-box">
                         <span className="flagged-title">⚠️ Human Review Flagged Reasons:</span>
                         <ul className="flagged-reasons-list">
-                          {product.confidence.flagged_reasons.map((reason, rIdx) => (
+                          {flaggedReasons.map((reason, rIdx) => (
                             <li key={rIdx}>{reason}</li>
                           ))}
                         </ul>
@@ -267,7 +298,7 @@ export default function CatalogExplorer() {
 
                     <div className="product-confidence-box">
                       <ConfidenceBar
-                        value={product.confidence.overall_confidence}
+                        value={getOverallConfidence(product)}
                         label="Pipeline Confidence"
                         showPercentage
                       />
@@ -367,4 +398,5 @@ export default function CatalogExplorer() {
     </section>
   );
 }
+
 
