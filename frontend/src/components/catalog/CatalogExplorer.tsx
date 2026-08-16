@@ -49,9 +49,9 @@ export default function CatalogExplorer() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'review'>('all');
   const [selectedProduct, setSelectedProduct] = useState<EnrichedProduct | null>(null);
 
-  // Pagination state: 6 items per page (2 rows of 3 cards each for clean alignment)
+  // Pagination state: 20 items per page (50 pages for 1,000 SKUs)
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 20;
 
   // Live Demo Modal State
   const [liveModalSku, setLiveModalSku] = useState<string | null>(null);
@@ -103,7 +103,7 @@ export default function CatalogExplorer() {
     return filteredProducts.slice(start, start + itemsPerPage);
   }, [filteredProducts, currentPage]);
 
-  // Windowed pagination generator
+  // Windowed pagination generator (1 2 3 4 5 6 ... 50)
   const paginationRange = useMemo(() => {
     const total = totalPages;
     const current = currentPage;
@@ -112,32 +112,33 @@ export default function CatalogExplorer() {
       return Array.from({ length: total }, (_, i) => i + 1);
     }
 
-    const pages: (number | string)[] = [1];
-    let start = Math.max(2, current - 1);
-    let end = Math.min(total - 1, current + 1);
+    const pages: (number | string)[] = [];
 
-    if (current <= 3) {
-      end = 4;
-    } else if (current >= total - 2) {
-      start = total - 3;
-    }
-
-    if (start > 2) {
+    if (current <= 4) {
+      for (let i = 1; i <= 6; i++) {
+        pages.push(i);
+      }
       pages.push('...');
-    }
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-
-    if (end < total - 1) {
+      pages.push(total);
+    } else if (current >= total - 3) {
+      pages.push(1);
       pages.push('...');
+      for (let i = total - 5; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+      pages.push('...');
+      pages.push(current - 1);
+      pages.push(current);
+      pages.push(current + 1);
+      pages.push('...');
+      pages.push(total);
     }
-
-    pages.push(total);
 
     return pages;
   }, [totalPages, currentPage]);
+
 
   const handleLiveEnrichClick = async (mpn: string) => {
     setLiveModalSku(mpn);
