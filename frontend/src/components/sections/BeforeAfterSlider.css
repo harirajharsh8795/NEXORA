@@ -29,10 +29,14 @@
 }
 
 .slider-panel--raw {
-  background: rgba(239, 68, 68, 0.04);
+  background: #ffffff;
   border: 1px solid rgba(239, 68, 68, 0.2);
   width: 100%;
   min-height: 480px;
+}
+
+.dark .slider-panel--raw {
+  background: #0e0714;
 }
 
 .slider-panel--enriched {
@@ -41,13 +45,18 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--bg-card);
+  background: #ffffff;
   border: 1px solid rgba(168, 85, 247, 0.3);
   z-index: 10;
   min-height: 480px;
   overflow: hidden;
   transition: clip-path 0.02s linear;
 }
+
+.dark .slider-panel--enriched {
+  background: #0a0f1d;
+}
+
 
 .slider-divider-line {
   position: absolute;
