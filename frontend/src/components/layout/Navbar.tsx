@@ -1,21 +1,30 @@
 import { useTheme } from '../../context/ThemeContext';
+import { useRouter } from '../../context/RouterContext';
 import './Navbar.css';
 
 const navLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'Pipeline', href: '#pipeline' },
-  { label: 'ROI Calculator', href: '#roi-calculator' },
-  { label: 'Catalog', href: '#catalog' },
+  { label: 'Features', href: '#features', route: '/' },
+  { label: 'Pipeline', href: '#pipeline', route: '/' },
+  { label: 'ROI Calculator', href: '#roi-calculator', route: '/' },
+  { label: 'Catalog', href: '/catalog', route: '/catalog' },
 ];
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
+  const { currentPath, navigate } = useRouter();
 
   return (
     <header className="navbar glass-card--no-hover">
       <div className="navbar__inner">
         {/* Logo */}
-        <a href="#" className="navbar__logo">
+        <a
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate('/');
+          }}
+          className="navbar__logo"
+        >
           <img
             src="/logo.png"
             alt="Nexora AI"
@@ -26,11 +35,22 @@ export default function Navbar() {
 
         {/* Navigation Links */}
         <nav className="navbar__nav">
-          {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className="navbar__link">
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = link.route === '/catalog' ? currentPath === '/catalog' : currentPath === '/';
+            return (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(link.href === '/catalog' ? '/catalog' : link.href);
+                }}
+                className={`navbar__link ${isActive && link.route === '/catalog' ? 'navbar__link--active' : ''}`}
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </nav>
 
         {/* Right side: theme toggle + CTA */}
@@ -42,12 +62,17 @@ export default function Navbar() {
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
-          <a href="#catalog" className="navbar__cta">
-            Explore Live Demo
+          <button
+            onClick={() => navigate('/catalog')}
+            className="navbar__cta"
+            style={{ border: 'none', cursor: 'pointer' }}
+          >
+            Open Live Catalog
             <span className="navbar__cta-arrow">→</span>
-          </a>
+          </button>
         </div>
       </div>
     </header>
   );
 }
+

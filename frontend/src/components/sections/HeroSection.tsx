@@ -1,7 +1,10 @@
 import Button from '../ui/Button';
+import { useRouter } from '../../context/RouterContext';
 import './HeroSection.css';
 
 export default function HeroSection() {
+  const { navigate } = useRouter();
+
   return (
     <section className="hero">
       <div className="hero__background">
@@ -29,14 +32,10 @@ export default function HeroSection() {
           </p>
 
           <div className="hero__ctas">
-            <Button variant="primary" size="lg" icon={<span>→</span>} onClick={() => {
-              document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' });
-            }}>
-              Explore Enriched Catalog
+            <Button variant="primary" size="lg" icon={<span>→</span>} onClick={() => navigate('/catalog')}>
+              Open Live Catalog Workspace
             </Button>
-            <Button variant="outline" size="lg" icon={<span>⚡</span>} onClick={() => {
-              document.getElementById('roi-calculator')?.scrollIntoView({ behavior: 'smooth' });
-            }}>
+            <Button variant="outline" size="lg" icon={<span>⚡</span>} onClick={() => navigate('#roi-calculator')}>
               Calculate ROI
             </Button>
           </div>

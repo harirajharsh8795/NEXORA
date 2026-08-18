@@ -67,7 +67,8 @@
   position: relative;
 }
 
-.navbar__link:hover {
+.navbar__link:hover,
+.navbar__link--active {
   color: var(--nexora-purple);
 }
 
@@ -82,7 +83,8 @@
   transition: width var(--transition-base);
 }
 
-.navbar__link:hover::after {
+.navbar__link:hover::after,
+.navbar__link--active::after {
   width: 100%;
 }
 

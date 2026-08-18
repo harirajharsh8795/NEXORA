@@ -1,7 +1,10 @@
 import Button from '../ui/Button';
+import { useRouter } from '../../context/RouterContext';
 import './CTABanner.css';
 
 export default function CTABanner() {
+  const { navigate } = useRouter();
+
   return (
     <section className="cta-banner-section">
       <div className="cta-banner glass-card">
@@ -18,10 +21,8 @@ export default function CTABanner() {
 
 
           <div className="cta-actions">
-            <Button variant="primary" size="lg" icon={<span>🚀</span>} onClick={() => {
-              document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' });
-            }}>
-              Explore Live Catalog Demo
+            <Button variant="primary" size="lg" icon={<span>🚀</span>} onClick={() => navigate('/catalog')}>
+              Open Live Catalog Workspace
             </Button>
             <Button variant="ghost" size="lg" onClick={() => {
               window.open('https://github.com/harirajharsh8795/NEXORA#readme', '_blank');
