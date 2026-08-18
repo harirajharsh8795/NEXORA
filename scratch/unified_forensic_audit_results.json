@@ -1,0 +1,79 @@
+{
+  "title": "Unified End-to-End Pre-Submission Forensic Audit Report",
+  "total_tests": 10,
+  "passed_tests": 10,
+  "failed_tests": 0,
+  "system_readiness_score": 100.0,
+  "detailed_test_results": [
+    {
+      "test_num": 1,
+      "test_name": "Completely Unseen SKU Ingestion",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "Dynamic instantiation without static fallback: 'UNSEEN-SKU-9999'"
+    },
+    {
+      "test_num": 2,
+      "test_name": "Modified / Near-Match SKU Handling",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "Preserved distinct product identities without mismatch"
+    },
+    {
+      "test_num": 3,
+      "test_name": "Missing Brand Identification",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "Assigned generic identity and routed to HITL review queue"
+    },
+    {
+      "test_num": 4,
+      "test_name": "Missing Attributes Abstention",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "Returned null/omitted for irrelevant Voltage attribute"
+    },
+    {
+      "test_num": 5,
+      "test_name": "Malformed Row Isolation",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "Isolated missing description with validation error flag"
+    },
+    {
+      "test_num": 6,
+      "test_name": "Amazon/eBay Prohibited Discard",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "Discarded marketplace URLs under Tier 99 EXCLUDED"
+    },
+    {
+      "test_num": 7,
+      "test_name": "Two Conflicting Manufacturer Sources",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "Flagged CONFLICT_DETECTED and routed to HITL queue"
+    },
+    {
+      "test_num": 8,
+      "test_name": "Unsupported / Hallucinated Spec Abstention",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "0 non-standard fabricated attributes assigned"
+    },
+    {
+      "test_num": 9,
+      "test_name": "Dataset A -> Dataset B Cache Isolation",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "Dataset B upload clears Dataset A records from export stream"
+    },
+    {
+      "test_num": 10,
+      "test_name": "252-Column CX1 Export Header Integrity",
+      "passed": true,
+      "status": "VERIFIED",
+      "evidence": "Exact header count: 252"
+    }
+  ]
+}

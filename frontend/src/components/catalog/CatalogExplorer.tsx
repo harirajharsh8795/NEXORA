@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 import StatusBadge from '../ui/StatusBadge';
 import ConfidenceBar from '../ui/ConfidenceBar';
 import EvidenceModal from './EvidenceModal';
-import { fetchProducts } from '../../api/client';
+import { fetchProducts, uploadEvaluatorDataset, exportDeliveryCsv } from '../../api/client';
 import { triggerLiveEnrichment, LIVE_DEMO_MPNS } from '../../api/liveEnrichment';
 import { MOCK_PRODUCTS } from '../../data/mockData';
 import type { EnrichedProduct } from '../../types';
@@ -49,6 +49,68 @@ export default function CatalogExplorer() {
     review: MOCK_PRODUCTS.filter((p) => isNeedsReview(p)).length || 309
   });
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'review'>('all');
+  const [selectedProduct, setSelectedProduct] = useState<EnrichedProduct | null>(null);
+
+  // Pagination state: 20 items per page (50 pages for 1,000 SKUs)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
+  // Live Demo Modal State
+  const [liveModalSku, setLiveModalSku] = useState<string | null>(null);
+  const [liveStep, setLiveStep] = useState<string>('');
+  const [liveFallbackMessage, setLiveFallbackMessage] = useState<string | null>(null);
+  const [isLiveRunning, setIsLiveRunning] = useState(false);
+
+  useEffect(() => {
+    fetchProducts().then((res) => {
+      if (res.products && res.products.length > 0) {
+        setProducts(res.products);
+        setStats({
+          total: res.stats.total || res.products.length,
+          approved: res.stats.approved,
+          review: res.stats.review,
+        });
+      }
+      setLoading(false);
+    });
+  }, []);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setUploadStatus(`Uploading & processing evaluator dataset "${file.name}"...`);
+
+    try {
+      const res = await uploadEvaluatorDataset(file);
+      setProducts(res.products);
+      setStats({
+        total: res.total,
+        approved: res.approved,
+        review: res.review,
+      });
+      setUploadStatus(`✅ Dynamic enrichment complete for "${res.filename}" (${res.total} SKUs processed)!`);
+    } catch (err: any) {
+      setUploadStatus(`❌ Processing error: ${err.message}`);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleExportCsv = async () => {
+    try {
+      await exportDeliveryCsv();
+    } catch (err: any) {
+      alert(`Export failed: ${err.message}`);
+    }
+  };
+
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'review'>('all');
@@ -219,6 +281,73 @@ export default function CatalogExplorer() {
           </span>
           <span className="live-demo-tag">10 SKUs Live Active</span>
         </div>
+
+        {/* Evaluator Upload & Export Action Bar */}
+        <div className="evaluator-action-bar" style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          alignItems: 'center',
+          justify: 'space-between',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          padding: '1rem 1.25rem',
+          marginBottom: '1.5rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <label className="upload-btn" style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+              color: '#fff',
+              padding: '0.6rem 1.2rem',
+              borderRadius: '8px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              boxShadow: '0 4px 14px rgba(6, 182, 212, 0.25)'
+            }}>
+              <span>📤 Upload Evaluator File (.csv / .xlsx)</span>
+              <input
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                onChange={handleFileUpload}
+                disabled={uploading}
+                style={{ display: 'none' }}
+              />
+            </label>
+
+            <button
+              onClick={handleExportCsv}
+              className="export-btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: '#fff',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                padding: '0.6rem 1.2rem',
+                borderRadius: '8px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <span>📥 Export 252-Column CX1 CSV</span>
+            </button>
+          </div>
+
+          {uploadStatus && (
+            <div style={{ fontSize: '0.85rem', color: uploadStatus.startsWith('❌') ? '#f87171' : '#34d399', fontWeight: 500 }}>
+              {uploadStatus}
+            </div>
+          )}
+        </div>
+
 
         {/* Filter Controls */}
         <div className="catalog-controls">

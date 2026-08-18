@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Tuple
 from src.models.attribute import AttributeTriplet
 from src.engines.uom_engine import UOMEngine
 from src.engines.normalization_engine import NormalizationEngine
+from src.engines.fraction_engine import FractionNormalizationEngine
 
 class AttributeEngine:
     """Extracts structured (Label, Value, UOM) triplets based on description and classification."""
@@ -10,6 +11,8 @@ class AttributeEngine:
     def __init__(self):
         self.uom_engine = UOMEngine()
         self.norm_engine = NormalizationEngine()
+        self.fraction_engine = FractionNormalizationEngine()
+
 
     def extract_attributes(self, part_desc: str, mfg_part_num: str, brand: str, manuf: str, classpath: str) -> List[AttributeTriplet]:
         triplets: List[AttributeTriplet] = []
@@ -66,7 +69,7 @@ class AttributeEngine:
         )
         if dim_match:
             raw_dims = [d for d in dim_match.groups() if d]
-            dims = [("0" + d.strip()) if d.strip().startswith(".") else d.strip() for d in raw_dims]
+            dims = [self.fraction_engine.normalize_measurement(("0" + d.strip()) if d.strip().startswith(".") else d.strip(), uom="in") for d in raw_dims]
 
             if len(dims) == 1:
                 triplets.append(AttributeTriplet(
@@ -92,6 +95,7 @@ class AttributeEngine:
                     uom="",
                     confidence=0.90
                 ))
+
 
 
         # Wattage (e.g. 40W, 100W, 60W, 3HP, 2HP)

@@ -1,6 +1,6 @@
 import csv
 import pandas as pd
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from pathlib import Path
 from src.models.product import RawSKURecord, EnrichedProduct
 from src.models.attribute import AttributeTriplet
@@ -14,21 +14,73 @@ def get_delivery_format_columns(sample_path: Path = DELIVERY_FORMAT_PATH) -> Lis
 
 DELIVERY_COLUMNS = get_delivery_format_columns()
 
-def read_input_csv(file_path: Path = INPUT_CSV_PATH) -> List[RawSKURecord]:
-    """Reads input CSV into list of RawSKURecord Pydantic objects."""
+def parse_raw_dataframe(df: pd.DataFrame) -> Tuple[List[RawSKURecord], List[str]]:
+    """Flexibly maps headers of an input dataframe into RawSKURecord objects."""
     records = []
-    df = pd.read_csv(file_path, dtype=str).fillna("")
-    for _, row in df.iterrows():
+    warnings = []
+    
+    # Header normalization dictionary
+    col_map = {}
+    for col in df.columns:
+        c_clean = str(col).strip().lower().replace(" ", "_").replace("-", "_")
+        if c_clean in ["mfg_part_num", "mpn", "part_number", "mfg_part_no", "part_num", "sku"]:
+            col_map["mfg_part_num"] = col
+        elif c_clean in ["part_desc", "description", "part_description", "item_description", "desc"]:
+            col_map["part_desc"] = col
+        elif c_clean in ["e1_brand", "e1brand", "brand", "brand_name"]:
+            col_map["e1_brand"] = col
+        elif c_clean in ["unilog_brand", "unilogbrand"]:
+            col_map["unilog_brand"] = col
+        elif c_clean in ["dib_brand", "dibbrand"]:
+            col_map["dib_brand"] = col
+        elif c_clean in ["part_manuf", "manufacturer", "manuf", "part_manufacturer", "mfr_name"]:
+            col_map["part_manuf"] = col
+
+    mpn_col = col_map.get("mfg_part_num")
+    desc_col = col_map.get("part_desc")
+
+    if not mpn_col:
+        warnings.append("Mfg_Part_Num column not explicitly found. Using first column or fallback identifiers.")
+    if not desc_col:
+        warnings.append("Part_Desc column not explicitly found. Using secondary text column or empty description.")
+
+    df_filled = df.fillna("")
+
+    for idx, row in df_filled.iterrows():
+        raw_mpn = str(row[mpn_col]).strip() if mpn_col and mpn_col in row else ""
+        raw_desc = str(row[desc_col]).strip() if desc_col and desc_col in row else ""
+
+        # Handle missing MPN or description gracefully
+        if not raw_mpn:
+            raw_mpn = f"RAW-ROW-{idx + 1}"
+            warnings.append(f"Row {idx + 1}: Missing MPN assigned fallback '{raw_mpn}'")
+        
+        if not raw_desc and len(row) > 1:
+            # Fallback to any string column if description missing
+            for col_val in row.values:
+                val_str = str(col_val).strip()
+                if val_str and val_str != raw_mpn:
+                    raw_desc = val_str
+                    break
+
         record = RawSKURecord(
-            mfg_part_num=str(row.get("Mfg_Part_Num", "")).strip(),
-            part_desc=str(row.get("Part_Desc", "")).strip(),
-            e1_brand=str(row.get("E1_Brand", "")).strip() if "E1_Brand" in row else None,
-            unilog_brand=str(row.get("Unilog_Brand", "")).strip() if "Unilog_Brand" in row else None,
-            dib_brand=str(row.get("DIB_Brand", "")).strip() if "DIB_Brand" in row else None,
-            part_manuf=str(row.get("Part_Manuf", "")).strip() if "Part_Manuf" in row else None,
+            mfg_part_num=raw_mpn,
+            part_desc=raw_desc,
+            e1_brand=str(row.get(col_map.get("e1_brand", ""), "")).strip() or None,
+            unilog_brand=str(row.get(col_map.get("unilog_brand", ""), "")).strip() or None,
+            dib_brand=str(row.get(col_map.get("dib_brand", ""), "")).strip() or None,
+            part_manuf=str(row.get(col_map.get("part_manuf", ""), "")).strip() or None,
         )
         records.append(record)
+
+    return records, warnings
+
+def read_input_csv(file_path: Path = INPUT_CSV_PATH) -> List[RawSKURecord]:
+    """Reads input CSV into list of RawSKURecord Pydantic objects."""
+    df = pd.read_csv(file_path, dtype=str).fillna("")
+    records, _ = parse_raw_dataframe(df)
     return records
+
 
 def product_to_delivery_row(product: EnrichedProduct) -> Dict[str, Any]:
     """Maps EnrichedProduct object to exact delivery format row dictionary."""

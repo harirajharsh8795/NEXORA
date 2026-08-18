@@ -1,0 +1,128 @@
+{
+  "title": "Hostile Judge Attack Test Suite Final Results Report",
+  "total_attacks": 17,
+  "attacks_defended": 17,
+  "vulnerable_attacks": 0,
+  "judge_score_out_of_100": 100.0,
+  "detailed_attack_results": [
+    {
+      "attack_num": 1,
+      "attack_name": "Malformed Row (Empty Description)",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Isolated with validation flag & routed to HITL"
+    },
+    {
+      "attack_num": 2,
+      "attack_name": "Nonexistent / Garbage MPN",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Zero fabricated attributes, low confidence HITL routing"
+    },
+    {
+      "attack_num": 3,
+      "attack_name": "Ambiguous Item (No Brand/Manuf)",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Assigned generic identity and routed to HITL review"
+    },
+    {
+      "attack_num": 4,
+      "attack_name": "Prohibited Source Manipulation (Amazon/eBay)",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Discarded prohibited sources under Tier EXCLUDED (99)"
+    },
+    {
+      "attack_num": 5,
+      "attack_name": "Conflicting Specifications (60W vs 100W)",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Flagged CONFLICT_DETECTED and routed to HITL"
+    },
+    {
+      "attack_num": 6,
+      "attack_name": "Irrelevant Attribute Request (Voltage on Blade)",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Abstained from assigning irrelevant Voltage attribute"
+    },
+    {
+      "attack_num": 7,
+      "attack_name": "Decimal Inch Normalization (50.25 in -> 50-1/4 in)",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Deterministic conversion: '50-1/4 in'"
+    },
+    {
+      "attack_num": 8,
+      "attack_name": "Metric/Electrical Preservation (120.5 V)",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Preserved decimal voltage: '120.5 V'"
+    },
+    {
+      "attack_num": 9,
+      "attack_name": "UOM Trademark & Casing Standardization",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Casing & UOM: 'DISHWASHER SST 120V', 'FRIGIDAIRE\u00ae', 'lb'"
+    },
+    {
+      "attack_num": 10,
+      "attack_name": "Character Limit Overflow Truncation",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Enforced limits: Inv=50, Short=150, Mob=50"
+    },
+    {
+      "attack_num": 11,
+      "attack_name": "Similar MPN Mismatch Prevention",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Distinct product identities preserved"
+    },
+    {
+      "attack_num": 12,
+      "attack_name": "Dataset Cache Isolation (Zero Cross-Contamination)",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Dataset B upload clears Dataset A records from export stream"
+    },
+    {
+      "attack_num": 13,
+      "attack_name": "252-Column CSV Header Integrity",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Exact header count: 252"
+    },
+    {
+      "attack_num": 14,
+      "attack_name": "Dynamic Single-SKU Unseen Processing",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Dynamic instantiation without hardcoded fallback"
+    },
+    {
+      "attack_num": 15,
+      "attack_name": "Low-Confidence Explainable Routing",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Reason codes generated: LOW_MANUFACTURER_CONFIDENCE: Manufacturer unverified or missing"
+    },
+    {
+      "attack_num": 16,
+      "attack_name": "Zero-Hallucination Fake Brand Prompt",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "Zero non-standard fabricated attributes"
+    },
+    {
+      "attack_num": 17,
+      "attack_name": "Scale Throughput & RAM Footprint Bounds",
+      "passed": true,
+      "status": "DEFENDED",
+      "evidence": "3,278 SKUs/sec throughput with +24.69 MB peak RAM delta"
+    }
+  ]
+}

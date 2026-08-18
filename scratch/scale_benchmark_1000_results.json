@@ -1,0 +1,26 @@
+{
+  "benchmark_title": "1,000-SKU Full Scale Pipeline Benchmark Report",
+  "total_skus_processed": 1000,
+  "wall_clock_time_sec": 0.305,
+  "throughput_skus_per_sec": 3278.7,
+  "avg_in_memory_latency_ms_per_sku": 0.305,
+  "peak_ram_delta_mb": 24.69,
+  "auto_approved_count": 701,
+  "hitl_review_count": 299,
+  "auto_approval_rate_pct": 70.1,
+  "hitl_review_rate_pct": 29.9,
+  "total_attributes_extracted": 3462,
+  "avg_attributes_per_sku": 3.46,
+  "lov_compliance_pct": 100.0,
+  "uom_compliance_pct": 100.0,
+  "stage_latencies_ms": {
+    "1_Entity_Resolution": 192.48,
+    "2_Classification": 16.01,
+    "3_Attribute_Extraction": 70.1,
+    "4_Enrichment_Candidate_Gen": 8.02,
+    "5_Content_Synthesis": 11.45,
+    "6_Validation": 1.87,
+    "7_Review_Routing": 5.09
+  },
+  "critical_distinction_note": "1,000 rows processed in-memory through deterministic multi-agent pipeline. Live web/PDF scraping is invoked dynamically per unseen SKU on-demand to avoid rate-limiting wall-clock stalls during 1k batch runs."
+}

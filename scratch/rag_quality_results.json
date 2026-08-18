@@ -1,0 +1,59 @@
+{
+  "title": "RAG Retrieval & Extraction Quality Audit Report",
+  "test_cases_audited": 4,
+  "total_audit_time_sec": 50.7,
+  "avg_retrieval_latency_sec": 12.68,
+  "total_tokens_consumed": 1722,
+  "trusted_source_ratio_pct": 100.0,
+  "prohibited_source_violations": 0,
+  "detailed_results": [
+    {
+      "mpn": "PDSH4816AF",
+      "brand": "FRIGIDAIRE",
+      "query": "FRIGIDAIRE PDSH4816AF 300 Series 24 in Built-In Dishwasher specifications datasheet PDF",
+      "evidence_found": true,
+      "primary_domain": "frigidaire.com",
+      "is_trusted_source": true,
+      "is_prohibited": false,
+      "retrieved_char_count": 0,
+      "estimated_token_cost": 0,
+      "extracted_specs_count": 1
+    },
+    {
+      "mpn": "D0724A",
+      "brand": "Diablo",
+      "query": "Diablo D0724A 7-1/4 in 24T Framing Saw Blade specifications datasheet PDF",
+      "evidence_found": true,
+      "primary_domain": "diablotools.com",
+      "is_trusted_source": true,
+      "is_prohibited": false,
+      "retrieved_char_count": 0,
+      "estimated_token_cost": 0,
+      "extracted_specs_count": 6
+    },
+    {
+      "mpn": "DCD771C2",
+      "brand": "DEWALT",
+      "query": "DEWALT DCD771C2 20V MAX Cordless Drill Combo Kit specifications datasheet PDF",
+      "evidence_found": true,
+      "primary_domain": "dewalt.com",
+      "is_trusted_source": true,
+      "is_prohibited": false,
+      "retrieved_char_count": 6890,
+      "estimated_token_cost": 1722,
+      "extracted_specs_count": 4
+    },
+    {
+      "mpn": "WDTS7024RZ",
+      "brand": "Whirlpool",
+      "query": "Whirlpool WDTS7024RZ 24 in Built-In Dishwasher specifications datasheet PDF",
+      "evidence_found": false,
+      "primary_domain": "whirlpool.com",
+      "is_trusted_source": true,
+      "is_prohibited": false,
+      "retrieved_char_count": 0,
+      "estimated_token_cost": 0,
+      "extracted_specs_count": 0
+    }
+  ]
+}

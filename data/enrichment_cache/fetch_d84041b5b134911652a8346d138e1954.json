@@ -1,0 +1,10 @@
+{
+  "url": "https://www.frigidaire.com/en/p/owner-center/product-support/PDSH4816AF",
+  "content_type": "html",
+  "raw_text": "",
+  "fetch_timestamp": "2026-08-18T13:27:58Z",
+  "http_status": 0,
+  "success": false,
+  "error": "HTTPSConnectionPool(host='www.frigidaire.com', port=443): Read timed out. (read timeout=10)",
+  "pdf_tables": []
+}

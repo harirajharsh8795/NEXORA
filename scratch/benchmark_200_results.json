@@ -1,0 +1,248 @@
+{
+  "benchmark_title": "200-Row Dataset Pipeline Benchmark Execution Report",
+  "total_skus_processed": 200,
+  "total_execution_time_sec": 0.1,
+  "avg_latency_ms_per_sku": 0.5,
+  "auto_approved_count": 161,
+  "human_review_count": 39,
+  "auto_approval_rate_pct": 80.5,
+  "total_attributes_extracted": 709,
+  "avg_attributes_per_sku": 3.5,
+  "lov_compliance_pct": 100.0,
+  "uom_compliance_pct": 100.0,
+  "gold_standard_smoke_eval": {
+    "benchmark_title": "ACTUAL BENCHMARK (2 Rows)",
+    "status": "SUCCESS",
+    "is_smoke_test": false,
+    "total_ground_truth_rows": 2,
+    "matched_prediction_rows": 2,
+    "evaluated_field_cells": 50,
+    "overall_exact_match_pct": 34.0,
+    "overall_normalized_match_pct": 44.0,
+    "best_performing_fields": [
+      "MANUFACTURER_NAME (100.0%)",
+      "BRAND_NAME (100.0%)",
+      "Classpath (100.0%)",
+      "MOBILE_DESC (100.0%)",
+      "SHORT_DESC (100.0%)"
+    ],
+    "worst_performing_fields": [
+      "ATTRIBUTE_VALUE 4 (0.0%)",
+      "ATTRIBUTE_UOM 4 (0.0%)",
+      "ATTRIBUTE_LABEL 5 (0.0%)",
+      "ATTRIBUTE_VALUE 5 (0.0%)",
+      "ATTRIBUTE_UOM 5 (0.0%)"
+    ],
+    "per_column_metrics": {
+      "MANUFACTURER_NAME": {
+        "exact_match_pct": 100.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 100.0
+      },
+      "BRAND_NAME": {
+        "exact_match_pct": 100.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 100.0
+      },
+      "Classpath": {
+        "exact_match_pct": 100.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 100.0
+      },
+      "MOBILE_DESC": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 100.0
+      },
+      "INVOICE_DESC": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "SHORT_DESC": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 100.0
+      },
+      "LONG_DESC1": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "ATTRIBUTE_LABEL 1": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "ATTRIBUTE_VALUE 1": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "ATTRIBUTE_UOM 1": {
+        "exact_match_pct": 100.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 0.0
+      },
+      "ATTRIBUTE_LABEL 2": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "ATTRIBUTE_VALUE 2": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "ATTRIBUTE_UOM 2": {
+        "exact_match_pct": 100.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 0.0
+      },
+      "ATTRIBUTE_LABEL 3": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "ATTRIBUTE_VALUE 3": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "ATTRIBUTE_UOM 3": {
+        "exact_match_pct": 100.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 0.0
+      },
+      "ATTRIBUTE_LABEL 4": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "ATTRIBUTE_VALUE 4": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 100.0
+      },
+      "ATTRIBUTE_UOM 4": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 0.0
+      },
+      "ATTRIBUTE_LABEL 5": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 0.0
+      },
+      "ATTRIBUTE_VALUE 5": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 0.0
+      },
+      "ATTRIBUTE_UOM 5": {
+        "exact_match_pct": 0.0,
+        "normalized_match_pct": 0.0,
+        "completeness_pct": 0.0
+      },
+      "Product Name": {
+        "exact_match_pct": 100.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 100.0
+      },
+      "MFR URL": {
+        "exact_match_pct": 50.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 100.0
+      },
+      "Specification Sheet": {
+        "exact_match_pct": 100.0,
+        "normalized_match_pct": 100.0,
+        "completeness_pct": 100.0
+      }
+    }
+  },
+  "top_completed_fields": [
+    [
+      "MFR URL",
+      100.0
+    ],
+    [
+      "PART_NUMBER",
+      100.0
+    ],
+    [
+      "Dept",
+      100.0
+    ],
+    [
+      "Class",
+      100.0
+    ],
+    [
+      "Fine",
+      100.0
+    ],
+    [
+      "SKU - MY_PART_NUMBER",
+      100.0
+    ],
+    [
+      "Mfg_Part_Num",
+      100.0
+    ],
+    [
+      "Part_Desc",
+      100.0
+    ],
+    [
+      "Part_Manuf",
+      100.0
+    ],
+    [
+      "MANUFACTURER_NAME",
+      100.0
+    ]
+  ],
+  "sparse_fields": [
+    [
+      "Ref URL 3",
+      0.0
+    ],
+    [
+      "Ref URL 4",
+      0.0
+    ],
+    [
+      "Ref URL 5",
+      0.0
+    ],
+    [
+      "Unilog_Brand",
+      0.0
+    ],
+    [
+      "DIB_Brand",
+      0.0
+    ],
+    [
+      "TRADE_NAME",
+      0.0
+    ],
+    [
+      "ALTERNATE_PART_NUMBER",
+      0.0
+    ],
+    [
+      "ITEM_FEATURES_5",
+      0.0
+    ],
+    [
+      "ITEM_FEATURES_6",
+      0.0
+    ],
+    [
+      "ITEM_FEATURES_7",
+      0.0
+    ]
+  ]
+}

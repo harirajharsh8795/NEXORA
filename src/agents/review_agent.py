@@ -16,12 +16,13 @@ class ReviewAgent(BaseAgent):
         for p in products:
             overall = p.confidence.calculate_overall()
 
-            if overall >= AUTO_APPROVE_CONFIDENCE_THRESHOLD and not p.confidence.flagged_reasons:
+            if overall >= AUTO_APPROVE_CONFIDENCE_THRESHOLD and not p.confidence.needs_human_review:
                 p.confidence.needs_human_review = False
                 approved.append(p)
             else:
                 p.confidence.needs_human_review = True
                 human_review.append(p)
+
 
         self.logger.info(f"Routing complete: {len(approved)} Auto-Approved ({(len(approved)/len(products))*100:.1f}%), {len(human_review)} Flagged for Human Review.")
         return approved, human_review

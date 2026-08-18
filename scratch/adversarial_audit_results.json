@@ -1,0 +1,40 @@
+{
+  "title": "Adversarial Hallucination & Abstention Audit Report",
+  "total_adversarial_skus": 3,
+  "total_abstentions": 3,
+  "total_hallucinations": 0,
+  "hallucination_rate_pct": 0.0,
+  "hitl_routing_rate_pct": 100.0,
+  "audit_results": [
+    {
+      "mpn": "GARBAGE-999-XYZ",
+      "desc": "Unknown Nonexistent Item",
+      "assigned_brand": "",
+      "assigned_manuf": "",
+      "confidence_score": 0.5717,
+      "routed_to_hitl": true,
+      "abstained_correctly": true,
+      "hallucinated_specs_found": 0
+    },
+    {
+      "mpn": "999999",
+      "desc": "Widget 50mm",
+      "assigned_brand": "",
+      "assigned_manuf": "",
+      "confidence_score": 0.5735,
+      "routed_to_hitl": true,
+      "abstained_correctly": true,
+      "hallucinated_specs_found": 0
+    },
+    {
+      "mpn": "FAKE-DRILL-001",
+      "desc": "Super Ultra Cordless Drill 99V",
+      "assigned_brand": "Fakebrand",
+      "assigned_manuf": "FakeCorp",
+      "confidence_score": 0.7735,
+      "routed_to_hitl": true,
+      "abstained_correctly": true,
+      "hallucinated_specs_found": 0
+    }
+  ]
+}
