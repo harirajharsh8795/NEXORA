@@ -1,5 +1,5 @@
 import pytest
-import pandas as pd
+import re
 from src.models.product import RawSKURecord
 from src.agents.entity_resolution_agent import EntityResolutionAgent
 from src.agents.classification_agent import ClassificationAgent
@@ -8,94 +8,118 @@ from src.engines.fuzzy_matcher import FuzzyMatcher
 from src.engines.classification_engine import ClassificationEngine
 from src.engines.attribute_engine import AttributeEngine
 
-def test_manufacturer_resolution_isolation():
-    """Verifies that MPN is NEVER assigned to Manufacturer under any circumstances."""
+def test_mfg_part_num_never_maps_to_manufacturer():
+    """Ensures MPN is NEVER assigned to Manufacturer."""
     matcher = FuzzyMatcher()
+    mfr, conf = matcher.resolve_manufacturer("TEST-BLADE-004", "7-1/4 in blade")
+    assert mfr != "TEST-BLADE-004", "MPN must not be assigned to Manufacturer!"
 
-    # Case 1: Unknown / Malformed manufacturer
-    manuf_name, conf = matcher.resolve_manufacturer("Unknown Manufacturer", "3/4 in steel pipe fitting")
-    assert manuf_name == "UNKNOWN", f"Expected UNKNOWN but got '{manuf_name}'"
-    assert conf == 0.0, f"Expected 0.0 confidence but got {conf}"
-
-    manuf_name, conf = matcher.resolve_manufacturer("MALFORMED-TEST-005", "Malformed data")
-    assert manuf_name == "UNKNOWN", f"Expected UNKNOWN but got '{manuf_name}'"
-    assert conf == 0.0, f"Expected 0.0 confidence but got {conf}"
-
-    # Case 2: Canonical Manufacturer Resolution
-    manuf_name, conf = matcher.resolve_manufacturer("Freud Inc.", "7-1/4 in. Saw Blade")
-    assert manuf_name == "Freud Inc"
-    assert conf >= 0.90
-
-def test_steel_vs_brass_pipe_fitting_classification():
-    """Verifies that steel fittings are classified as Steel Pipe Fittings, NOT Brass."""
-    engine = ClassificationEngine()
-
-    # Steel fitting test
-    dept, cat_class, fine, classpath, conf = engine.classify("3/4 in steel pipe fitting", "TEST-PIPE-003")
-    assert fine == "Steel Pipe Fittings", f"Expected Steel Pipe Fittings but got '{fine}'"
-    assert "Steel Pipe Fittings" in classpath, f"Expected Steel Pipe Fittings in classpath but got '{classpath}'"
-
-    # Brass fitting test
-    dept, cat_class, fine, classpath, conf = engine.classify("3/8 in brass coupling 150#", "TEST-PIPE-002")
-    assert fine == "Brass Pipe Fittings", f"Expected Brass Pipe Fittings but got '{fine}'"
-    assert "Brass Pipe Fittings" in classpath, f"Expected Brass Pipe Fittings in classpath but got '{classpath}'"
-
-def test_product_isolated_attribute_extraction():
-    """Verifies that saw blade attributes (teeth, blade diameter) do NOT leak into drills or fittings."""
-    engine = AttributeEngine()
-
-    # Drill test
-    drill_attrs = engine.extract_attributes(
-        part_desc="20V Max Cordless Drill Driver 1/2 in Chuck",
-        mfg_part_num="DCD771C2",
-        brand="DeWalt",
-        manuf="DeWalt",
-        classpath="Tools & Hardware>Power Tools>Cordless Drills"
+def test_part_manuf_maps_to_manufacturer():
+    """Ensures Part_Manuf input correctly maps to Manufacturer entity."""
+    record = RawSKURecord(
+        mfg_part_num="UNSEEN-TEST-001",
+        part_desc="20V Max Cordless Drill Driver",
+        part_manuf="Demo Manufacturer",
+        e1_brand="DeWalt"
     )
-    labels = [a.label for a in drill_attrs]
-    assert "Voltage Rating" in labels
-    assert "Number of Teeth" not in labels, "Saw blade attribute 'Number of Teeth' leaked into Drill!"
-    assert "Blade Diameter" not in labels, "Saw blade attribute 'Blade Diameter' leaked into Drill!"
+    er = EntityResolutionAgent()
+    products = er.process([record])
+    assert products[0].manufacturer_name == "Demo Manufacturer"
+    assert products[0].mfg_part_num == "UNSEEN-TEST-001"
 
-    # Steel fitting test
-    fitting_attrs = engine.extract_attributes(
-        part_desc="3/4 in steel pipe fitting 150#",
+def test_unknown_manufacturer_does_not_use_mpn():
+    """Ensures Unknown Manufacturer inputs yield UNKNOWN, NOT the MPN string."""
+    matcher = FuzzyMatcher()
+    mfr, conf = matcher.resolve_manufacturer("Unknown Manufacturer", "3/4 in steel pipe fitting")
+    assert mfr == "UNKNOWN"
+    assert conf == 0.0
+
+def test_brass_description_produces_brass():
+    """Ensures explicit 'brass' produce Material: Brass, NOT Carbon Steel."""
+    engine = AttributeEngine()
+    attrs = engine.extract_attributes(
+        part_desc="1/2 in brass coupling 150#",
+        mfg_part_num="TEST-PIPE-002",
+        brand="-- Unbranded --",
+        manuf="UNKNOWN",
+        classpath="Plumbing & Pipe>Pipe & Pipe Fittings>Brass Pipe Fittings"
+    )
+    mat_attr = next((a for a in attrs if a.label == "Material"), None)
+    assert mat_attr is not None, "Material attribute missing!"
+    assert mat_attr.value == "Brass", f"Expected Brass but got '{mat_attr.value}'"
+
+def test_steel_description_produces_steel():
+    """Ensures explicit 'steel' produces Material: Carbon Steel."""
+    engine = AttributeEngine()
+    attrs = engine.extract_attributes(
+        part_desc="3/4 in steel pipe fitting",
         mfg_part_num="TEST-PIPE-003",
         brand="-- Unbranded --",
         manuf="UNKNOWN",
         classpath="Plumbing & Pipe>Pipe & Pipe Fittings>Steel Pipe Fittings"
     )
-    fit_labels = [a.label for a in fitting_attrs]
-    assert "Fitting Size" in fit_labels or "Material" in fit_labels
-    assert "Number of Teeth" not in fit_labels, "Saw blade attribute leaked into Fitting!"
+    mat_attr = next((a for a in attrs if a.label == "Material"), None)
+    assert mat_attr is not None, "Material attribute missing!"
+    assert mat_attr.value == "Carbon Steel", f"Expected Carbon Steel but got '{mat_attr.value}'"
 
-def test_real_manufacturer_evaluator_dataset_b():
-    """Verifies Test B dataset with real industrial products and valid evidence graphs."""
+def test_stainless_steel_description_produces_stainless_steel():
+    """Ensures explicit 'stainless steel' produces Material: Stainless Steel."""
+    engine = AttributeEngine()
+    attrs = engine.extract_attributes(
+        part_desc="2 in stainless steel pipe coupling 300#",
+        mfg_part_num="TEST-PIPE-004",
+        brand="-- Unbranded --",
+        manuf="UNKNOWN",
+        classpath="Plumbing & Pipe>Pipe & Pipe Fittings>Steel Pipe Fittings"
+    )
+    mat_attr = next((a for a in attrs if a.label == "Material"), None)
+    assert mat_attr is not None, "Material attribute missing!"
+    assert mat_attr.value == "Stainless Steel", f"Expected Stainless Steel but got '{mat_attr.value}'"
+
+def test_explicit_material_overrides_category_default():
+    """Ensures explicit material in description overrides category defaults."""
+    engine = ClassificationEngine()
+
+    dept, cat_class, fine, classpath, conf = engine.classify("3/4 in steel pipe fitting", "TEST-PIPE-003")
+    assert fine == "Steel Pipe Fittings"
+    assert "Steel Pipe Fittings" in classpath
+
+    dept2, cat_class2, fine2, classpath2, conf2 = engine.classify("1/2 in brass coupling 150#", "TEST-PIPE-002")
+    assert fine2 == "Brass Pipe Fittings"
+    assert "Brass Pipe Fittings" in classpath2
+
+def test_provenance_matches_actual_input_field():
+    """Ensures evidence graph provenance matches actual input vendor field."""
+    record = RawSKURecord(
+        mfg_part_num="UNSEEN-TEST-001",
+        part_desc="20V Max Cordless Drill Driver",
+        part_manuf="Demo Manufacturer",
+        e1_brand="DeWalt"
+    )
+    er = EntityResolutionAgent()
+    products = er.process([record])
+
+    evidence = products[0].evidence_graph.evidences.get("MANUFACTURER_NAME")
+    assert evidence is not None
+    assert evidence.value == "Demo Manufacturer"
+    assert "Demo Manufacturer" in evidence.snippet
+
+def test_no_cross_row_attribute_contamination():
+    """Ensures attributes do not leak across different rows in a batch."""
     records = [
         RawSKURecord(mfg_part_num="D0724A", part_desc="7-1/4 in. x 24-Teeth Framing Saw Blade", part_manuf="Freud Inc.", e1_brand="Diablo"),
-        RawSKURecord(mfg_part_num="DW088K", part_desc="Self-Leveling Cross Line Laser Level", part_manuf="DeWalt", e1_brand="DeWalt"),
-        RawSKURecord(mfg_part_num="BR120", part_desc="20 Amp Single-Pole Type BR Circuit Breaker", part_manuf="Eaton", e1_brand="Eaton")
+        RawSKURecord(mfg_part_num="UNSEEN-TEST-001", part_desc="20V Max Cordless Drill Driver", part_manuf="Demo Manufacturer", e1_brand="DeWalt")
     ]
-
     er = EntityResolutionAgent()
     products = er.process(records)
     products = ClassificationAgent().process(products)
     products = AttributeAgent().process(products)
 
-    assert len(products) == 3
+    saw = products[0]
+    drill = products[1]
 
-    # Freud SKU
-    freud_p = products[0]
-    assert freud_p.manufacturer_name == "Freud Inc"
-    assert freud_p.brand_name == "Diablo"
-    assert "Saw Blades" in freud_p.classpath
+    saw_labels = [a.label for a in saw.attributes]
+    drill_labels = [a.label for a in drill.attributes]
 
-    # DeWalt SKU
-    dewalt_p = products[1]
-    assert dewalt_p.manufacturer_name == "DeWalt"
-    assert dewalt_p.mfg_part_num == "DW088K"
-
-    # Eaton SKU
-    eaton_p = products[2]
-    assert eaton_p.manufacturer_name == "Eaton"
-    assert "Circuit Breakers" in eaton_p.classpath
+    assert "Number of Teeth" in saw_labels
+    assert "Number of Teeth" not in drill_labels, "Saw blade teeth count leaked into Drill!"

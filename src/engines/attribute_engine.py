@@ -74,10 +74,12 @@ class AttributeEngine:
                 norm_sz = self.fraction_engine.normalize_measurement(size_match.group(1), uom="in")
                 triplets.append(AttributeTriplet(index=len(triplets)+1, label="Fitting Size", value=norm_sz, uom="in", confidence=0.92))
 
-            if "BRASS" in text_upper or "BRS" in text_upper:
+            if re.search(r"\b(BRASS|BRS)\b", text_upper):
                 triplets.append(AttributeTriplet(index=len(triplets)+1, label="Material", value="Brass", uom="", confidence=0.98))
-            elif "SS" in text_upper.split() or "STAINLESS" in text_upper:
+            elif re.search(r"\b(STAINLESS|STAINLESS STEEL)\b", text_upper) or "SS" in text_upper.split():
                 triplets.append(AttributeTriplet(index=len(triplets)+1, label="Material", value="Stainless Steel", uom="", confidence=0.98))
+            elif re.search(r"\bSTEEL\b", text_upper):
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Material", value="Carbon Steel", uom="", confidence=0.98))
 
             press_match = re.search(r"\b(150|300|125|250)\s*(?:#|lb|PSI)\b", text, re.IGNORECASE)
             if press_match:
@@ -101,7 +103,7 @@ class AttributeEngine:
             if dim_match:
                 norm_dim = self.fraction_engine.normalize_measurement(dim_match.group(1), uom="in")
                 triplets.append(AttributeTriplet(index=len(triplets)+1, label="Blade Diameter", value=norm_dim, uom="in", confidence=0.95))
-            teeth_match = re.search(r"\b(\d{1,3})\s*(?:T|Tooth|Teeth)\b", text, re.IGNORECASE)
+            teeth_match = re.search(r"\b(\d{1,3})\s*(?:-|\s*)?(?:T|Tooth|Teeth)\b", text, re.IGNORECASE)
             if teeth_match:
                 triplets.append(AttributeTriplet(index=len(triplets)+1, label="Number of Teeth", value=teeth_match.group(1), uom="", confidence=0.95))
 

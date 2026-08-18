@@ -346,10 +346,39 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
           };
         }
 
-        if (textUpper.includes('STEEL') || textUpper.includes('STAINLESS') || textUpper.includes('SS')) {
-          attributes.push({ index: 2, label: 'Material', value: textUpper.includes('STAINLESS') ? 'Stainless Steel' : 'Carbon Steel', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
-        } else if (textUpper.includes('BRASS') || textUpper.includes('BRS')) {
+        if (/\b(BRASS|BRS)\b/i.test(textUpper)) {
           attributes.push({ index: 2, label: 'Material', value: 'Brass', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
+          evidences['ATTRIBUTE_Material'] = {
+            field_name: 'Material',
+            value: 'Brass',
+            confidence: 0.98,
+            source_type: 'input_catalog_extraction',
+            snippet: 'Extracted material "Brass" from product description',
+            validated_by_lov: true,
+            validated_by_uom: false
+          };
+        } else if (/\bSTAINLESS\b/i.test(textUpper) || /\bSS\b/i.test(rawDesc)) {
+          attributes.push({ index: 2, label: 'Material', value: 'Stainless Steel', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
+          evidences['ATTRIBUTE_Material'] = {
+            field_name: 'Material',
+            value: 'Stainless Steel',
+            confidence: 0.98,
+            source_type: 'input_catalog_extraction',
+            snippet: 'Extracted material "Stainless Steel" from product description',
+            validated_by_lov: true,
+            validated_by_uom: false
+          };
+        } else if (/\bSTEEL\b/i.test(textUpper)) {
+          attributes.push({ index: 2, label: 'Material', value: 'Carbon Steel', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
+          evidences['ATTRIBUTE_Material'] = {
+            field_name: 'Material',
+            value: 'Carbon Steel',
+            confidence: 0.98,
+            source_type: 'input_catalog_extraction',
+            snippet: 'Extracted material "Steel" from product description',
+            validated_by_lov: true,
+            validated_by_uom: false
+          };
         }
 
         const pressMatch = rawDesc.match(/\b(150|300|125|250)\s*(?:#|lb|PSI)\b/i);

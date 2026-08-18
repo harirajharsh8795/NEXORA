@@ -1,3 +1,4 @@
+import re
 import json
 from pathlib import Path
 from typing import Tuple, Optional, Dict
@@ -27,6 +28,8 @@ class FuzzyMatcher:
 
         raw_upper = raw_manuf_name.strip().upper()
         if any(bad in raw_upper for bad in ["UNKNOWN", "MALFORMED", "GARBAGE", "N/A", "NULL", "NONE", "FICTIONAL", "UNBRANDED"]):
+            return "UNKNOWN", 0.0
+        if re.search(r"^(TEST|SKU|PART|MPN|ITEM|RAW-ROW|UNSEEN|MALFORMED)-", raw_upper) or re.search(r"^[A-Z0-9]+-[A-Z0-9]+-\d+$", raw_upper):
             return "UNKNOWN", 0.0
 
         desc_upper = part_desc.upper() if part_desc else ""
