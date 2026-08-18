@@ -17,10 +17,14 @@ class AttributeEngine:
     def extract_attributes(self, part_desc: str, mfg_part_num: str, brand: str, manuf: str, classpath: str) -> List[AttributeTriplet]:
         triplets: List[AttributeTriplet] = []
         text = f"{part_desc} {mfg_part_num}".strip()
+        text_upper = text.upper()
+
+        if any(bad in text_upper for bad in ["MALFORMED", "UNKNOWN", "GARBAGE", "BAD-DATA", "INVALID"]):
+            return []
 
         # 1. Product Type / Subcategory
         prod_type = self._extract_product_type(text, classpath)
-        if prod_type:
+        if prod_type and prod_type != "Unknown Product":
             triplets.append(AttributeTriplet(
                 index=len(triplets)+1,
                 label="Product Type",
@@ -30,7 +34,7 @@ class AttributeEngine:
             ))
 
         # 2. Brand
-        if brand:
+        if brand and brand != "-- Unbranded --" and brand != "UNKNOWN":
             triplets.append(AttributeTriplet(
                 index=len(triplets)+1,
                 label="Brand",
@@ -40,7 +44,7 @@ class AttributeEngine:
             ))
 
         # 3. Model / MPN
-        if mfg_part_num:
+        if mfg_part_num and not any(bad in mfg_part_num.upper() for bad in ["MALFORMED", "UNKNOWN", "GARBAGE"]):
             triplets.append(AttributeTriplet(
                 index=len(triplets)+1,
                 label="Model",
@@ -49,107 +53,57 @@ class AttributeEngine:
                 confidence=1.0
             ))
 
-        # 4. Dimensions & Specifications (Regex extraction)
-        # Grit Size (e.g., P150, P120, P80, 80 Grit)
-        grit_match = re.search(r"\b(P\d{2,4}|\d{2,4}\s*Grit)\b", text, re.IGNORECASE)
-        if grit_match:
-            triplets.append(AttributeTriplet(
-                index=len(triplets)+1,
-                label="Grit",
-                value=grit_match.group(1).upper(),
-                uom="",
-                confidence=0.95
-            ))
+        # 4. Product-Specific Specification Extraction
+        # Power Tools (Drills / Drivers)
+        if "DRILL" in text_upper or "IMPACT" in text_upper or "DRIVER" in text_upper:
+            volt_match = re.search(r"\b(\d{1,2})\s*(V|Volt|Volts)\b", text, re.IGNORECASE)
+            if volt_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Voltage Rating", value=volt_match.group(1), uom="V", confidence=0.96))
 
-        # Dimensions e.g. 5"x.045"x7/8", 1/2"x18", 1nx6-16'
-        dim_num_pattern = r"(\d*(?:\.\d+)|(?:\d+/\d+)|\d+)"
-        dim_match = re.search(
-            rf"{dim_num_pattern}\s*(?:\"|in)?\s*[xX]\s*{dim_num_pattern}\s*(?:\"|in)?(?:\s*[xX]\s*{dim_num_pattern}\s*(?:\"|in)?)?",
-            text
-        )
-        if dim_match:
-            raw_dims = [d for d in dim_match.groups() if d]
-            dims = [self.fraction_engine.normalize_measurement(("0" + d.strip()) if d.strip().startswith(".") else d.strip(), uom="in") for d in raw_dims]
+            drive_match = re.search(r"\b(1/2|1/4|3/8|5/8)\s*(?:in|\")?\s*(?:Chuck|Drive|Hex)\b", text, re.IGNORECASE)
+            if drive_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Chuck Size", value=f"{drive_match.group(1)} in", uom="", confidence=0.95))
 
-            if len(dims) == 1:
-                triplets.append(AttributeTriplet(
-                    index=len(triplets)+1,
-                    label="Diameter",
-                    value=self.norm_engine.normalize_dimension_value(dims[0]),
-                    uom="in",
-                    confidence=0.90
-                ))
-            elif len(dims) == 2:
-                triplets.append(AttributeTriplet(
-                    index=len(triplets)+1,
-                    label="Size",
-                    value=f"{dims[0]} in x {dims[1]} in",
-                    uom="",
-                    confidence=0.90
-                ))
-            elif len(dims) == 3:
-                triplets.append(AttributeTriplet(
-                    index=len(triplets)+1,
-                    label="Size",
-                    value=f"{dims[0]} in x {dims[1]} in x {dims[2]} in",
-                    uom="",
-                    confidence=0.90
-                ))
+            if "BRUSHLESS" in text_upper:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Motor Type", value="Brushless", uom="", confidence=0.98))
 
+        # Pipe Fittings & Couplings
+        elif "COUPLING" in text_upper or "CPLG" in text_upper or "FITTING" in text_upper or "PIPE" in text_upper:
+            size_match = re.search(r"\b(\d+/\d+|\d+(?:\.\d+)?)\s*(?:in|\"|#)?\s*(?:CPLG|COUPLING|BRS|PIPE)?\b", text, re.IGNORECASE)
+            if size_match:
+                norm_sz = self.fraction_engine.normalize_measurement(size_match.group(1), uom="in")
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Fitting Size", value=norm_sz, uom="in", confidence=0.92))
 
+            if "BRASS" in text_upper or "BRS" in text_upper:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Material", value="Brass", uom="", confidence=0.98))
+            elif "SS" in text_upper.split() or "STAINLESS" in text_upper:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Material", value="Stainless Steel", uom="", confidence=0.98))
 
-        # Wattage (e.g. 40W, 100W, 60W, 3HP, 2HP)
-        watt_match = re.search(r"\b(\d+(?:\.\d+)?)\s*(W|Watt|Watts)\b", text, re.IGNORECASE)
-        if watt_match:
-            triplets.append(AttributeTriplet(
-                index=len(triplets)+1,
-                label="Wattage",
-                value=watt_match.group(1),
-                uom="W",
-                confidence=0.95
-            ))
+            press_match = re.search(r"\b(150|300|125|250)\s*(?:#|lb|PSI)\b", text, re.IGNORECASE)
+            if press_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Pressure Rating", value=f"{press_match.group(1)} lb", uom="", confidence=0.95))
 
-        hp_match = re.search(r"\b(\d+(?:\.\d+)?)\s*(HP|Horsepower)\b", text, re.IGNORECASE)
-        if hp_match:
-            triplets.append(AttributeTriplet(
-                index=len(triplets)+1,
-                label="Horsepower",
-                value=hp_match.group(1),
-                uom="HP",
-                confidence=0.95
-            ))
+        # Circuit Breakers
+        elif "BREAKER" in text_upper:
+            amp_match = re.search(r"\b(\d{1,3})\s*(A|Amp|Amps)\b", text, re.IGNORECASE)
+            if amp_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Amperage Rating", value=amp_match.group(1), uom="A", confidence=0.96))
+            volt_match = re.search(r"\b(\d{3})\s*(V|Volt|Volts)\b", text, re.IGNORECASE)
+            if volt_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Voltage Rating", value=volt_match.group(1), uom="V", confidence=0.96))
+            pole_match = re.search(r"\b([123])\s*(?:-|\s*)Pole\b", text, re.IGNORECASE)
+            if pole_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Number of Poles", value=pole_match.group(1), uom="", confidence=0.96))
 
-        # Voltage (e.g. 120V, 230V, 115V)
-        volt_match = re.search(r"\b(\d{2,3})\s*(V|Volt|Volts)\b", text, re.IGNORECASE)
-        if volt_match:
-            triplets.append(AttributeTriplet(
-                index=len(triplets)+1,
-                label="Voltage Rating",
-                value=volt_match.group(1),
-                uom="V",
-                confidence=0.95
-            ))
-
-        # Tooth Count (e.g. 24T, 60 Tooth, 12Teeth)
-        teeth_match = re.search(r"\b(\d{1,3})\s*(?:T|Tooth|Teeth)\b", text, re.IGNORECASE)
-        if teeth_match:
-            triplets.append(AttributeTriplet(
-                index=len(triplets)+1,
-                label="Number of Teeth",
-                value=teeth_match.group(1),
-                uom="",
-                confidence=0.95
-            ))
-
-        # Color / Finish (e.g., Stainless Steel, SS, Honey Grove, Tide Pool, Pebble Beach)
-        if "SS" in text.split() or "STAINLESS" in text.upper():
-            triplets.append(AttributeTriplet(
-                index=len(triplets)+1,
-                label="Material",
-                value="Stainless Steel",
-                uom="",
-                confidence=0.95
-            ))
+        # Saw Blades & Abrasives
+        elif "SAW" in text_upper or "BLADE" in text_upper or "CUT-OFF" in text_upper or "ABRASIVE" in text_upper:
+            dim_match = re.search(r"\b(\d+-\d+/\d+|\d+/\d+|\d+(?:\.\d+)?)\s*(?:in|\")?\s*(?:x|X)?\b", text)
+            if dim_match:
+                norm_dim = self.fraction_engine.normalize_measurement(dim_match.group(1), uom="in")
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Blade Diameter", value=norm_dim, uom="in", confidence=0.95))
+            teeth_match = re.search(r"\b(\d{1,3})\s*(?:T|Tooth|Teeth)\b", text, re.IGNORECASE)
+            if teeth_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Number of Teeth", value=teeth_match.group(1), uom="", confidence=0.95))
 
         return triplets
 

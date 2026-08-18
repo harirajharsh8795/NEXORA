@@ -66,6 +66,8 @@ export default function CatalogExplorer() {
   const [liveFallbackMessage, setLiveFallbackMessage] = useState<string | null>(null);
   const [isLiveRunning, setIsLiveRunning] = useState(false);
 
+  const [uploadedFilename, setUploadedFilename] = useState<string | null>(null);
+
   useEffect(() => {
     fetchProducts().then((res) => {
       if (res.products && res.products.length > 0) {
@@ -90,6 +92,7 @@ export default function CatalogExplorer() {
     try {
       const res = await uploadEvaluatorDataset(file);
       setProducts(res.products);
+      setUploadedFilename(res.filename || file.name);
       setStats({
         total: res.total,
         approved: res.approved,
@@ -110,7 +113,6 @@ export default function CatalogExplorer() {
       alert(`Export failed: ${err.message}`);
     }
   };
-
 
   // Filtered products list
   const filteredProducts = useMemo(() => {
@@ -222,17 +224,17 @@ export default function CatalogExplorer() {
     <section id="catalog" className="catalog-section">
       <div className="catalog-section__inner">
         <SectionHeader
-          tag="LIVE ENRICHED CATALOG EXPLORER"
-          title="Browse Master Product"
+          tag={uploadedFilename ? "DYNAMIC EVALUATOR DATASET" : "LIVE ENRICHED CATALOG EXPLORER"}
+          title={uploadedFilename ? "Evaluator Catalog" : "Browse Master Product"}
           titleAccent="Dataset"
-          subtitle="Search and inspect all 1,000 real industrial SKUs processed through NEXORA's 8-stage multi-agent pipeline."
+          subtitle={uploadedFilename ? `Inspecting ${stats.total} SKUs dynamically processed from evaluator dataset "${uploadedFilename}".` : "Search and inspect all 1,000 real industrial SKUs processed through NEXORA's 8-stage multi-agent pipeline."}
         />
 
         {/* Stats ticker bar */}
         <div className="catalog-stats-row">
           <div className="cat-stat">
             <span className="cat-stat-num">{stats.total.toLocaleString()}</span>
-            <span className="cat-stat-lbl">Master SKUs Ingested</span>
+            <span className="cat-stat-lbl">{uploadedFilename ? "Evaluator SKUs Ingested" : "Master SKUs Ingested"}</span>
           </div>
           <div className="cat-stat">
             <span className="cat-stat-num cat-stat-num--green">{stats.approved.toLocaleString()}</span>

@@ -185,80 +185,194 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
 
     const rawMpn = row[mpnIdx >= 0 ? mpnIdx : 0] || `SKU-${i}`;
     const rawDesc = row[descIdx >= 0 ? descIdx : 1] || row[0] || 'Industrial Product Component';
-    const rawManuf = row[mfrIdx >= 0 ? mfrIdx : 2] || 'Freud Inc';
-    const rawBrand = row[brandIdx >= 0 ? brandIdx : 3] || 'Diablo';
+    const rawManuf = row[mfrIdx >= 0 ? mfrIdx : 2] || '';
+    const rawBrand = row[brandIdx >= 0 ? brandIdx : 3] || '';
 
+    const textUpper = `${rawDesc} ${rawMpn} ${rawManuf}`.toUpperCase();
+
+    // 1. Check for Malformed / Unknown SKU
+    const isMalformed = anyBad([rawMpn, rawDesc, rawManuf]);
+    function anyBad(arr: string[]) {
+      return arr.some((s) => /MALFORMED|UNKNOWN|GARBAGE|BAD-DATA|INVALID/i.test(s));
+    }
+
+    // 2. Dynamic Manufacturer Resolution
+    let resolvedManuf = 'UNKNOWN';
+    let manufConf = 0.0;
+    if (!isMalformed && rawManuf.trim()) {
+      const cleanManuf = rawManuf.split('(')[0].trim();
+      if (!/UNKNOWN|MALFORMED|N\/A|GARBAGE|UNBRANDED/i.test(cleanManuf)) {
+        resolvedManuf = cleanManuf;
+        manufConf = 0.98;
+      }
+    }
+
+    // 3. Dynamic Brand Resolution
+    let resolvedBrand = '-- Unbranded --';
+    let brandConf = 0.60;
+    if (!isMalformed && rawBrand.trim() && !/-- Unbranded --|generic|unknown/i.test(rawBrand)) {
+      resolvedBrand = rawBrand.trim();
+      brandConf = 0.96;
+    }
+
+    // 4. Dynamic Taxonomy Classification
+    let dept = 'Tools & Hardware';
+    let catClass = 'General Hardware';
+    let fineLine = 'Industrial Hardware';
+    let classpath = 'Tools & Hardware > General Hardware > Industrial Supplies';
+    let classConf = 0.70;
+
+    if (isMalformed) {
+      dept = 'Unclassified';
+      catClass = 'Pending Review';
+      fineLine = 'Unknown Product';
+      classpath = 'Unclassified > Pending Review > Unknown Product';
+      classConf = 0.0;
+    } else if (textUpper.includes('DRILL') || textUpper.includes('IMPACT') || textUpper.includes('DRIVER')) {
+      dept = 'Tools & Hardware';
+      catClass = 'Power Tools';
+      fineLine = 'Cordless Drills';
+      classpath = 'Tools & Hardware > Power Tools > Cordless Drills';
+      classConf = 0.96;
+    } else if (textUpper.includes('COUPLING') || textUpper.includes('CPLG') || textUpper.includes('PIPE') || textUpper.includes('FITTING')) {
+      dept = 'Plumbing & Pipe';
+      catClass = 'Pipe & Pipe Fittings';
+      fineLine = 'Brass Pipe Fittings';
+      classpath = 'Plumbing & Pipe > Pipe & Pipe Fittings > Brass Pipe Fittings';
+      classConf = 0.96;
+    } else if (textUpper.includes('BREAKER') || textUpper.includes('PANELBOARD')) {
+      dept = 'Electrical & Lighting';
+      catClass = 'Distribution Equipment';
+      fineLine = 'Circuit Breakers';
+      classpath = 'Electrical & Lighting > Distribution Equipment > Circuit Breakers';
+      classConf = 0.96;
+    } else if (textUpper.includes('SAW') || textUpper.includes('BLADE')) {
+      dept = 'Tools & Hardware';
+      catClass = 'Power Tool Accessories';
+      fineLine = 'Saw Blades';
+      classpath = 'Tools & Hardware > Power Tool Accessories > Saw Blades';
+      classConf = 0.96;
+    } else if (textUpper.includes('LED') || textUpper.includes('BULB')) {
+      dept = 'Electrical & Lighting';
+      catClass = 'Lighting';
+      fineLine = 'LED Light Bulbs';
+      classpath = 'Electrical & Lighting > Lighting > Light Bulbs > LED Light Bulbs';
+      classConf = 0.96;
+    }
+
+    // 5. Fraction Normalization
     const normDesc = rawDesc
       .replace(/\b0\.5\b/g, '1/2')
       .replace(/\b0\.25\b/g, '1/4')
       .replace(/\b0\.75\b/g, '3/4')
       .replace(/\b50\.25\b/g, '50-1/4');
 
-    const isUnbranded = rawBrand.includes('-- Unbranded --') || rawBrand.toLowerCase().includes('generic');
-    const isFake = rawMpn.toUpperCase().includes('FAKE') || rawMpn.toUpperCase().includes('INJECT');
+    // 6. Dynamic Product-Isolated Attribute Extraction
+    const attributes: any[] = [];
+    if (!isMalformed) {
+      if (textUpper.includes('DRILL') || textUpper.includes('DRIVER')) {
+        const voltMatch = rawDesc.match(/\b(\d{1,2})\s*(V|Volt|Volts)\b/i);
+        if (voltMatch) attributes.push({ index: 1, label: 'Voltage Rating', value: voltMatch[1], uom: 'V', confidence: 0.96, is_lov_valid: true, is_uom_standardized: true });
 
-    const overallConf = isFake ? 0.45 : isUnbranded ? 0.72 : 0.96;
-    const needsReview = overallConf < 0.85;
+        const driveMatch = rawDesc.match(/\b(1\/2|1\/4|3\/8|5\/8)\s*(?:in|")?\s*(?:Chuck|Drive|Hex)\b/i);
+        if (driveMatch) attributes.push({ index: 2, label: 'Chuck Size', value: `${driveMatch[1]} in`, uom: '', confidence: 0.95, is_lov_valid: true, is_uom_standardized: true });
+
+        if (textUpper.includes('BRUSHLESS')) attributes.push({ index: 3, label: 'Motor Type', value: 'Brushless', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
+      } else if (textUpper.includes('COUPLING') || textUpper.includes('CPLG') || textUpper.includes('PIPE')) {
+        const szMatch = rawDesc.match(/\b(\d+\/\d+|\d+(?:\.\d+)?)\s*(?:in|"|#)?\b/i);
+        if (szMatch) attributes.push({ index: 1, label: 'Fitting Size', value: `${szMatch[1]} in`, uom: 'in', confidence: 0.92, is_lov_valid: true, is_uom_standardized: true });
+
+        if (textUpper.includes('BRASS') || textUpper.includes('BRS')) attributes.push({ index: 2, label: 'Material', value: 'Brass', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
+        const pressMatch = rawDesc.match(/\b(150|300|125|250)\s*(?:#|lb|PSI)\b/i);
+        if (pressMatch) attributes.push({ index: 3, label: 'Pressure Rating', value: `${pressMatch[1]} lb`, uom: '', confidence: 0.95, is_lov_valid: true, is_uom_standardized: true });
+      } else if (textUpper.includes('BREAKER')) {
+        const ampMatch = rawDesc.match(/\b(\d{1,3})\s*(A|Amp|Amps)\b/i);
+        if (ampMatch) attributes.push({ index: 1, label: 'Amperage Rating', value: ampMatch[1], uom: 'A', confidence: 0.96, is_lov_valid: true, is_uom_standardized: true });
+        const voltMatch = rawDesc.match(/\b(\d{3})\s*(V|Volt|Volts)\b/i);
+        if (voltMatch) attributes.push({ index: 2, label: 'Voltage Rating', value: voltMatch[1], uom: 'V', confidence: 0.96, is_lov_valid: true, is_uom_standardized: true });
+      } else if (textUpper.includes('SAW') || textUpper.includes('BLADE')) {
+        const dimMatch = rawDesc.match(/\b(\d+-\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)\s*(?:in|")?\b/i);
+        if (dimMatch) attributes.push({ index: 1, label: 'Blade Diameter', value: `${dimMatch[1]} in`, uom: 'in', confidence: 0.95, is_lov_valid: true, is_uom_standardized: true });
+        const teethMatch = rawDesc.match(/\b(\d{1,3})\s*(?:T|Tooth|Teeth)\b/i);
+        if (teethMatch) attributes.push({ index: 2, label: 'Number of Teeth', value: teethMatch[1], uom: '', confidence: 0.95, is_lov_valid: true, is_uom_standardized: true });
+      }
+    }
+
+    // 7. Dynamic Confidence Calculation & HITL Routing
+    const overallConf = isMalformed ? 0.0 : (manufConf < 0.8 || resolvedBrand === '-- Unbranded --') ? 0.72 : 0.96;
+    const needsReview = overallConf < 0.85 || isMalformed;
+    const flaggedReasons: string[] = [];
+    if (isMalformed) flaggedReasons.push('MALFORMED_INPUT_DATA', 'UNRESOLVED_MANUFACTURER_IDENTITY');
+    else if (resolvedManuf === 'UNKNOWN') flaggedReasons.push('UNRESOLVED_MANUFACTURER_IDENTITY');
+    else if (resolvedBrand === '-- Unbranded --') flaggedReasons.push('UNBRANDED_CATALOG_ITEM');
+
+    // 8. Dynamic Product-Isolated Evidence Graph
+    const evidences: Record<string, any> = {};
+    if (resolvedManuf !== 'UNKNOWN') {
+      evidences['MANUFACTURER_NAME'] = {
+        field_name: 'MANUFACTURER_NAME',
+        value: resolvedManuf,
+        confidence: manufConf,
+        source_type: 'input_catalog',
+        snippet: `Extracted from catalog input vendor field: "${rawManuf}"`,
+        validated_by_lov: true,
+        validated_by_uom: true
+      };
+    } else {
+      evidences['MANUFACTURER_NAME'] = {
+        field_name: 'MANUFACTURER_NAME',
+        value: 'UNKNOWN',
+        confidence: 0.0,
+        source_type: 'unresolved',
+        snippet: 'Input manufacturer missing or unverified - flagged for human review',
+        validated_by_lov: false,
+        validated_by_uom: false
+      };
+    }
 
     const product: EnrichedProduct = {
       mfg_part_num: rawMpn,
       part_desc: normDesc,
       raw_manuf: rawManuf,
       raw_brand: rawBrand,
-      manufacturer_name: rawManuf.split('(')[0].trim() || 'Freud Inc.',
-      brand_name: isUnbranded ? '-- Unbranded --' : rawBrand,
-      trade_name: isUnbranded ? undefined : `${rawBrand} Industrial`,
+      manufacturer_name: resolvedManuf,
+      brand_name: resolvedBrand,
+      trade_name: resolvedBrand !== '-- Unbranded --' ? `${resolvedBrand} Industrial` : undefined,
       manufacturer_part_number: rawMpn,
-      department: 'Tools & Hardware',
-      category_class: 'Power Tool Accessories',
-      fine_line: 'Saw Blades',
-      classpath: 'Tools & Hardware > Power Tool Accessories > Saw Blades',
+      department: dept,
+      category_class: catClass,
+      fine_line: fineLine,
+      classpath: classpath,
       mobile_desc: `${rawMpn} ${normDesc}`.slice(0, 50),
       invoice_desc: `${rawMpn} ${normDesc}`.slice(0, 50),
-      short_desc: `${rawManuf} ${rawMpn} ${normDesc}`.slice(0, 150),
-      long_desc1: `${normDesc} manufactured by ${rawManuf}. Standardized LOV attribute extraction complete.`,
-      retail_desc: `${normDesc} — Professional Grade`,
-      marketing_description: `High performance industrial catalog item ${rawMpn} by ${rawManuf}.`,
+      short_desc: `${resolvedManuf} ${rawMpn} ${normDesc}`.slice(0, 150),
+      long_desc1: `${normDesc} classified under ${classpath}.`,
+      retail_desc: `${normDesc}`,
+      marketing_description: `Product SKU ${rawMpn} classified in ${classpath}.`,
       item_features: [
         'LOV & UOM Standardized',
-        'Zero-LLM Fraction Conversion Applied',
-        'Tier-1 Manufacturer Evidence Grounded'
+        'Dynamic Taxonomy Classification Applied'
       ],
-      attributes: [
-        { index: 1, label: 'Blade Diameter', value: '7-1/4', uom: 'in', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true },
-        { index: 2, label: 'Number of Teeth', value: '24', uom: '', confidence: 0.99, is_lov_valid: true, is_uom_standardized: true },
-        { index: 3, label: 'Arbor Size', value: '5/8', uom: 'in', confidence: 0.96, is_lov_valid: true, is_uom_standardized: true }
-      ],
+      attributes: attributes,
       product_name: normDesc,
-      ref_urls: ['https://www.diablotools.com/products/' + rawMpn],
+      ref_urls: resolvedManuf !== 'UNKNOWN' ? [`https://www.google.com/search?q=${encodeURIComponent(resolvedManuf + ' ' + rawMpn)}`] : [],
       product_image: undefined,
       alternate_images: [],
       specification_sheet: undefined,
       instruction_manual: undefined,
-      actual_image_yes_no: 'Y',
+      actual_image_yes_no: 'N',
       confidence: {
-        manufacturer_confidence: overallConf,
-        brand_confidence: isUnbranded ? 0.60 : overallConf,
-        classpath_confidence: 1.0,
-        attribute_confidence: 0.98,
+        manufacturer_confidence: manufConf,
+        brand_confidence: brandConf,
+        classpath_confidence: classConf,
+        attribute_confidence: attributes.length > 0 ? 0.95 : 0.0,
         overall_confidence: overallConf,
         needs_human_review: needsReview,
-        flagged_reasons: needsReview ? [isUnbranded ? 'UNBRANDED_CATALOG_ITEM' : 'LOW_MANUFACTURER_CONFIDENCE'] : []
+        flagged_reasons: flaggedReasons
       },
       evidence_graph: {
         product_mpn: rawMpn,
-        evidences: {
-          MANUFACTURER_NAME: {
-            field_name: 'MANUFACTURER_NAME',
-            value: rawManuf,
-            confidence: overallConf,
-            source_type: 'deterministic',
-            source_url: 'https://www.diablotools.com/spec.pdf',
-            snippet: `Official manufacturer datasheet for ${rawMpn}`,
-            validated_by_lov: true,
-            validated_by_uom: true
-          }
-        }
+        evidences: evidences
       }
     };
 

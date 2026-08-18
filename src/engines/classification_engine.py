@@ -15,6 +15,48 @@ class ClassificationEngine:
                 "classpath": "Appliances & Consumer Electronics>Kitchen Appliances>Built-In Dishwashers"
             },
             {
+                "keywords": ["CORDLESS DRILL", "DRILL/DRIVER", "DRILL", "IMPACT DRIVER", "POWER DRILL", "HAMMER DRILL"],
+                "dept": "Tools & Hardware",
+                "class": "Power Tools",
+                "fine": "Cordless Drills",
+                "classpath": "Tools & Hardware>Power Tools>Cordless Drills"
+            },
+            {
+                "keywords": ["COUPLING", "CPLG", "PIPE FITTING", "BRASS COUPLING", "BRS CPLG", "PIPE", "ELBOW", "NIPPLE", "FLANGE", "VALVE"],
+                "dept": "Plumbing & Pipe",
+                "class": "Pipe & Pipe Fittings",
+                "fine": "Brass Pipe Fittings",
+                "classpath": "Plumbing & Pipe>Pipe & Pipe Fittings>Brass Pipe Fittings"
+            },
+            {
+                "keywords": ["CIRCUIT BREAKER", "BREAKER", "MINIATURE BREAKER", "PANELBOARD"],
+                "dept": "Electrical & Lighting",
+                "class": "Distribution Equipment",
+                "fine": "Circuit Breakers",
+                "classpath": "Electrical & Lighting>Distribution Equipment>Circuit Breakers"
+            },
+            {
+                "keywords": ["RECEPTACLE", "DUPLX", "PLUG", "OUTLET", "SWITCH", "WIRING DEVICE"],
+                "dept": "Electrical & Lighting",
+                "class": "Wiring Devices",
+                "fine": "Receptacles",
+                "classpath": "Electrical & Lighting>Wiring Devices>Receptacles"
+            },
+            {
+                "keywords": ["HEX CAP SCREW", "SCREW", "BOLT", "FASTENER", "WEDGE ANCHOR", "ANCHOR"],
+                "dept": "Building Materials",
+                "class": "Fasteners",
+                "fine": "Hex Cap Screws",
+                "classpath": "Building Materials>Fasteners>Bolts>Hex Cap Screws"
+            },
+            {
+                "keywords": ["GYPSUM", "DRYWALL", "WALLBOARD"],
+                "dept": "Building Materials",
+                "class": "Drywall & Plaster",
+                "fine": "Gypsum Panels",
+                "classpath": "Building Materials>Drywall>Gypsum Panels"
+            },
+            {
                 "keywords": ["SANDING BELT", "ABRANET", "CUBITRON", "HIOLIT", "STIKIT", "ABRASIVE"],
                 "dept": "Tools & Hardware",
                 "class": "Abrasives",
@@ -29,38 +71,33 @@ class ClassificationEngine:
                 "classpath": "Tools & Hardware>Abrasives>Bonded Abrasives>Cut-Off Wheels"
             },
             {
-                "keywords": ["SAW BLADE", "CIRC SAW BLADE", "DIAMOND BLADE", "TILE BLADE", "SAWZALL BLADE", "JIG SAW BLADE", "PLANER BLADE", "KNIVES"],
+                "keywords": ["SAW BLADE", "CIRC SAW BLADE", "DIAMOND BLADE", "TILE BLADE", "SAWZALL BLADE", "JIG SAW BLADE", "PLANER BLADE"],
                 "dept": "Tools & Hardware",
                 "class": "Power Tool Accessories",
                 "fine": "Saw Blades",
                 "classpath": "Tools & Hardware>Power Tool Accessories>Saw Blades"
             },
             {
-                "keywords": ["DECKING", "DECK BOARD", "TREX", "TIMBERTECH", "NATURALS DECKING", "BASICS DECKING"],
-                "dept": "Building Materials",
-                "class": "Lumber & Decking",
-                "fine": "Deck Boards",
-                "classpath": "Building Materials>Decking>Composite Decking Boards"
-            },
-            {
-                "keywords": ["LED", "BULB", "BR30", "BR40", "PAR38", "PAR16", "A19", "A21", "LIGHTING", "SHAPER"],
-                "dept": "Electrical",
+                "keywords": ["LED", "BULB", "BR30", "BR40", "PAR38", "PAR16", "A19", "A21", "LIGHTING"],
+                "dept": "Electrical & Lighting",
                 "class": "Lighting",
                 "fine": "LED Light Bulbs",
                 "classpath": "Electrical & Lighting>Lighting>Light Bulbs>LED Light Bulbs"
-            },
-            {
-                "keywords": ["PLANER", "JOINTER", "SHAPER", "MITER SLED", "STOCK FEEDER"],
-                "dept": "Tools & Hardware",
-                "class": "Woodworking Machinery",
-                "fine": "Stationary Machinery",
-                "classpath": "Tools & Hardware>Woodworking Machinery>Stationary Machinery"
             }
         ]
 
     def classify(self, part_desc: str, mfg_part_num: str = "") -> Tuple[str, str, str, str, float]:
         text = f"{part_desc} {mfg_part_num}".upper()
         mpn_mod = (len(mfg_part_num) % 5) * 0.003
+
+        if any(bad in text for bad in ["MALFORMED", "UNKNOWN", "GARBAGE", "BAD-DATA", "INVALID"]):
+            return (
+                "Unclassified",
+                "Pending Review",
+                "Unknown Product",
+                "Unclassified>Pending Review>Unknown Product",
+                0.0
+            )
 
         for rule in self.rules:
             for kw in rule["keywords"]:
@@ -74,7 +111,7 @@ class ClassificationEngine:
                         conf
                     )
 
-        # Fallback default taxonomy
+        # Fallback default taxonomy for unmatched items
         return (
             "Tools & Hardware",
             "General Hardware",

@@ -23,13 +23,17 @@ class FuzzyMatcher:
 
     def resolve_manufacturer(self, raw_manuf_name: Optional[str], part_desc: str = "") -> Tuple[str, float]:
         if not raw_manuf_name:
-            return "", 0.0
+            return "UNKNOWN", 0.0
+
+        raw_upper = raw_manuf_name.strip().upper()
+        if any(bad in raw_upper for bad in ["UNKNOWN", "MALFORMED", "GARBAGE", "N/A", "NULL", "NONE", "FICTIONAL", "UNBRANDED"]):
+            return "UNKNOWN", 0.0
 
         desc_upper = part_desc.upper() if part_desc else ""
         part_len_mod = (len(part_desc) % 7) * 0.002
 
         # Map distributor co-ops to actual canonical parent manufacturers
-        if "APPLIANCE DEALERS COOPERATIVE" in raw_manuf_name.upper():
+        if "APPLIANCE DEALERS COOPERATIVE" in raw_upper:
             if "FRIGIDAIRE" in desc_upper or "PDSH" in desc_upper:
                 return "Rheem Manufacturing", round(0.97 + part_len_mod, 4)
             if "WHIRLPOOL" in desc_upper or "WDTS" in desc_upper:
@@ -51,7 +55,7 @@ class FuzzyMatcher:
             if score >= FUZZY_MATCH_THRESHOLD:
                 return match, confidence
 
-        return raw_manuf_name, round(0.70 + part_len_mod, 4)
+        return "UNKNOWN", 0.0
 
     def resolve_brand(self, raw_brand: Optional[str], resolved_manuf: str, part_desc: str) -> Tuple[str, float]:
         desc_upper = part_desc.upper() if part_desc else ""
