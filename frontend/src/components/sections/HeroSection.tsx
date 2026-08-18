@@ -16,7 +16,7 @@ export default function HeroSection() {
             <span className="hero__badge-pulse" />
             <span className="hero__badge-text">Enterprise Edition 2026</span>
             <span className="hero__badge-divider">•</span>
-            <span className="hero__badge-accent">LOV-Constrained Multi-Agent RAG</span>
+            <span className="hero__badge-accent">Evidence-Grounded Multi-Agent Pipeline</span>
           </div>
 
           <h1 className="hero__title">
@@ -25,7 +25,7 @@ export default function HeroSection() {
           </h1>
 
           <p className="hero__subtitle">
-            NEXORA is an evidence-driven Product Intelligence Engine that ingests incomplete, raw distributor SKUs, resolves canonical entities with zero hallucinations, standardizes UOMs, and generates LOV-validated product catalogs at enterprise scale.
+            NEXORA is an evidence-driven Product Intelligence Engine that ingests incomplete, raw distributor SKUs, resolves canonical entities with source grounding, standardizes UOMs, and generates LOV-validated product catalogs at scale.
           </p>
 
           <div className="hero__ctas">
@@ -44,15 +44,15 @@ export default function HeroSection() {
           <div className="hero__proof-pills">
             <div className="hero__proof-item">
               <span className="hero__proof-icon">✅</span>
-              <span><strong>1,000 / 1,000 SKUs</strong> Processed</span>
+              <span><strong>1,000 SKUs</strong> Benchmark Processed</span>
             </div>
             <div className="hero__proof-item">
               <span className="hero__proof-icon">🎯</span>
-              <span><strong>100% MFR Accuracy</strong> Match</span>
+              <span><strong>Canonical Manufacturer</strong> Resolution</span>
             </div>
             <div className="hero__proof-item">
               <span className="hero__proof-icon">🛡️</span>
-              <span><strong>0 Hallucinated</strong> LOV Attributes</span>
+              <span><strong>Evidence-Grounded</strong> Validation</span>
             </div>
           </div>
         </div>
@@ -63,8 +63,9 @@ export default function HeroSection() {
             <div className="hero__card-header">
               <div className="hero__card-status">
                 <span className="hero__status-dot" />
-                <span className="hero__status-title">Live Pipeline Stream</span>
+                <span className="hero__status-title">Representative Pipeline Example</span>
               </div>
+
               <span className="hero__sku-badge">SKU #1000 Verified</span>
             </div>
 

@@ -62,10 +62,11 @@ export default function FeatureProductIntelligence() {
               <li className="feature-check-item">
                 <span className="check-icon">🏭</span>
                 <div>
-                  <strong>100% Canonical Manufacturer Match:</strong>
-                  <p>Matches raw vendor noise ('Freud Inc (2435)') to official manufacturer names and parent corporations with 100% accuracy.</p>
+                  <strong>Canonical Manufacturer Resolution:</strong>
+                  <p>Matches noisy manufacturer names against canonical master data and contextual evidence, with low-confidence cases routed to review.</p>
                 </div>
               </li>
+
               <li className="feature-check-item">
                 <span className="check-icon">🏷️</span>
                 <div>

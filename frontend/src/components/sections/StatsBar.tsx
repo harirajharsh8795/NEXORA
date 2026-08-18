@@ -8,31 +8,32 @@ export default function StatsBar() {
         <div className="stats-grid">
           <StatCard
             value="1,000"
-            label="Raw SKUs Processed"
-            sublabel="100% full dataset coverage with 0 dropouts"
+            label="Benchmark SKUs Processed"
+            sublabel="Full 1,000 input SKUs processed without batch errors"
             accentColor="var(--nexora-purple)"
           />
 
           <StatCard
-            value="384.9 / sec"
-            label="Core Pipeline Speed"
-            sublabel="2.6ms/SKU local engine • 750K SKUs in ~33 mins"
+            value="3,278 / sec"
+            label="Deterministic Pipeline Speed"
+            sublabel="0.305ms/SKU local benchmark (Live search latency-bound)"
             accentColor="var(--nexora-cyan)"
           />
 
           <StatCard
             value="3,462"
             label="LOV Attributes Extracted"
-            sublabel="100% LOV compliant with UOM standardization"
+            sublabel="100% LOV & UOM compliance on tested benchmark"
             accentColor="var(--nexora-pink)"
           />
 
           <StatCard
-            value="68.0%"
-            label="Auto-Approved Split"
-            sublabel="Conf ≥ 85% auto-passed; 32% routed to HITL triage"
+            value="70.1%"
+            label="Auto-Approved Rate"
+            sublabel="Confidence ≥85% auto-approved; 29.9% routed to HITL review"
             accentColor="var(--color-success)"
           />
+
         </div>
       </div>
     </section>

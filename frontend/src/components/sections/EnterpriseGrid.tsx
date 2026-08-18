@@ -7,13 +7,14 @@ export default function EnterpriseGrid() {
     {
       icon: '🛡️',
       title: 'LOV Governance Engine',
-      description: 'Guarantees 100% taxonomy compliance. Extracted values must match pre-approved List of Values dictionary or get flagged.'
+      description: 'Enforces taxonomy compliance. Extracted values are validated against pre-approved List of Values dictionaries or routed to human review.'
     },
     {
       icon: '🌐',
-      title: 'Multi-Agent RAG Orchestration',
-      description: 'Simultaneously queries live manufacturer websites, spec PDFs, and product databases to fill catalog attribute gaps.'
+      title: 'Multi-Agent Retrieval Orchestration',
+      description: 'Queries targeted manufacturer websites and technical spec PDFs to retrieve evidence and fill catalog attribute gaps.'
     },
+
     {
       icon: '🔗',
       title: 'Evidence Provenance Graph',

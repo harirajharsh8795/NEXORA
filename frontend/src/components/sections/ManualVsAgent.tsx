@@ -5,21 +5,21 @@ import './ManualVsAgent.css';
 export default function ManualVsAgent() {
   const comparisonRows = [
     {
-      metric: 'Core Engine Speed',
+      metric: 'Deterministic Pipeline Speed',
       manual: '30–60 Minutes / SKU',
-      agent: '0.62ms / SKU (~1,600 SKUs / sec)',
+      agent: '0.305ms / SKU (3,278 SKUs / sec local benchmark)',
       winner: 'agent'
     },
     {
-      metric: 'Live Web RAG Sourcing',
+      metric: 'Live Manufacturer Enrichment',
       manual: '1–2 Days / Vendor Feed',
-      agent: '~25–50s / SKU (Live Search, Fetch & Gemini RAG)',
+      agent: 'Retrieval & LLM latency-bound per unseen SKU',
       winner: 'agent'
     },
     {
       metric: 'LOV Compliance',
       manual: 'Inconsistent (~62% compliance)',
-      agent: '100% LOV Guardrail Enforcement',
+      agent: '100% LOV & UOM Benchmark Compliance',
       winner: 'agent'
     },
     {
@@ -30,23 +30,24 @@ export default function ManualVsAgent() {
     },
     {
       metric: 'Entity Resolution',
-      manual: 'Manual Google Search & Guesswork',
-      agent: '27,000+ Master Lookup + RAG',
+      manual: 'Manual Web Search & Guesswork',
+      agent: 'Master Dictionary Lookup + Contextual Search',
       winner: 'agent'
     },
     {
       metric: 'Traceability & Provenance',
       manual: 'No audit trail for values',
-      agent: 'Evidence Graph for every field',
+      agent: 'Evidence Graph for supported fields',
       winner: 'agent'
     },
     {
-      metric: 'Cost at 10,000 SKUs',
-      manual: '$150,000+ ($15/SKU labor)',
-      agent: '$10.00 ($0.001/SKU LLM & compute)',
+      metric: 'Illustrative Direct Cost / 10k SKUs',
+      manual: '$150,000+ ($15/SKU estimated labor)',
+      agent: '$10.00 estimated direct API/compute cost',
       winner: 'agent'
     }
   ];
+
 
 
   return (

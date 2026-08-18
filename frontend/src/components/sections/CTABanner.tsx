@@ -10,11 +10,12 @@ export default function CTABanner() {
           <span className="cta-tag">READY FOR ENTERPRISE CATALOG ENRICHMENT?</span>
           <h2 className="cta-title">
             Transform Your Product Catalog <br />
-            <span className="text-gradient">With Autonomous AI</span>
+            <span className="text-gradient">With Multi-Agent Intelligence</span>
           </h2>
           <p className="cta-subtitle">
-            Zero hallucinations. 100% LOV compliance. Complete evidence graph audit trails for every field.
+            Evidence-grounded enrichment. Deterministic LOV/UOM validation. Traceable product intelligence.
           </p>
+
 
           <div className="cta-actions">
             <Button variant="primary" size="lg" icon={<span>🚀</span>} onClick={() => {

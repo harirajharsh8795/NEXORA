@@ -27,11 +27,24 @@ export default function ROICalculator() {
     <section id="roi-calculator" className="roi-section">
       <div className="roi-section__inner">
         <SectionHeader
-          tag="BUSINESS ROI CALCULATOR"
-          title="Calculate Your Time &amp; Cost"
-          titleAccent="Savings"
-          subtitle="See how much your organization saves by replacing manual catalog enrichment teams with NEXORA's autonomous multi-agent pipeline."
+          tag="ILLUSTRATIVE ROI PROJECTION"
+          title="Calculate Your Estimated Time &amp; Cost"
+          titleAccent="Difference"
+          subtitle="Estimate potential time and cost differences when supplementing manual catalog enrichment workflows with NEXORA's multi-agent pipeline."
         />
+
+        <div className="roi-disclaimer-note" style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.04)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          marginBottom: '24px',
+          fontSize: '0.85rem',
+          color: 'var(--text-secondary)',
+          textAlign: 'center'
+        }}>
+          💡 <strong>Illustrative Note:</strong> Estimates are based on user-provided assumptions for catalog size, manual enrichment cost, and processing time. Actual infrastructure, model, retrieval, and human-review costs may vary.
+        </div>
 
         <div className="roi-grid">
           {/* Controls Box */}
@@ -100,12 +113,12 @@ export default function ROICalculator() {
           {/* Results Box */}
           <Card className="roi-card roi-card--results">
             <div className="results-badge">PROJECTION SUMMARY</div>
-            <h3 className="roi-card-heading">Estimated Impact</h3>
+            <h3 className="roi-card-heading">Illustrative Projected Impact</h3>
 
             <div className="savings-hero">
-              <span className="savings-label">TOTAL COST SAVINGS</span>
+              <span className="savings-label">ESTIMATED COST DIFFERENCE</span>
               <div className="savings-amount">${totalSavings.toLocaleString()}</div>
-              <span className="savings-percent">({savingsPercent}% Cost Reduction)</span>
+              <span className="savings-percent">({savingsPercent}% Projected Savings)</span>
             </div>
 
             <div className="impact-metrics">
@@ -114,7 +127,7 @@ export default function ROICalculator() {
                 <span className="impact-v impact-v--red">${totalManualCost.toLocaleString()}</span>
               </div>
               <div className="impact-row">
-                <span className="impact-k">NEXORA Multi-Agent Cost:</span>
+                <span className="impact-k">NEXORA Estimated Direct Cost:</span>
                 <span className="impact-v impact-v--green">${totalNexoraCost.toLocaleString()}</span>
               </div>
               <div className="impact-row">
@@ -122,7 +135,7 @@ export default function ROICalculator() {
                 <span className="impact-v">{totalManualHours.toLocaleString()} hours</span>
               </div>
               <div className="impact-row">
-                <span className="impact-k">NEXORA Pipeline Time:</span>
+                <span className="impact-k">NEXORA Estimated Pipeline Time:</span>
                 <span className="impact-v impact-v--cyan">{totalNexoraHours} hours ({timeSavedHours.toLocaleString()} hrs saved)</span>
               </div>
             </div>
@@ -134,6 +147,7 @@ export default function ROICalculator() {
             </Button>
           </Card>
         </div>
+
       </div>
     </section>
   );

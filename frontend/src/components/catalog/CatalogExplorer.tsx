@@ -112,35 +112,6 @@ export default function CatalogExplorer() {
   };
 
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'review'>('all');
-  const [selectedProduct, setSelectedProduct] = useState<EnrichedProduct | null>(null);
-
-  // Pagination state: 20 items per page (50 pages for 1,000 SKUs)
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
-
-  // Live Demo Modal State
-  const [liveModalSku, setLiveModalSku] = useState<string | null>(null);
-  const [liveStep, setLiveStep] = useState<string>('');
-  const [liveFallbackMessage, setLiveFallbackMessage] = useState<string | null>(null);
-  const [isLiveRunning, setIsLiveRunning] = useState(false);
-
-  useEffect(() => {
-    fetchProducts().then((res) => {
-      if (res.products && res.products.length > 0) {
-        setProducts(res.products);
-        setStats({
-          total: res.stats.total || res.products.length,
-          approved: res.stats.approved,
-          review: res.stats.review,
-        });
-      }
-      setLoading(false);
-    });
-  }, []);
-
-
   // Filtered products list
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -288,7 +259,7 @@ export default function CatalogExplorer() {
           flexWrap: 'wrap',
           gap: '1rem',
           alignItems: 'center',
-          justify: 'space-between',
+          justifyContent: 'space-between',
           background: 'rgba(255, 255, 255, 0.03)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '12px',

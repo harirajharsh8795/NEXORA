@@ -85,25 +85,26 @@ export const MOCK_PRICING_TIERS: PricingTier[] = [
 export const MOCK_FAQS: FAQItem[] = [
   {
     question: 'How is Nexora different from a traditional PIM (Product Information Management) system?',
-    answer: 'Traditional PIMs are static repositories where catalog managers must manually key in attributes, write descriptions, and cross-reference spreadsheets. Nexora is an autonomous intelligence layer that sits upstream: our multi-agent AI pipeline takes messy, incomplete supplier data, enriches and standardizes it with full evidence provenance, and pushes clean, audit-ready data directly into your PIM or ERP.'
+    answer: 'Traditional PIMs are static repositories where catalog managers must manually key in attributes, write descriptions, and cross-reference spreadsheets. Nexora is a multi-agent intelligence layer that sits upstream: our pipeline takes messy, incomplete supplier data, enriches and standardizes it with full evidence provenance, and pushes clean, schema-aligned data directly into your PIM or ERP.'
   },
   {
-    question: 'How does the 8-agent pipeline ensure zero hallucinations on critical product specs?',
-    answer: 'Nexora enforces deterministic guardrails at every stage. Numbers, dimensions, and electrical ratings are extracted using strict regex parsers and validated against canonical List of Values (LOV) dictionaries and standard UOM mappings. Every extracted attribute generates an Evidence Item linking back to exact source text, spec sheet PDFs, or manufacturer URLs with auditable provenance.'
+    question: 'How does NEXORA reduce unsupported product attributes?',
+    answer: 'NEXORA combines source-grounded retrieval, deterministic LOV/UOM validation, confidence scoring, and human-review routing. Unsupported or conflicting values can be rejected or sent to HITL review.'
   },
   {
     question: 'What happens when a product falls below the 85% confidence threshold?',
     answer: 'Any product with a composite confidence score under 85% is automatically flagged and routed to the Human-in-the-Loop (HITL) Review Queue. The reviewer is shown the exact flagged reasons, raw inputs, proposed values, and side-by-side evidence snippets to approve or edit with one click.'
   },
   {
-    question: 'Can Nexora handle large catalogs with hundreds of thousands of SKUs?',
-    answer: 'Yes. Our pipeline is architected for asynchronous horizontal batch processing. In our production benchmark, 1,000 complex industrial SKUs were fully resolved, classified, enriched with 3,400+ attribute triplets, and validated in under 30 seconds with 100% manufacturer resolution.'
+    question: 'Can Nexora handle large catalogs with thousands of SKUs?',
+    answer: 'Yes. Our deterministic in-memory processing layer sustained 3,278 SKUs/sec on the benchmark environment (0.305s total for 1,000 SKUs). Live web search and LLM enrichment are separately latency-bound per unseen SKU.'
   },
   {
     question: 'What input data formats and sources are supported?',
-    answer: 'Nexora ingests CSV, Excel (.xlsx), raw JSON payloads, vendor spec PDFs, high-res product renders, and live REST API feeds. The pipeline automatically normalizes field name variations across suppliers.'
+    answer: 'Nexora ingests CSV, Excel (.xlsx), raw JSON payloads, vendor spec PDFs, and live REST API feeds. The pipeline automatically normalizes field name variations across suppliers.'
   }
 ];
+
 
 export const MOCK_TESTIMONIALS: Testimonial[] = [
   {

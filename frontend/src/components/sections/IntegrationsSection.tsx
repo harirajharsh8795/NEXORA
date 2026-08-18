@@ -7,42 +7,42 @@ export default function IntegrationsSection() {
     {
       icon: '🗃️',
       category: 'PIM Systems',
-      description: 'Native schema mapping for CX1, Akeneo, Syndigo, and custom Product Information Management platforms.'
+      description: 'Designed for schema compatibility with CX1, Akeneo, Syndigo, and custom Product Information Management platforms.'
     },
     {
       icon: '🏢',
       category: 'ERP Platforms',
-      description: 'Invoice, line item, and logistics description sync with Enterprise Resource Planning software.'
+      description: 'Schema-compatible formatting for invoice, line item, and logistics descriptions.'
     },
     {
       icon: '🛒',
-      category: 'E-Commerce Engines',
-      description: 'Automated catalog ingestion for B2B distributors and enterprise digital storefronts.'
+      category: 'E-Commerce Storefronts',
+      description: 'Structured, commerce-ready output formatted for digital distributor storefronts.'
     },
     {
       icon: '📊',
       category: 'Data Warehouses',
-      description: 'Direct SQL & parquet pipeline sync for Snowflake, BigQuery, and enterprise data lakes.'
+      description: 'Export compatible with standard data warehouse formats (CSV/JSON/Parquet).'
     },
     {
       icon: '⚡',
-      category: 'REST API & Webhooks',
-      description: 'High-throughput async endpoint wrappers with real-time webhooks for batch & stream processing.'
+      category: 'REST API Endpoints',
+      description: 'Standard REST endpoints for single-SKU dynamic enrichment and batch ingestion.'
     },
     {
       icon: '🏛️',
-      category: 'Master Data Management',
-      description: 'Golden record synchronization and canonical taxonomy lookup across distributor networks.'
+      category: 'Master Data Systems',
+      description: 'Golden record structure and canonical taxonomy lookup for distributor catalogs.'
     },
     {
       icon: '🖼️',
-      category: 'Digital Asset Management',
-      description: 'Automatic association of product images, spec sheet PDFs, SDS docs, and CAD drawings.'
+      category: 'Digital Assets & Specs',
+      description: 'Structured extraction of product image links, specification sheet PDFs, and instruction manuals.'
     },
     {
       icon: '📦',
-      category: 'Distributor Feeds',
-      description: '252-column CSV/JSON schema exporter tuned for industrial distribution standards.'
+      category: 'Distributor Delivery',
+      description: '252-column CSV/XLSX delivery format exporter tuned for Unilog industrial catalog standards.'
     }
   ];
 
@@ -51,16 +51,16 @@ export default function IntegrationsSection() {
       <div className="integrations-section__inner">
         <SectionHeader
           tag="ENTERPRISE CONNECTIVITY"
-          title="Seamless Integration Across Your"
+          title="Designed for Integration Across Your"
           titleAccent="Data Stack"
-          subtitle="NEXORA connects via standard REST APIs, webhooks, and CSV/JSON schema exporters with zero vendor lock-in."
+          subtitle="NEXORA outputs schema-aligned delivery formats and standard REST API endpoints for seamless catalog integration."
         />
 
         <div className="integrations-grid">
           {integrationCategories.map((item, idx) => (
             <Card key={idx} className="integration-card">
               <div className="integration-icon">{item.icon}</div>
-              <div className="integration-badge">Generic System Category</div>
+              <div className="integration-badge">Schema-Compatible Destination</div>
               <h3 className="integration-category">{item.category}</h3>
               <p className="integration-desc">{item.description}</p>
             </Card>
@@ -68,9 +68,10 @@ export default function IntegrationsSection() {
         </div>
 
         <div className="integrations-disclaimer">
-          <span>ℹ️ Note: Standard system category architecture shown. All integrations connect via open schema endpoints.</span>
+          <span>ℹ️ Potential Integration Targets: System names represent standard target platforms compatible with NEXORA's 252-column export schema.</span>
         </div>
       </div>
     </section>
   );
 }
+

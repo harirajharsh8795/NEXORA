@@ -51,10 +51,10 @@ export default function PipelineSection() {
         };
       case 6:
         return {
-          title: 'Stage 6: Manufacturer RAG & Web Enrichment',
+          title: 'Stage 6: Targeted Manufacturer Web & PDF Retrieval',
           input: `Manufacturer URL Discovery query: "${sampleProduct.manufacturer_name} ${sampleProduct.mfg_part_num}"`,
           output: `MFR URL: "${sampleProduct.mfr_url}"\nSpecification Sheet PDF: "${sampleProduct.specification_sheet}"\nInstruction Manual PDF: "${sampleProduct.instruction_manual}"`,
-          explanation: 'Queries verified web sources and extracts technical spec sheets, manuals, and image assets.'
+          explanation: 'Queries targeted manufacturer web portals and spec sheets (discarding prohibited marketplace sources) to extract verified technical evidence.'
         };
       case 7:
         return {
@@ -87,10 +87,11 @@ export default function PipelineSection() {
       <div className="pipeline-section__inner">
         <SectionHeader
           tag="MULTI-AGENT PIPELINE DEEP-DIVE"
-          title="The 8-Stage Autonomous"
-          titleAccent="Enrichment Architecture"
-          subtitle="Click any stage below to inspect its operational role and view real input/output data processed through NEXORA."
+          title="The 8-Stage"
+          titleAccent="Enrichment Pipeline"
+          subtitle="Click any stage below to inspect its operational role and view representative input/output data processed through NEXORA."
         />
+
 
         {/* 8-Stage Grid */}
         <div className="pipeline-stages-grid">

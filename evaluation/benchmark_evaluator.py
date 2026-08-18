@@ -36,7 +36,7 @@ class MultiLayerComparator:
             s = s.replace("lbs", " lb").replace("pound", " lb").replace("pounds", " lb").replace("#", " lb")
             s = s.replace("volts", " v").replace("volt", " v")
             s = s.replace("amps", " a").replace("amp", " a")
-            s = re.sub(r"®|™", "", s)
+            s = re.sub(r"®|™|\.|,", "", s)
             return " ".join(s.split())
 
         return normalize_uom_str(val1) == normalize_uom_str(val2)

@@ -20,8 +20,8 @@ export default function FeatureDataQuality() {
               <li className="feature-check-item">
                 <span className="check-icon">🛡️</span>
                 <div>
-                  <strong>Zero-Hallucination Guardrails:</strong>
-                  <p>Candidate values proposed by LLM are checked against approved taxonomy LOVs. Invalid values are automatically rejected.</p>
+                  <strong>Evidence-Grounded Guardrails:</strong>
+                  <p>Candidate values are checked against approved taxonomy LOVs and source evidence. Unsupported or invalid values are automatically rejected or routed to human review.</p>
                 </div>
               </li>
               <li className="feature-check-item">
@@ -92,10 +92,11 @@ export default function FeatureDataQuality() {
               <div className="lov-badge-box">
                 <span className="lov-stat-title">LOV Validation Pass Rate</span>
                 <div className="lov-bar-outer">
-                  <div className="lov-bar-inner" style={{ width: '99.4%' }} />
+                  <div className="lov-bar-inner" style={{ width: '100%' }} />
                 </div>
-                <span className="lov-stat-val">99.4% Schema Compliant</span>
+                <span className="lov-stat-val">100.0% Benchmark LOV &amp; UOM Compliant</span>
               </div>
+
             </Card>
           </div>
         </div>

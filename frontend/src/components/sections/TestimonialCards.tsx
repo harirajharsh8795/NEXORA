@@ -5,24 +5,25 @@ import './TestimonialCards.css';
 export default function TestimonialCards() {
   const testimonials = [
     {
-      quote: "NEXORA eliminated 80% of our manual catalog review backlog in less than 48 hours. The LOV guardrails mean zero hallucinations in our downstream Shopify store.",
+      quote: "NEXORA offers structured LOV guardrails and UOM standardization, streamlining catalog enrichment for complex distributor SKU files.",
       name: "Sarah Jenkins",
       title: "VP of Product Content",
-      company: "Apex Industrial Supply (Fictional Demo Persona)"
+      company: "Apex Industrial Supply (Illustrative Persona Example)"
     },
     {
-      quote: "The Evidence Graph is a game changer. When an auditor or manufacturer asks where an attribute came from, we can point to the exact spec PDF line number.",
+      quote: "The Evidence Graph is a major asset. Being able to trace every attribute directly back to source URLs and PDF snippets gives catalog managers complete confidence.",
       name: "Marcus Vance",
       title: "Director of PIM Operations",
-      company: "Global Logistics & Fasteners (Fictional Demo Persona)"
+      company: "Global Logistics & Fasteners (Illustrative Persona Example)"
     },
     {
-      quote: "We enriched over 50,000 raw supplier SKUs with 100% manufacturer resolution accuracy. Our search conversion increased by 34% within 30 days.",
+      quote: "Standardizing unbranded vendor inputs and generating 252-column commerce-ready files dramatically reduces manual data entry overhead.",
       name: "Elena Rostova",
       title: "Head of E-Commerce Engineering",
-      company: "OmniChannel Distribution (Fictional Demo Persona)"
+      company: "OmniChannel Distribution (Illustrative Persona Example)"
     }
   ];
+
 
   return (
     <section className="testimonials-section">
