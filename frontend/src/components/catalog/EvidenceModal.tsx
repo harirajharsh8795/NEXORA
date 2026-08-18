@@ -91,17 +91,34 @@ export default function EvidenceModal({ product, onClose }: EvidenceModalProps) 
                 </div>
 
                 {evidences.map((item, idx) => (
-                  <div key={idx} className="evidence-tr">
-                    <span className="td-field">{item.field_name}</span>
-                    <span className="td-val">{item.value || '—'}</span>
-                    <span className="td-source">
-                      <span className="source-badge">{item.source_type}</span>
-                    </span>
-                    <span className="td-conf">{(item.confidence * 100).toFixed(0)}%</span>
-                    <span className="td-validation">
-                      {item.validated_by_lov ? '✅ LOV' : '—'}{' '}
-                      {item.validated_by_uom ? '📐 UOM' : ''}
-                    </span>
+                  <div key={idx} className="evidence-tr-container" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0.6rem 0' }}>
+                    <div className="evidence-tr" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1fr 0.6fr 0.8fr', gap: '0.5rem', alignItems: 'center' }}>
+                      <span className="td-field" style={{ fontWeight: 600, color: '#e2e8f0' }}>{item.field_name}</span>
+                      <span className="td-val" style={{ color: '#38bdf8' }}>{item.value || '—'}</span>
+                      <span className="td-source">
+                        <span className="source-badge" style={{ padding: '0.2rem 0.5rem', borderRadius: '4px', background: 'rgba(56,189,248,0.1)', color: '#38bdf8', fontSize: '0.75rem' }}>{item.source_type}</span>
+                      </span>
+                      <span className="td-conf">{(item.confidence * 100).toFixed(0)}%</span>
+                      <span className="td-validation">
+                        {item.validated_by_lov ? '✅ LOV' : '—'}{' '}
+                        {item.validated_by_uom ? '📐 UOM' : ''}
+                      </span>
+                    </div>
+
+                    {(item.source_url || item.snippet) && (
+                      <div className="evidence-details-row" style={{ marginTop: '0.3rem', fontSize: '0.75rem', color: '#94a3b8', paddingLeft: '0.5rem' }}>
+                        {item.source_url && (
+                          <div style={{ marginBottom: '0.15rem' }}>
+                            🔗 <strong>Source URL:</strong> <a href={item.source_url} target="_blank" rel="noopener noreferrer" style={{ color: '#818cf8', textDecoration: 'underline' }}>{item.source_url}</a>
+                          </div>
+                        )}
+                        {item.snippet && (
+                          <div>
+                            💬 <strong>Context Snippet:</strong> <em>"{item.snippet}"</em>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

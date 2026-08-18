@@ -44,7 +44,7 @@ class FuzzyMatcher:
             canonical = self.manufacturer_master[raw_manuf_name]["canonical_name"]
             return canonical, round(0.985 + part_len_mod, 4)
 
-        # RapidFuzz match
+        # RapidFuzz match against master database
         if self.manuf_names:
             match, score, _ = process.extractOne(
                 raw_manuf_name,
@@ -55,7 +55,8 @@ class FuzzyMatcher:
             if score >= FUZZY_MATCH_THRESHOLD:
                 return match, confidence
 
-        return "UNKNOWN", 0.0
+        # Clean non-malformed vendor input (unverified in master list)
+        return raw_manuf_name.split("(")[0].strip(), 0.75
 
     def resolve_brand(self, raw_brand: Optional[str], resolved_manuf: str, part_desc: str) -> Tuple[str, float]:
         desc_upper = part_desc.upper() if part_desc else ""

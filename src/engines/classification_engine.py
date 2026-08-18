@@ -22,11 +22,25 @@ class ClassificationEngine:
                 "classpath": "Tools & Hardware>Power Tools>Cordless Drills"
             },
             {
-                "keywords": ["COUPLING", "CPLG", "PIPE FITTING", "BRASS COUPLING", "BRS CPLG", "PIPE", "ELBOW", "NIPPLE", "FLANGE", "VALVE"],
+                "keywords": ["STEEL PIPE FITTING", "STEEL PIPE", "STEEL COUPLING", "STEEL FITTING", "STAINLESS PIPE", "STAINLESS FITTING", "SS FITTING", "SS CPLG"],
+                "dept": "Plumbing & Pipe",
+                "class": "Pipe & Pipe Fittings",
+                "fine": "Steel Pipe Fittings",
+                "classpath": "Plumbing & Pipe>Pipe & Pipe Fittings>Steel Pipe Fittings"
+            },
+            {
+                "keywords": ["BRASS PIPE", "BRASS COUPLING", "BRS CPLG", "BRASS FITTING", "BRS FITTING"],
                 "dept": "Plumbing & Pipe",
                 "class": "Pipe & Pipe Fittings",
                 "fine": "Brass Pipe Fittings",
                 "classpath": "Plumbing & Pipe>Pipe & Pipe Fittings>Brass Pipe Fittings"
+            },
+            {
+                "keywords": ["COUPLING", "CPLG", "PIPE FITTING", "PIPE", "ELBOW", "NIPPLE", "FLANGE", "VALVE"],
+                "dept": "Plumbing & Pipe",
+                "class": "Pipe & Pipe Fittings",
+                "fine": "Industrial Pipe Fittings",
+                "classpath": "Plumbing & Pipe>Pipe & Pipe Fittings>Industrial Pipe Fittings"
             },
             {
                 "keywords": ["CIRCUIT BREAKER", "BREAKER", "MINIATURE BREAKER", "PANELBOARD"],

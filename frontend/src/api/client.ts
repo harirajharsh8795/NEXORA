@@ -171,11 +171,21 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
     return values;
   };
 
-  const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase());
-  const mpnIdx = headers.findIndex((h) => h.includes('mpn') || h.includes('sku') || h.includes('part') || h.includes('item'));
-  const descIdx = headers.findIndex((h) => h.includes('desc') || h.includes('title') || h.includes('name'));
-  const mfrIdx = headers.findIndex((h) => h.includes('manuf') || h.includes('mfg') || h.includes('vendor'));
-  const brandIdx = headers.findIndex((h) => h.includes('brand') || h.includes('trade'));
+  const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase().trim());
+  
+  // Unambiguous column indexing (DO NOT use generic .includes('part') for MPN!)
+  const mpnIdx = headers.findIndex((h) => 
+    h === 'mfg_part_num' || h === 'mpn' || h === 'sku' || h === 'item_num' || h === 'part_num' || h.startsWith('mfg_part') || h.includes('part_num')
+  );
+  const descIdx = headers.findIndex((h) => 
+    h === 'part_desc' || h.includes('desc') || h.includes('title') || h === 'description'
+  );
+  const mfrIdx = headers.findIndex((h) => 
+    h === 'part_manuf' || h.includes('manuf') || h.includes('mfg') || h.includes('vendor') || h === 'manufacturer'
+  );
+  const brandIdx = headers.findIndex((h) => 
+    h === 'e1_brand' || h === 'unilog_brand' || h.includes('brand') || h.includes('trade')
+  );
 
   const parsedProducts: EnrichedProduct[] = [];
 
@@ -196,14 +206,19 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
       return arr.some((s) => /MALFORMED|UNKNOWN|GARBAGE|BAD-DATA|INVALID/i.test(s));
     }
 
-    // 2. Dynamic Manufacturer Resolution
+    // 2. Dynamic Manufacturer Resolution (MPN is NEVER assigned to Manufacturer!)
     let resolvedManuf = 'UNKNOWN';
     let manufConf = 0.0;
+    let manufSnippet = 'Input manufacturer missing or unverified';
+    let manufSourceType = 'unresolved';
+
     if (!isMalformed && rawManuf.trim()) {
       const cleanManuf = rawManuf.split('(')[0].trim();
       if (!/UNKNOWN|MALFORMED|N\/A|GARBAGE|UNBRANDED/i.test(cleanManuf)) {
         resolvedManuf = cleanManuf;
-        manufConf = 0.98;
+        manufConf = 0.75;
+        manufSourceType = 'input_catalog';
+        manufSnippet = `Extracted from catalog input vendor field: "${rawManuf}"`;
       }
     }
 
@@ -215,7 +230,7 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
       brandConf = 0.96;
     }
 
-    // 4. Dynamic Taxonomy Classification
+    // 4. Precise Taxonomy Classification (Steel vs Brass vs General Pipe Fittings)
     let dept = 'Tools & Hardware';
     let catClass = 'General Hardware';
     let fineLine = 'Industrial Hardware';
@@ -234,12 +249,24 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
       fineLine = 'Cordless Drills';
       classpath = 'Tools & Hardware > Power Tools > Cordless Drills';
       classConf = 0.96;
-    } else if (textUpper.includes('COUPLING') || textUpper.includes('CPLG') || textUpper.includes('PIPE') || textUpper.includes('FITTING')) {
+    } else if (textUpper.includes('STEEL') && (textUpper.includes('PIPE') || textUpper.includes('COUPLING') || textUpper.includes('CPLG') || textUpper.includes('FITTING'))) {
+      dept = 'Plumbing & Pipe';
+      catClass = 'Pipe & Pipe Fittings';
+      fineLine = 'Steel Pipe Fittings';
+      classpath = 'Plumbing & Pipe > Pipe & Pipe Fittings > Steel Pipe Fittings';
+      classConf = 0.96;
+    } else if ((textUpper.includes('BRASS') || textUpper.includes('BRS')) && (textUpper.includes('PIPE') || textUpper.includes('COUPLING') || textUpper.includes('CPLG') || textUpper.includes('FITTING'))) {
       dept = 'Plumbing & Pipe';
       catClass = 'Pipe & Pipe Fittings';
       fineLine = 'Brass Pipe Fittings';
       classpath = 'Plumbing & Pipe > Pipe & Pipe Fittings > Brass Pipe Fittings';
       classConf = 0.96;
+    } else if (textUpper.includes('COUPLING') || textUpper.includes('CPLG') || textUpper.includes('PIPE') || textUpper.includes('FITTING')) {
+      dept = 'Plumbing & Pipe';
+      catClass = 'Pipe & Pipe Fittings';
+      fineLine = 'Industrial Pipe Fittings';
+      classpath = 'Plumbing & Pipe > Pipe & Pipe Fittings > Industrial Pipe Fittings';
+      classConf = 0.92;
     } else if (textUpper.includes('BREAKER') || textUpper.includes('PANELBOARD')) {
       dept = 'Electrical & Lighting';
       catClass = 'Distribution Equipment';
@@ -269,22 +296,66 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
 
     // 6. Dynamic Product-Isolated Attribute Extraction
     const attributes: any[] = [];
+    const evidences: Record<string, any> = {};
+
     if (!isMalformed) {
       if (textUpper.includes('DRILL') || textUpper.includes('DRIVER')) {
         const voltMatch = rawDesc.match(/\b(\d{1,2})\s*(V|Volt|Volts)\b/i);
-        if (voltMatch) attributes.push({ index: 1, label: 'Voltage Rating', value: voltMatch[1], uom: 'V', confidence: 0.96, is_lov_valid: true, is_uom_standardized: true });
+        if (voltMatch) {
+          attributes.push({ index: 1, label: 'Voltage Rating', value: voltMatch[1], uom: 'V', confidence: 0.96, is_lov_valid: true, is_uom_standardized: true });
+          evidences['ATTRIBUTE_Voltage Rating'] = {
+            field_name: 'Voltage Rating',
+            value: `${voltMatch[1]} V`,
+            confidence: 0.96,
+            source_type: 'input_catalog_extraction',
+            snippet: `Extracted from description text: "${voltMatch[0]}"`,
+            validated_by_lov: true,
+            validated_by_uom: true
+          };
+        }
 
         const driveMatch = rawDesc.match(/\b(1\/2|1\/4|3\/8|5\/8)\s*(?:in|")?\s*(?:Chuck|Drive|Hex)\b/i);
-        if (driveMatch) attributes.push({ index: 2, label: 'Chuck Size', value: `${driveMatch[1]} in`, uom: '', confidence: 0.95, is_lov_valid: true, is_uom_standardized: true });
+        if (driveMatch) {
+          attributes.push({ index: 2, label: 'Chuck Size', value: `${driveMatch[1]} in`, uom: '', confidence: 0.95, is_lov_valid: true, is_uom_standardized: true });
+          evidences['ATTRIBUTE_Chuck Size'] = {
+            field_name: 'Chuck Size',
+            value: `${driveMatch[1]} in`,
+            confidence: 0.95,
+            source_type: 'input_catalog_extraction',
+            snippet: `Extracted chuck size: "${driveMatch[0]}"`,
+            validated_by_lov: true,
+            validated_by_uom: true
+          };
+        }
 
-        if (textUpper.includes('BRUSHLESS')) attributes.push({ index: 3, label: 'Motor Type', value: 'Brushless', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
-      } else if (textUpper.includes('COUPLING') || textUpper.includes('CPLG') || textUpper.includes('PIPE')) {
+        if (textUpper.includes('BRUSHLESS')) {
+          attributes.push({ index: 3, label: 'Motor Type', value: 'Brushless', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
+        }
+      } else if (textUpper.includes('COUPLING') || textUpper.includes('CPLG') || textUpper.includes('PIPE') || textUpper.includes('FITTING')) {
         const szMatch = rawDesc.match(/\b(\d+\/\d+|\d+(?:\.\d+)?)\s*(?:in|"|#)?\b/i);
-        if (szMatch) attributes.push({ index: 1, label: 'Fitting Size', value: `${szMatch[1]} in`, uom: 'in', confidence: 0.92, is_lov_valid: true, is_uom_standardized: true });
+        if (szMatch) {
+          attributes.push({ index: 1, label: 'Fitting Size', value: `${szMatch[1]} in`, uom: 'in', confidence: 0.92, is_lov_valid: true, is_uom_standardized: true });
+          evidences['ATTRIBUTE_Fitting Size'] = {
+            field_name: 'Fitting Size',
+            value: `${szMatch[1]} in`,
+            confidence: 0.92,
+            source_type: 'input_catalog_extraction',
+            snippet: `Extracted pipe fitting size: "${szMatch[0]}"`,
+            validated_by_lov: true,
+            validated_by_uom: true
+          };
+        }
 
-        if (textUpper.includes('BRASS') || textUpper.includes('BRS')) attributes.push({ index: 2, label: 'Material', value: 'Brass', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
+        if (textUpper.includes('STEEL') || textUpper.includes('STAINLESS') || textUpper.includes('SS')) {
+          attributes.push({ index: 2, label: 'Material', value: textUpper.includes('STAINLESS') ? 'Stainless Steel' : 'Carbon Steel', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
+        } else if (textUpper.includes('BRASS') || textUpper.includes('BRS')) {
+          attributes.push({ index: 2, label: 'Material', value: 'Brass', uom: '', confidence: 0.98, is_lov_valid: true, is_uom_standardized: true });
+        }
+
         const pressMatch = rawDesc.match(/\b(150|300|125|250)\s*(?:#|lb|PSI)\b/i);
-        if (pressMatch) attributes.push({ index: 3, label: 'Pressure Rating', value: `${pressMatch[1]} lb`, uom: '', confidence: 0.95, is_lov_valid: true, is_uom_standardized: true });
+        if (pressMatch) {
+          attributes.push({ index: 3, label: 'Pressure Rating', value: `${pressMatch[1]} lb`, uom: '', confidence: 0.95, is_lov_valid: true, is_uom_standardized: true });
+        }
       } else if (textUpper.includes('BREAKER')) {
         const ampMatch = rawDesc.match(/\b(\d{1,3})\s*(A|Amp|Amps)\b/i);
         if (ampMatch) attributes.push({ index: 1, label: 'Amperage Rating', value: ampMatch[1], uom: 'A', confidence: 0.96, is_lov_valid: true, is_uom_standardized: true });
@@ -298,37 +369,35 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
       }
     }
 
-    // 7. Dynamic Confidence Calculation & HITL Routing
+    // 7. Dynamic Confidence Calculation & Governance Assessment
     const overallConf = isMalformed ? 0.0 : (manufConf < 0.8 || resolvedBrand === '-- Unbranded --') ? 0.72 : 0.96;
     const needsReview = overallConf < 0.85 || isMalformed;
     const flaggedReasons: string[] = [];
     if (isMalformed) flaggedReasons.push('MALFORMED_INPUT_DATA', 'UNRESOLVED_MANUFACTURER_IDENTITY');
     else if (resolvedManuf === 'UNKNOWN') flaggedReasons.push('UNRESOLVED_MANUFACTURER_IDENTITY');
+    else if (manufConf < 0.8) flaggedReasons.push('UNVERIFIED_VENDOR_MANUFACTURER');
     else if (resolvedBrand === '-- Unbranded --') flaggedReasons.push('UNBRANDED_CATALOG_ITEM');
 
-    // 8. Dynamic Product-Isolated Evidence Graph
-    const evidences: Record<string, any> = {};
-    if (resolvedManuf !== 'UNKNOWN') {
-      evidences['MANUFACTURER_NAME'] = {
-        field_name: 'MANUFACTURER_NAME',
-        value: resolvedManuf,
-        confidence: manufConf,
-        source_type: 'input_catalog',
-        snippet: `Extracted from catalog input vendor field: "${rawManuf}"`,
-        validated_by_lov: true,
-        validated_by_uom: true
-      };
-    } else {
-      evidences['MANUFACTURER_NAME'] = {
-        field_name: 'MANUFACTURER_NAME',
-        value: 'UNKNOWN',
-        confidence: 0.0,
-        source_type: 'unresolved',
-        snippet: 'Input manufacturer missing or unverified - flagged for human review',
-        validated_by_lov: false,
-        validated_by_uom: false
-      };
-    }
+    // 8. Populate Entity Evidence Nodes
+    evidences['MANUFACTURER_NAME'] = {
+      field_name: 'MANUFACTURER_NAME',
+      value: resolvedManuf,
+      confidence: manufConf,
+      source_type: manufSourceType,
+      snippet: manufSnippet,
+      validated_by_lov: resolvedManuf !== 'UNKNOWN',
+      validated_by_uom: false
+    };
+
+    evidences['CLASSPATH'] = {
+      field_name: 'CLASSPATH',
+      value: classpath,
+      confidence: classConf,
+      source_type: 'taxonomy_rule_matcher',
+      snippet: `Classified based on product description keywords: "${rawDesc}"`,
+      validated_by_lov: true,
+      validated_by_uom: false
+    };
 
     const product: EnrichedProduct = {
       mfg_part_num: rawMpn,
