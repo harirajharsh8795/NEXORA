@@ -1,0 +1,9 @@
+mfg_part_num,part_desc,part_manuf,e1_brand
+UNSEEN-TEST-001,20V Max Cordless Drill Driver,Demo Manufacturer,DeWalt
+MODIFIED-TEST-002,Heavy duty titanium coated saw blade,Demo Manufacturer,Diablo
+TEST-PIPE-003,3/4 in steel pipe fitting,Unknown Manufacturer,Unbranded
+TEST-BLADE-004,7-1/4 in framing circular saw blade,Unknown Manufacturer,Freud Inc
+MALFORMED-TEST-005,Malformed corrupted line item,MALFORMED-TEST-005,Garbage
+TEST-FITTING-006,1/2 in brass coupling 150#,Demo Manufacturer,BrassCorp
+TEST-DRILL-007,Brushless 1/2 in cordless hammer drill 20V,Demo Manufacturer,DeWalt
+TEST-COUPLING-008,2 in stainless steel pipe coupling 300#,Demo Manufacturer,SteelCorp

@@ -173,18 +173,18 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
 
   const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase().trim());
   
-  // Unambiguous column indexing (DO NOT use generic .includes('part') for MPN!)
+  // Unambiguous & Disambiguated column indexing (mfg_part_num must NEVER match mfrIdx!)
   const mpnIdx = headers.findIndex((h) => 
-    h === 'mfg_part_num' || h === 'mpn' || h === 'sku' || h === 'item_num' || h === 'part_num' || h.startsWith('mfg_part') || h.includes('part_num')
+    h === 'mfg_part_num' || h === 'mpn' || h === 'sku' || h === 'item_num' || h === 'part_num' || h === 'mfg_part_no' || h === 'part_number'
   );
   const descIdx = headers.findIndex((h) => 
-    h === 'part_desc' || h.includes('desc') || h.includes('title') || h === 'description'
+    h === 'part_desc' || h === 'description' || h === 'desc' || h.includes('desc') || h === 'title'
   );
   const mfrIdx = headers.findIndex((h) => 
-    h === 'part_manuf' || h.includes('manuf') || h.includes('mfg') || h.includes('vendor') || h === 'manufacturer'
+    h === 'part_manuf' || h === 'manufacturer' || h === 'vendor' || h === 'manuf' || h === 'part_manufacturer' || h === 'mfr_name'
   );
   const brandIdx = headers.findIndex((h) => 
-    h === 'e1_brand' || h === 'unilog_brand' || h.includes('brand') || h.includes('trade')
+    h === 'e1_brand' || h === 'unilog_brand' || h === 'brand' || h.includes('brand') || h === 'dib_brand'
   );
 
   const parsedProducts: EnrichedProduct[] = [];
@@ -195,8 +195,8 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
 
     const rawMpn = row[mpnIdx >= 0 ? mpnIdx : 0] || `SKU-${i}`;
     const rawDesc = row[descIdx >= 0 ? descIdx : 1] || row[0] || 'Industrial Product Component';
-    const rawManuf = row[mfrIdx >= 0 ? mfrIdx : 2] || '';
-    const rawBrand = row[brandIdx >= 0 ? brandIdx : 3] || '';
+    const rawManuf = mfrIdx >= 0 ? (row[mfrIdx] || '') : '';
+    const rawBrand = brandIdx >= 0 ? (row[brandIdx] || '') : '';
 
     const textUpper = `${rawDesc} ${rawMpn} ${rawManuf}`.toUpperCase();
 
@@ -214,7 +214,11 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
 
     if (!isMalformed && rawManuf.trim()) {
       const cleanManuf = rawManuf.split('(')[0].trim();
-      if (!/UNKNOWN|MALFORMED|N\/A|GARBAGE|UNBRANDED/i.test(cleanManuf)) {
+      const isMpnValue = cleanManuf.toUpperCase() === rawMpn.toUpperCase() ||
+                         /^(TEST|SKU|PART|MPN|ITEM|RAW-ROW|UNSEEN|MALFORMED)-/i.test(cleanManuf) ||
+                         /^[A-Z0-9]+-[A-Z0-9]+-\d+$/i.test(cleanManuf);
+
+      if (!/UNKNOWN|MALFORMED|N\/A|GARBAGE|UNBRANDED/i.test(cleanManuf) && !isMpnValue) {
         resolvedManuf = cleanManuf;
         manufConf = 0.75;
         manufSourceType = 'input_catalog';

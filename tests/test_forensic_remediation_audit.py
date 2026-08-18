@@ -123,3 +123,52 @@ def test_no_cross_row_attribute_contamination():
 
     assert "Number of Teeth" in saw_labels
     assert "Number of Teeth" not in drill_labels, "Saw blade teeth count leaked into Drill!"
+
+def test_nexora_manual_8_sku_dataset_verification():
+    """Verifies all 8 SKUs of NEXORA_manual_test_dataset.csv for exact MPN != Manufacturer isolation."""
+    records = [
+        RawSKURecord(mfg_part_num="UNSEEN-TEST-001", part_desc="20V Max Cordless Drill Driver", part_manuf="Demo Manufacturer", e1_brand="DeWalt"),
+        RawSKURecord(mfg_part_num="MODIFIED-TEST-002", part_desc="Heavy duty titanium coated saw blade", part_manuf="Demo Manufacturer", e1_brand="Diablo"),
+        RawSKURecord(mfg_part_num="TEST-PIPE-003", part_desc="3/4 in steel pipe fitting", part_manuf="Unknown Manufacturer", e1_brand="Unbranded"),
+        RawSKURecord(mfg_part_num="TEST-BLADE-004", part_desc="7-1/4 in framing circular saw blade", part_manuf="Unknown Manufacturer", e1_brand="Freud Inc"),
+        RawSKURecord(mfg_part_num="MALFORMED-TEST-005", part_desc="Malformed corrupted line item", part_manuf="MALFORMED-TEST-005", e1_brand="Garbage"),
+        RawSKURecord(mfg_part_num="TEST-FITTING-006", part_desc="1/2 in brass coupling 150#", part_manuf="Demo Manufacturer", e1_brand="BrassCorp"),
+        RawSKURecord(mfg_part_num="TEST-DRILL-007", part_desc="Brushless 1/2 in cordless hammer drill 20V", part_manuf="Demo Manufacturer", e1_brand="DeWalt"),
+        RawSKURecord(mfg_part_num="TEST-COUPLING-008", part_desc="2 in stainless steel pipe coupling 300#", part_manuf="Demo Manufacturer", e1_brand="SteelCorp")
+    ]
+
+    er = EntityResolutionAgent()
+    products = er.process(records)
+
+    # UNSEEN-TEST-001
+    assert products[0].mfg_part_num == "UNSEEN-TEST-001"
+    assert products[0].manufacturer_name == "Demo Manufacturer"
+
+    # MODIFIED-TEST-002
+    assert products[1].mfg_part_num == "MODIFIED-TEST-002"
+    assert products[1].manufacturer_name == "Demo Manufacturer"
+
+    # TEST-PIPE-003
+    assert products[2].mfg_part_num == "TEST-PIPE-003"
+    assert products[2].manufacturer_name == "UNKNOWN"
+
+    # TEST-BLADE-004
+    assert products[3].mfg_part_num == "TEST-BLADE-004"
+    assert products[3].manufacturer_name == "UNKNOWN"
+
+    # MALFORMED-TEST-005
+    assert products[4].mfg_part_num == "MALFORMED-TEST-005"
+    assert products[4].manufacturer_name == "UNKNOWN"
+
+    # TEST-FITTING-006
+    assert products[5].mfg_part_num == "TEST-FITTING-006"
+    assert products[5].manufacturer_name == "Demo Manufacturer"
+
+    # TEST-DRILL-007
+    assert products[6].mfg_part_num == "TEST-DRILL-007"
+    assert products[6].manufacturer_name == "Demo Manufacturer"
+
+    # TEST-COUPLING-008
+    assert products[7].mfg_part_num == "TEST-COUPLING-008"
+    assert products[7].manufacturer_name == "Demo Manufacturer"
+
