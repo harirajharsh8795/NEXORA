@@ -159,6 +159,7 @@ export async function uploadEvaluatorFile(file: File): Promise<{
       approved: data.auto_approved_count || normalizedProducts.filter((p) => !p.confidence.needs_human_review).length,
       review: data.human_review_count || normalizedProducts.filter((p) => p.confidence.needs_human_review).length,
       filename: data.filename || file.name,
+      is_client_fallback: false,
       warnings: data.warnings || []
     };
   } catch (err: any) {
@@ -549,7 +550,9 @@ async function parseAndEnrichFileClientSide(file: File): Promise<{
     total: parsedProducts.length,
     approved: approvedCount,
     review: reviewCount,
-    filename: file.name
+    filename: file.name,
+    is_client_fallback: true,
+    warnings: ['⚡ Processed locally via Client-Side Engine (Local Fallback)']
   };
 }
 

@@ -44,18 +44,19 @@ def test_live_xlsx_upload():
     xlsx_bytes = xlsx_buf.getvalue()
     files = {"file": ("NEXORA_Judge_Style_Test_Dataset.xlsx", xlsx_bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
     
-    print("Uploading multi-sheet XLSX dataset to live Render API...")
-    res = requests.post(LIVE_API_URL, files=files, timeout=60)
+    print("Uploading multi-sheet XLSX dataset to live Render API (/api/upload)...")
+    res = requests.post("https://nexora-d7u7.onrender.com/api/upload", files=files, timeout=60)
     print("XLSX Status Code:", res.status_code)
-    print("XLSX Response JSON:", res.json())
+    print("XLSX Response JSON Status:", res.json().get("status"))
+    print("XLSX Total SKUs:", res.json().get("total_skus"))
     assert res.status_code == 200, f"XLSX upload failed with status {res.status_code}"
 
 def test_live_corrupted_xlsx_upload():
     corrupted_bytes = b"CORRUPTED_NON_EXCEL_BYTE_STREAM"
     files = {"file": ("corrupted.xlsx", corrupted_bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
     
-    print("Uploading corrupted XLSX dataset to live Render API...")
-    res = requests.post(LIVE_API_URL, files=files, timeout=60)
+    print("Uploading corrupted XLSX dataset to live Render API (/api/upload)...")
+    res = requests.post("https://nexora-d7u7.onrender.com/api/upload", files=files, timeout=60)
     print("Corrupted XLSX Status Code:", res.status_code)
     print("Corrupted XLSX Response JSON:", res.json())
     assert res.status_code == 400, f"Expected 400, got {res.status_code}"

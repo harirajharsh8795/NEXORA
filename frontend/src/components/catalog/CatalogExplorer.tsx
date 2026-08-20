@@ -98,7 +98,11 @@ export default function CatalogExplorer() {
         approved: res.approved,
         review: res.review,
       });
-      setUploadStatus(`✅ Dynamic enrichment complete for "${res.filename}" (${res.total} SKUs processed)!`);
+      if ((res as any).is_client_fallback) {
+        setUploadStatus(`⚡ Dynamic enrichment complete for "${res.filename}" via Client-Side Fallback Engine (${res.total} SKUs processed)!`);
+      } else {
+        setUploadStatus(`✅ Backend AI dynamic enrichment complete for "${res.filename}" (${res.total} SKUs processed)!`);
+      }
     } catch (err: any) {
       setUploadStatus(`❌ Processing error: ${err.message}`);
     } finally {
