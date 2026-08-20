@@ -18,6 +18,7 @@ app = FastAPI(
 
 # Specific origins without wildcard *
 origins = [
+    "*",
     "https://nexora-otuu.vercel.app",
     "https://nexora-d7u7.onrender.com",
     "http://localhost:5173",
@@ -25,11 +26,10 @@ origins = [
     "http://127.0.0.1:5173"
 ]
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
