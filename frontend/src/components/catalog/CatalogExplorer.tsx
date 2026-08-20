@@ -388,15 +388,19 @@ export default function CatalogExplorer() {
                 return (
                   <Card key={product.mfg_part_num} className="product-card">
                     <div className="product-card-top">
-                      <div className="flex items-center gap-2 overflow-hidden">
-                        <span className="product-mpn" title={product.mfg_part_num}>{product.mfg_part_num}</span>
+                      <span className="product-mpn" title={product.mfg_part_num}>{product.mfg_part_num}</span>
+                      <div className="product-badges-group">
+                        <StatusBadge status={isApproved ? 'approved' : 'review'} />
                         {isLiveCandidate && (
-                          <span className="live-demo-tag shrink-0" title="Capable of real-time Gemini AI web enrichment">
+                          <button
+                            className="live-demo-badge-btn"
+                            onClick={() => handleLiveEnrichClick(product.mfg_part_num)}
+                            title="Run real-time Gemini AI web search, fetch & extraction"
+                          >
                             ⚡ Try Live
-                          </span>
+                          </button>
                         )}
                       </div>
-                      <StatusBadge status={isApproved ? 'approved' : 'review'} />
                     </div>
 
                     <h4 className="product-name" title={product.product_name || product.part_desc}>
@@ -466,7 +470,7 @@ export default function CatalogExplorer() {
                       />
                     </div>
 
-                    <div className="product-card-footer flex gap-2">
+                    <div className="product-card-footer">
                       <Button
                         variant="outline"
                         size="sm"
@@ -475,16 +479,6 @@ export default function CatalogExplorer() {
                       >
                         🔗 View Evidence Graph
                       </Button>
-
-                      {isLiveCandidate && (
-                        <button
-                          className="live-btn whitespace-nowrap"
-                          onClick={() => handleLiveEnrichClick(product.mfg_part_num)}
-                          title="Run real-time search, fetch, and Gemini extraction"
-                        >
-                          ⚡ Run Live
-                        </button>
-                      )}
                     </div>
                   </Card>
                 );
