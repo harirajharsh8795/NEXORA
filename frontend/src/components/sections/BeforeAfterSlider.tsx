@@ -43,7 +43,7 @@ export default function BeforeAfterSlider() {
   };
 
   return (
-    <section id="pipeline" className="before-after-section">
+    <section id="transformation" className="before-after-section">
       <div className="before-after-section__inner">
         <SectionHeader
           tag="BEFORE vs AFTER INTELLIGENCE"

@@ -84,22 +84,30 @@ export default function PipelineSection() {
 
   return (
     <section id="pipeline" className="pipeline-section">
+      {/* Cinematic Ambient Glow Orbs */}
+      <div className="pipeline-ambient-glow" aria-hidden="true">
+        <div className="pipeline-orb pipeline-orb--purple" />
+        <div className="pipeline-orb pipeline-orb--cyan" />
+        <div className="pipeline-orb pipeline-orb--indigo" />
+      </div>
+
       <div className="pipeline-section__inner">
         <SectionHeader
           tag="MULTI-AGENT PIPELINE DEEP-DIVE"
           title="The 8-Stage"
           titleAccent="Enrichment Pipeline"
-          subtitle="Click any stage below to inspect its operational role and view representative input/output data processed through NEXORA."
+          subtitle="Move your cursor across any stage to scrub through the live enrichment pipeline and automatically inspect real-time telemetry below."
         />
 
-
         {/* 8-Stage Grid */}
-        <div className="pipeline-stages-grid">
+        <div className="pipeline-stages-grid" role="tablist" aria-label="Pipeline Stages">
           {MOCK_PIPELINE_STAGES.map((stage) => (
             <StageCard
               key={stage.id}
               stage={stage}
+              stageNumber={stage.id}
               isSelected={selectedStageId === stage.id}
+              onHover={() => setSelectedStageId(stage.id)}
               onClick={() => setSelectedStageId(stage.id)}
             />
           ))}
@@ -107,24 +115,43 @@ export default function PipelineSection() {
 
         {/* Inspection Panel */}
         <Card className="pipeline-inspection-panel">
-          <div className="inspection-header">
-            <div className="inspection-title-group">
-              <span className="inspection-badge">STAGE 0{selectedStage.id} INSPECTOR</span>
-              <h3 className="inspection-title">{selectedStage.icon} {example.title}</h3>
+          <div key={selectedStageId} className="inspection-content-animated">
+            <div className="inspection-header">
+              <div className="inspection-title-group">
+                <div className="inspection-badge-row">
+                  <span className="inspection-badge">STAGE 0{selectedStage.id} TELEMETRY</span>
+                  <span className="inspection-pulse-badge">
+                    <span className="pulse-dot" /> LIVE INSPECTOR
+                  </span>
+                </div>
+                <h3 className="inspection-title">
+                  <span className="inspection-title-icon">{selectedStage.icon}</span>
+                  {example.title}
+                </h3>
+              </div>
+              <div className="inspection-status-pill">
+                <span className="status-indicator-check">✓</span>
+                <span>Active Execution Verified</span>
+              </div>
             </div>
-            <span className="inspection-status-pill">Active Execution Verified</span>
-          </div>
 
-          <p className="inspection-explanation">{example.explanation}</p>
+            <p className="inspection-explanation">{example.explanation}</p>
 
-          <div className="inspection-data-comparison">
-            <div className="data-box data-box--input">
-              <span className="data-box-label">STAGE INPUT DATA</span>
-              <pre className="data-box-code">{example.input}</pre>
-            </div>
-            <div className="data-box data-box--output">
-              <span className="data-box-label data-box-label--accent">STAGE ENRICHED OUTPUT</span>
-              <pre className="data-box-code">{example.output}</pre>
+            <div className="inspection-data-comparison">
+              <div className="data-box data-box--input">
+                <div className="data-box-topbar">
+                  <span className="data-box-label">STAGE INPUT PAYLOAD</span>
+                  <span className="data-box-tag">RAW VENDOR DATA</span>
+                </div>
+                <pre className="data-box-code">{example.input}</pre>
+              </div>
+              <div className="data-box data-box--output">
+                <div className="data-box-topbar">
+                  <span className="data-box-label data-box-label--accent">STAGE ENRICHED OUTPUT</span>
+                  <span className="data-box-tag data-box-tag--accent">VALIDATED EVIDENCE</span>
+                </div>
+                <pre className="data-box-code">{example.output}</pre>
+              </div>
             </div>
           </div>
         </Card>
@@ -132,3 +159,4 @@ export default function PipelineSection() {
     </section>
   );
 }
+

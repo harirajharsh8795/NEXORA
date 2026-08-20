@@ -9,14 +9,14 @@ import type {
 } from '../types';
 
 export const MOCK_PIPELINE_STAGES: PipelineStage[] = [
-  { id: 1, name: 'Entity Resolution', icon: '⚡', description: 'Resolves vendor names, brand variations & trade names against canonical master databases.', status: 'completed' },
-  { id: 2, name: 'Taxonomy Classification', icon: '🗂️', description: 'Hierarchical 4-tier taxonomy mapping (Dept > Class > Fine Line > Classpath).', status: 'completed' },
-  { id: 3, name: 'Attribute Extraction', icon: '🔍', description: 'Extracts structured (Label, Value, UOM) triplets from raw specs with regex engines.', status: 'completed' },
-  { id: 4, name: 'Content Generation', icon: '✍️', description: 'Synthesizes 6 distinct channel-specific descriptions (Mobile, Invoice, Retail, etc).', status: 'completed' },
-  { id: 5, name: 'Manufacturer Enrichment', icon: '🌐', description: 'Discovers verified manufacturer URLs, spec sheet PDFs, and image assets.', status: 'completed' },
-  { id: 6, name: 'LOV & UOM Validation', icon: '🛡️', description: 'Validates every value against List of Values (LOV) & standardizes UOMs.', status: 'completed' },
-  { id: 7, name: 'Confidence & Review', icon: '⚖️', description: 'Calculates weighted confidence score. Flags score < 85% for human review.', status: 'completed' },
-  { id: 8, name: 'Commerce Delivery', icon: '🚀', description: 'Exports schema-compliant 252-column master catalog ready for PIM & AI agents.', status: 'completed' }
+  { id: 1, name: 'Input Intelligence', icon: '⚡', description: 'Cleans vendor noise, removes placeholders & normalizes strings.', status: 'completed' },
+  { id: 2, name: 'Entity Resolution', icon: '🎯', description: 'Resolves vendor names, brand variations & trade names against canonical master databases.', status: 'completed' },
+  { id: 3, name: 'Taxonomy Classification', icon: '🗂️', description: 'Hierarchical 4-tier taxonomy mapping (Dept > Class > Fine Line > Classpath).', status: 'completed' },
+  { id: 4, name: 'Attribute Extraction', icon: '🔍', description: 'Extracts structured (Label, Value, UOM) triplets from raw specs with regex engines.', status: 'completed' },
+  { id: 5, name: 'LOV & UOM Validation', icon: '🛡️', description: 'Validates every value against List of Values (LOV) & standardizes UOMs.', status: 'completed' },
+  { id: 6, name: 'Manufacturer Retrieval', icon: '🌐', description: 'Discovers verified manufacturer URLs, spec sheet PDFs, and image assets.', status: 'completed' },
+  { id: 7, name: 'Channel Synthesis', icon: '✍️', description: 'Synthesizes 5 distinct channel-specific descriptions (Mobile, Invoice, Retail, etc).', status: 'completed' },
+  { id: 8, name: 'Confidence & Review', icon: '⚖️', description: 'Calculates weighted confidence score. Flags score < 85% for human review.', status: 'completed' }
 ];
 
 export const MOCK_TAXONOMY_CATEGORIES: TaxonomyCategory[] = [

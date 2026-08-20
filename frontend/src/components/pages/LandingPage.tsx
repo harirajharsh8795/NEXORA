@@ -7,7 +7,6 @@ import FeatureCommerceReady from '../sections/FeatureCommerceReady';
 import PipelineSection from '../sections/PipelineSection';
 import ROICalculator from '../sections/ROICalculator';
 import ManualVsAgent from '../sections/ManualVsAgent';
-import EnterpriseGrid from '../sections/EnterpriseGrid';
 import IntegrationsSection from '../sections/IntegrationsSection';
 import TaxonomyExplorer from '../sections/TaxonomyExplorer';
 import CatalogCalloutSection from '../sections/CatalogCalloutSection';
@@ -30,7 +29,6 @@ export default function LandingPage() {
       {/* Business Impact & Interactive Tools */}
       <ROICalculator />
       <ManualVsAgent />
-      <EnterpriseGrid />
       <IntegrationsSection />
 
       {/* Taxonomy & Live Interactive Catalog Workspace Teaser */}
@@ -43,3 +41,4 @@ export default function LandingPage() {
     </main>
   );
 }
+
