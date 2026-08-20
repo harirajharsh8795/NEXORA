@@ -91,6 +91,7 @@ export async function uploadEvaluatorFile(file: File): Promise<{
   approved: number;
   review: number;
   filename: string;
+  is_client_fallback?: boolean;
   warnings?: string[];
 }> {
   // 1. Client-Side XLSX Format & Corruption Pre-Validation
@@ -175,6 +176,7 @@ async function parseAndEnrichFileClientSide(file: File): Promise<{
   approved: number;
   review: number;
   filename: string;
+  is_client_fallback?: boolean;
   warnings?: string[];
 }> {
   let csvText = '';

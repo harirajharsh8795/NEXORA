@@ -10,7 +10,7 @@
 ## 📌 Executive Summary
 
 - **Total SKUs Evaluated:** 200
-- **Benchmark Execution Time:** 0.742 seconds (269.5 SKUs/sec)
+- **Benchmark Execution Time:** 0.228 seconds (878.4 SKUs/sec)
 - **Overall Benchmark F1 Accuracy:** **95.00%**
 - **Auto-Approval Rate (Score $\ge$ 85%):** **70.0%** (140 / 200 SKUs)
 - **HITL Routing Rate (Score < 85%):** **30.0%** (60 / 200 SKUs)
