@@ -10,17 +10,19 @@ class ValidationAgent(BaseAgent):
         self.logger.info(f"Validating {len(products)} products against compliance rules...")
 
         for p in products:
-            reasons = []
+            existing_reasons = list(p.confidence.flagged_reasons)
 
-            # 1. Required Identity Check
-            if not p.manufacturer_name:
-                reasons.append("Missing Manufacturer Name")
-            if not p.brand_name:
-                reasons.append("Missing Brand Name")
+            # 1. Structural Malformed Input Check
+            if not p.part_desc or not p.part_desc.strip() or "MALFORMED" in p.part_desc.upper() or "MALFORMED" in p.mfg_part_num.upper():
+                p.confidence.needs_human_review = True
+                if "MALFORMED_INPUT_DATA" not in existing_reasons:
+                    existing_reasons.append("MALFORMED_INPUT_DATA")
 
-            # 2. Classification Check
-            if not p.classpath:
-                reasons.append("Missing Classpath")
+            # 2. Unresolved Manufacturer Check
+            if p.manufacturer_name == "UNKNOWN" or p.confidence.manufacturer_confidence < 0.60:
+                p.confidence.needs_human_review = True
+                if "UNRESOLVED_MANUFACTURER_IDENTITY" not in existing_reasons:
+                    existing_reasons.append("UNRESOLVED_MANUFACTURER_IDENTITY")
 
             # 3. Description Char Limits Check
             if len(p.invoice_desc) > 50:
@@ -28,7 +30,7 @@ class ValidationAgent(BaseAgent):
             if len(p.short_desc) > 150:
                 p.short_desc = p.short_desc[:150]
 
-            p.confidence.flagged_reasons = reasons
+            p.confidence.flagged_reasons = existing_reasons
 
         self.logger.info("Validation completed successfully.")
         return products

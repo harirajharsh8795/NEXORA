@@ -261,11 +261,8 @@ async function parseAndEnrichFileClientSide(file: File): Promise<{
 
     const textUpper = `${rawDesc} ${rawMpn} ${rawManuf}`.toUpperCase();
 
-    // 1. Check for Malformed / Unknown SKU
-    const isMalformed = anyBad([rawMpn, rawDesc, rawManuf]);
-    function anyBad(arr: string[]) {
-      return arr.some((s) => /MALFORMED|UNKNOWN|GARBAGE|BAD-DATA|INVALID/i.test(s));
-    }
+    // 1. Check for Malformed Input (Description missing/empty or explicit malformed token)
+    const isMalformed = !rawDesc || !rawDesc.trim() || /MALFORMED|GARBAGE|BAD-DATA|INVALID/i.test(rawDesc) || /MALFORMED/i.test(rawMpn);
 
     // 2. Dynamic Manufacturer Resolution (MPN is NEVER assigned to Manufacturer!)
     let resolvedManuf = 'UNKNOWN';

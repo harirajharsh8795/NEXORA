@@ -40,7 +40,9 @@ class ConfidenceScore(BaseModel):
 
         # Generate explainable HITL routing reason codes
         if self.manufacturer_confidence < 0.60:
-            if "LOW_MANUFACTURER_CONFIDENCE" not in self.flagged_reasons:
+            if "UNRESOLVED_MANUFACTURER_IDENTITY" not in self.flagged_reasons:
+                self.flagged_reasons.append("UNRESOLVED_MANUFACTURER_IDENTITY")
+            if "LOW_MANUFACTURER_CONFIDENCE: Manufacturer unverified or missing" not in self.flagged_reasons:
                 self.flagged_reasons.append("LOW_MANUFACTURER_CONFIDENCE: Manufacturer unverified or missing")
         
         if self.brand_confidence <= 0.60:

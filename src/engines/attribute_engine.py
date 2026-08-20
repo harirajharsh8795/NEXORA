@@ -19,7 +19,7 @@ class AttributeEngine:
         text = f"{part_desc} {mfg_part_num}".strip()
         text_upper = text.upper()
 
-        if any(bad in text_upper for bad in ["MALFORMED", "UNKNOWN", "GARBAGE", "BAD-DATA", "INVALID"]):
+        if not part_desc or not part_desc.strip() or any(bad in text_upper for bad in ["MALFORMED", "GARBAGE", "BAD-DATA", "INVALID"]):
             return []
 
         # 1. Product Type / Subcategory
@@ -44,7 +44,7 @@ class AttributeEngine:
             ))
 
         # 3. Model / MPN
-        if mfg_part_num and not any(bad in mfg_part_num.upper() for bad in ["MALFORMED", "UNKNOWN", "GARBAGE"]):
+        if mfg_part_num and not any(bad in mfg_part_num.upper() for bad in ["MALFORMED", "GARBAGE"]):
             triplets.append(AttributeTriplet(
                 index=len(triplets)+1,
                 label="Model",

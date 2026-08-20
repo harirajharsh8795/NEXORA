@@ -132,7 +132,7 @@ class ClassificationEngine:
         text = f"{part_desc} {mfg_part_num}".upper()
         mpn_mod = (len(mfg_part_num) % 5) * 0.003
 
-        if any(bad in text for bad in ["MALFORMED", "UNKNOWN", "GARBAGE", "BAD-DATA", "INVALID"]):
+        if not part_desc or not part_desc.strip() or any(bad in text for bad in ["MALFORMED", "GARBAGE", "BAD-DATA", "INVALID"]):
             return (
                 "Unclassified",
                 "Pending Review",
