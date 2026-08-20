@@ -107,6 +107,50 @@ class AttributeEngine:
             if teeth_match:
                 triplets.append(AttributeTriplet(index=len(triplets)+1, label="Number of Teeth", value=teeth_match.group(1), uom="", confidence=0.95))
 
+        # Appliances / Dishwashers (e.g. PDSH4816AF)
+        elif "DISHWASHER" in text_upper or "REFRIGERATOR" in text_upper or "WASHER" in text_upper or "DRYER" in text_upper or "APPLIANCE" in text_upper:
+            if "SS" in text_upper.split() or "STAINLESS" in text_upper:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Material", value="Stainless Steel", uom="", confidence=0.98))
+            volt_match = re.search(r"\b(\d{3})\s*(V|Volt|Volts)\b", text, re.IGNORECASE)
+            if volt_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Voltage Rating", value=volt_match.group(1), uom="V", confidence=0.96))
+            amp_match = re.search(r"\b(\d{1,2})\s*(A|Amp|Amps)\b", text, re.IGNORECASE)
+            if amp_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Amperage Rating", value=amp_match.group(1), uom="A", confidence=0.96))
+            sound_match = re.search(r"\b(\d{2})\s*(dBA|dB)\b", text, re.IGNORECASE)
+            if sound_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Sound Level", value=sound_match.group(1), uom="dBA", confidence=0.95))
+
+        # Faucets & Plumbing Fixtures
+        elif "FAUCET" in text_upper or "SINK" in text_upper or "TAP" in text_upper:
+            gpm_match = re.search(r"\b(\d+(?:\.\d+)?)\s*(?:GPM)\b", text, re.IGNORECASE)
+            if gpm_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Flow Rate", value=gpm_match.group(1), uom="GPM", confidence=0.96))
+            if "CHROME" in text_upper:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Finish", value="Chrome", uom="", confidence=0.98))
+            elif "NICKEL" in text_upper or "BRUSHED NICKEL" in text_upper:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Finish", value="Brushed Nickel", uom="", confidence=0.98))
+
+        # Decking & Railing
+        elif "DECKING" in text_upper or "DECK" in text_upper:
+            len_match = re.search(r"\b(\d+)\s*(?:ft|feet|')\b", text, re.IGNORECASE)
+            if len_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Length", value=len_match.group(1), uom="ft", confidence=0.95))
+            if "COMPOSITE" in text_upper:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Material", value="Composite", uom="", confidence=0.98))
+
+        # Bushings
+        elif "BUSHING" in text_upper:
+            sz_match = re.search(r"\b(\d+/\d+|\d+(?:\.\d+)?)\b", text, re.IGNORECASE)
+            if sz_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Bushing Size", value=sz_match.group(1), uom="in", confidence=0.92))
+
+        # HVAC
+        elif "HVAC" in text_upper or "THERMOSTAT" in text_upper or "FURNACE" in text_upper:
+            cfm_match = re.search(r"\b(\d{3,4})\s*(?:CFM)\b", text, re.IGNORECASE)
+            if cfm_match:
+                triplets.append(AttributeTriplet(index=len(triplets)+1, label="Air Flow", value=cfm_match.group(1), uom="CFM", confidence=0.96))
+
         return triplets
 
     def _extract_product_type(self, text: str, classpath: str) -> str:

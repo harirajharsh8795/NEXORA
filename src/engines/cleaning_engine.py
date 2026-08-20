@@ -15,6 +15,26 @@ class DataCleaningEngine:
             return None
         return cleaned
 
+    def clean_description(self, desc: Optional[str]) -> Optional[str]:
+        cleaned = self.clean_text(desc)
+        if not cleaned:
+            return None
+
+        # Insert space between number/fraction and unit word/abbreviation (e.g. 24IN -> 24 in, 0.5IN -> 0.5 in)
+        cleaned = re.sub(r"\b(\d+(?:/\d+|\.\d+)?)\s*(INCH|INCHES|FEET|FOOT|MM|CM|PSI|VOLT|VOLTS|AMP|AMPS|WATT|WATTS|LBS|GPM|CFM|HP|RPM)\b", r"\1 \2", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"(\d+(?:/\d+|\.\d+)?)\s*(IN|FT|V|A|W|LB)\b", r"\1 \2", cleaned)
+        
+        # Canonicalize unit casing
+        cleaned = re.sub(r"\b(\d+(?:/\d+|\.\d+)?)\s+IN\b", r"\1 in", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"\b(\d+(?:/\d+|\.\d+)?)\s+FT\b", r"\1 ft", cleaned, flags=re.IGNORECASE)
+
+        # Normalize decimal measurements to fractions (e.g. 0.5 in -> 1/2 in)
+        from src.engines.fraction_engine import FractionNormalizationEngine
+        fraction_engine = FractionNormalizationEngine()
+        cleaned = fraction_engine.normalize_measurement(cleaned)
+
+        return cleaned
+
     def parse_manufacturer(self, raw_manuf: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
         cleaned = self.clean_text(raw_manuf)
         if not cleaned:
@@ -31,7 +51,7 @@ class DataCleaningEngine:
     def clean_record(self, record: Dict[str, Any]) -> Dict[str, Any]:
         """Cleans raw CSV record fields."""
         mpn = self.clean_text(record.get("mfg_part_num"))
-        desc = self.clean_text(record.get("part_desc"))
+        desc = self.clean_description(record.get("part_desc"))
         e1_brand = self.clean_text(record.get("e1_brand"))
         unilog_brand = self.clean_text(record.get("unilog_brand"))
         dib_brand = self.clean_text(record.get("dib_brand"))

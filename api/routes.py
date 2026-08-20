@@ -122,12 +122,37 @@ async def upload_evaluator_file(file: UploadFile = File(...)):
     contents = await file.read()
 
     try:
-        if filename.endswith(".xlsx") or filename.endswith(".xls"):
-            df = pd.read_excel(io.BytesIO(contents), dtype=str).fillna("")
+        if filename.lower().endswith((".xlsx", ".xls")):
+            sheets = pd.read_excel(io.BytesIO(contents), sheet_name=None, dtype=str)
+            if not sheets:
+                raise ValueError("No sheets found in Excel file.")
+            
+            # Smart Multi-Sheet Detection: Search for sheet containing product data columns
+            target_df = None
+            for sheet_name, sheet_df in sheets.items():
+                if sheet_df is None or sheet_df.empty:
+                    continue
+                cols_lower = [str(c).strip().lower() for c in sheet_df.columns]
+                if any(k in cols_lower for k in ["mfg_part_num", "mpn", "part_number", "part_desc", "description", "sku"]):
+                    target_df = sheet_df
+                    break
+            
+            # Fallback to first non-empty sheet if no explicit header match
+            if target_df is None:
+                for sheet_df in sheets.values():
+                    if sheet_df is not None and not sheet_df.empty:
+                        target_df = sheet_df
+                        break
+            
+            if target_df is None or target_df.empty:
+                raise HTTPException(status_code=400, detail="Uploaded dataset is empty.")
+            df = target_df.fillna("")
         else:
             df = pd.read_csv(io.BytesIO(contents), dtype=str).fillna("")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to parse uploaded file: {str(e)}")
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=400, detail="Unable to parse this file — please check the format")
 
     if df.empty:
         raise HTTPException(status_code=400, detail="Uploaded dataset is empty.")

@@ -384,10 +384,10 @@ export default function CatalogExplorer() {
                 return (
                   <Card key={product.mfg_part_num} className="product-card">
                     <div className="product-card-top">
-                      <div className="flex items-center gap-2">
-                        <span className="product-mpn">{product.mfg_part_num}</span>
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <span className="product-mpn" title={product.mfg_part_num}>{product.mfg_part_num}</span>
                         {isLiveCandidate && (
-                          <span className="live-demo-tag" title="Capable of real-time Gemini AI web enrichment">
+                          <span className="live-demo-tag shrink-0" title="Capable of real-time Gemini AI web enrichment">
                             ⚡ Try Live
                           </span>
                         )}
@@ -395,20 +395,22 @@ export default function CatalogExplorer() {
                       <StatusBadge status={isApproved ? 'approved' : 'review'} />
                     </div>
 
-                    <h4 className="product-name">{product.product_name || product.part_desc}</h4>
+                    <h4 className="product-name" title={product.product_name || product.part_desc}>
+                      {product.product_name || product.part_desc}
+                    </h4>
 
                     <div className="product-meta-lines">
                       <div className="meta-line">
                         <span className="meta-k">Manufacturer:</span>
-                        <span className="meta-v">{product.manufacturer_name}</span>
+                        <span className="meta-v" title={product.manufacturer_name}>{product.manufacturer_name}</span>
                       </div>
                       <div className="meta-line">
                         <span className="meta-k">Brand:</span>
-                        <span className="meta-v">{product.brand_name}</span>
+                        <span className="meta-v" title={product.brand_name}>{product.brand_name}</span>
                       </div>
                       <div className="meta-line">
                         <span className="meta-k">Classpath:</span>
-                        <span className="meta-v meta-v--cyan">{product.classpath}</span>
+                        <span className="meta-v meta-v--cyan" title={product.classpath}>{product.classpath}</span>
                       </div>
                     </div>
 
@@ -425,7 +427,7 @@ export default function CatalogExplorer() {
                               : `${valStr} ${uomStr}`;
 
                             return (
-                              <span key={idx} className="attr-pill">
+                              <span key={idx} className="attr-pill" title={`${attr.label}: ${formattedVal}`}>
                                 {attr.label}: <strong>{formattedVal}</strong>
                               </span>
                             );

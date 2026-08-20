@@ -92,6 +92,34 @@ class ClassificationEngine:
                 "classpath": "Tools & Hardware>Power Tool Accessories>Saw Blades"
             },
             {
+                "keywords": ["FAUCET", "SINK FAUCET", "LAVATORY FAUCET", "KITCHEN FAUCET", "TAP", "SHOWER HEAD"],
+                "dept": "Plumbing & Pipe",
+                "class": "Plumbing Fixtures",
+                "fine": "Faucets & Fixtures",
+                "classpath": "Plumbing & Pipe>Plumbing Fixtures>Faucets & Fixtures"
+            },
+            {
+                "keywords": ["DECKING", "DECK BOARD", "COMPOSITE DECKING", "TIMBER DECK", "RAILING"],
+                "dept": "Building Materials",
+                "class": "Lumber & Composites",
+                "fine": "Decking & Railing",
+                "classpath": "Building Materials>Lumber & Composites>Decking & Railing"
+            },
+            {
+                "keywords": ["BUSHING", "REDUCER BUSHING", "PIPE BUSHING", "FLUSH BUSHING"],
+                "dept": "Plumbing & Pipe",
+                "class": "Pipe & Pipe Fittings",
+                "fine": "Pipe Bushings",
+                "classpath": "Plumbing & Pipe>Pipe & Pipe Fittings>Pipe Bushings"
+            },
+            {
+                "keywords": ["HVAC", "THERMOSTAT", "FURNACE", "HEAT PUMP", "AIR HANDLER", "AIR FILTER", "DUCT"],
+                "dept": "Heating, Vent & AC",
+                "class": "HVAC Equipment",
+                "fine": "HVAC Supplies",
+                "classpath": "Heating, Vent & AC>HVAC Equipment>HVAC Supplies"
+            },
+            {
                 "keywords": ["LED", "BULB", "BR30", "BR40", "PAR38", "PAR16", "A19", "A21", "LIGHTING"],
                 "dept": "Electrical & Lighting",
                 "class": "Lighting",

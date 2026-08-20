@@ -99,7 +99,12 @@ export async function uploadEvaluatorDataset(file: File): Promise<{
     });
 
     if (!res.ok) {
-      throw new Error(`Upload server error ${res.status}`);
+      let errorMsg = `Upload server error ${res.status}`;
+      try {
+        const errorJson = await res.json();
+        if (errorJson.detail) errorMsg = errorJson.detail;
+      } catch (_) {}
+      throw new Error(errorMsg);
     }
 
     const data = await res.json();
@@ -133,8 +138,7 @@ export async function uploadEvaluatorDataset(file: File): Promise<{
       warnings: data.warnings || []
     };
   } catch (err: any) {
-    console.warn('Backend API server unreachable or upload endpoint error. Falling back to dynamic client-side CSV parsing:', err);
-    return await parseAndEnrichCsvClientSide(file);
+    throw err;
   }
 }
 

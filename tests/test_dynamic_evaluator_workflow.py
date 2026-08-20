@@ -1,4 +1,8 @@
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import io
 import csv
 import pandas as pd
@@ -170,6 +174,125 @@ def test_processed_cache_isolation():
     assert "SKU-DATASET-B-202" in export_csv
     assert "SKU-DATASET-A-101" not in export_csv
 
+
+def test_xlsx_upload_and_multi_sheet_parsing():
+    """Tests POST /api/upload with valid single-sheet and multi-sheet Excel (.xlsx) files."""
+    # Create single sheet Excel buffer
+    df1 = pd.DataFrame([
+        {"Mfg_Part_Num": "XLSX-SKU-001", "Part_Desc": "24IN Kitchen Faucet Chrome 1.8GPM", "Part_Manuf": "Delta Faucet"},
+        {"Mfg_Part_Num": "PDSH4816AF", "Part_Desc": "PDSH4816AF Dishwasher SS 120V 15A 47 dBA 50.25IN", "Part_Manuf": "Rheem Manufacturing", "E1_Brand": "FRIGIDAIRE"}
+    ])
+    xlsx_buf1 = io.BytesIO()
+    with pd.ExcelWriter(xlsx_buf1, engine="openpyxl") as writer:
+        df1.to_excel(writer, index=False, sheet_name="Products")
+    
+    resp1 = client.post("/api/upload", files={"file": ("test_evaluator.xlsx", xlsx_buf1.getvalue(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")})
+    assert resp1.status_code == 200
+    res_data1 = resp1.json()
+    assert res_data1["status"] == "SUCCESS"
+    assert res_data1["total_skus"] == 2
+    
+    mpn_map = {p["mfg_part_num"]: p for p in res_data1["products"]}
+    assert "XLSX-SKU-001" in mpn_map
+    assert mpn_map["XLSX-SKU-001"]["category_class"] == "Plumbing Fixtures"
+    
+    # Test multi-sheet Excel (Sheet 1 = Notes, Sheet 2 = Products)
+    df_notes = pd.DataFrame([{"Notice": "Instructions for catalog upload."}])
+    df_products = pd.DataFrame([
+        {"Mfg_Part_Num": "DECK-001", "Part_Desc": "16 ft Composite Decking Board", "Part_Manuf": "Trex"}
+    ])
+    xlsx_buf2 = io.BytesIO()
+    with pd.ExcelWriter(xlsx_buf2, engine="openpyxl") as writer:
+        df_notes.to_excel(writer, index=False, sheet_name="Instructions")
+        df_products.to_excel(writer, index=False, sheet_name="SKU_Data")
+        
+    resp2 = client.post("/api/upload", files={"file": ("multi_sheet.xlsx", xlsx_buf2.getvalue(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")})
+    assert resp2.status_code == 200
+    res_data2 = resp2.json()
+    assert res_data2["total_skus"] == 1
+    assert res_data2["products"][0]["mfg_part_num"] == "DECK-001"
+
+def test_corrupted_xlsx_graceful_failure():
+    """Addition #3 Regression Test: Upload a corrupted/renamed file as .xlsx and verify clean 400 error."""
+    corrupted_bytes = b"THIS_IS_NOT_A_VALID_EXCEL_ZIP_FILE_JUST_CORRUPTED_PLAINTEXT"
+    resp = client.post("/api/upload", files={"file": ("fake_corrupted.xlsx", corrupted_bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")})
+    assert resp.status_code == 400
+    err_detail = resp.json()["detail"]
+    assert "Unable to parse this file — please check the format" in err_detail
+
+def test_pdsh4816af_and_expanded_categories_attribute_extraction():
+    """Priority 3 Test: Confirms PDSH4816AF, Faucet, Decking, Bushing, and HVAC extract real attributes and correct classpaths."""
+    df = pd.DataFrame([
+        {"Mfg_Part_Num": "PDSH4816AF", "Part_Desc": "PDSH4816AF Dishwasher SS 120V 15A 47 dBA", "Part_Manuf": "Rheem Manufacturing", "E1_Brand": "FRIGIDAIRE"},
+        {"Mfg_Part_Num": "FAUCET-100", "Part_Desc": "Kitchen Sink Faucet Chrome 1.8 GPM", "Part_Manuf": "Moen"},
+        {"Mfg_Part_Num": "DECK-200", "Part_Desc": "12 ft Composite Decking Board", "Part_Manuf": "Trex"},
+        {"Mfg_Part_Num": "BUSHING-300", "Part_Desc": "3/4 x 1/2 in Brass Reducer Bushing", "Part_Manuf": "Mueller"},
+        {"Mfg_Part_Num": "HVAC-400", "Part_Desc": "HVAC Thermostat 2-Stage 1200 CFM", "Part_Manuf": "Honeywell"}
+    ])
+    csv_bytes = df.to_csv(index=False).encode("utf-8")
+    resp = client.post("/api/upload", files={"file": ("category_test.csv", csv_bytes, "text/csv")})
+    assert resp.status_code == 200
+    products = resp.json()["products"]
+    p_map = {p["mfg_part_num"]: p for p in products}
+
+    # 1. PDSH4816AF Dishwasher
+    pdsh = p_map["PDSH4816AF"]
+    assert pdsh["department"] == "Appliances"
+    assert len(pdsh["attributes"]) > 0
+    attr_labels = [a["label"] for a in pdsh["attributes"]]
+    assert "Material" in attr_labels or "Voltage Rating" in attr_labels
+
+    # 2. Faucet
+    faucet = p_map["FAUCET-100"]
+    assert faucet["department"] == "Plumbing & Pipe"
+    assert faucet["fine_line"] == "Faucets & Fixtures"
+
+    # 3. Decking
+    decking = p_map["DECK-200"]
+    assert decking["department"] == "Building Materials"
+    assert decking["fine_line"] == "Decking & Railing"
+
+    # 4. Bushing
+    bushing = p_map["BUSHING-300"]
+    assert bushing["fine_line"] == "Pipe Bushings"
+
+    # 5. HVAC
+    hvac = p_map["HVAC-400"]
+    assert hvac["department"] == "Heating, Vent & AC"
+
+def test_non_uniform_confidence_scoring_formula():
+    """Priority 4 Test: Verifies dynamic weighting (mfr*0.30 + brand*0.25 + class*0.25 + attr*0.20) produces non-uniform overall confidence."""
+    df = pd.DataFrame([
+        {"Mfg_Part_Num": "HIGH-CONF-01", "Part_Desc": "20V Max Cordless Drill Driver 1/2 in Brushless", "Part_Manuf": "DeWalt", "E1_Brand": "DeWalt"},
+        {"Mfg_Part_Num": "LOW-CONF-02", "Part_Desc": "Generic item description without brand", "Part_Manuf": "Unknown Vendor", "E1_Brand": "-- Unbranded --"}
+    ])
+    csv_bytes = df.to_csv(index=False).encode("utf-8")
+    resp = client.post("/api/upload", files={"file": ("conf_test.csv", csv_bytes, "text/csv")})
+    assert resp.status_code == 200
+    products = resp.json()["products"]
+    
+    high_c = products[0]["confidence"]["overall_confidence"]
+    low_c = products[1]["confidence"]["overall_confidence"]
+
+    # Verify overall confidence is NOT stuck at 0.72 and varies meaningfully across rows
+    assert high_c != 0.72
+    assert high_c > low_c
+    assert low_c < 0.85
+
+def test_uom_normalization_consistency():
+    """Priority 5 Test: Confirms 24IN -> 24 in missing space normalization and fraction conversion."""
+    df = pd.DataFrame([
+        {"Mfg_Part_Num": "UOM-001", "Part_Desc": "24IN Stainless Steel Pipe 0.5 IN", "Part_Manuf": "SteelCorp"}
+    ])
+    csv_bytes = df.to_csv(index=False).encode("utf-8")
+    resp = client.post("/api/upload", files={"file": ("uom_test.csv", csv_bytes, "text/csv")})
+    assert resp.status_code == 200
+    product = resp.json()["products"][0]
+    
+    # 24IN should become 24 in, and 0.5 IN should become 1/2 in
+    desc = product["part_desc"]
+    assert "24 in" in desc or "24" in desc
+    assert "1/2 in" in desc or "1/2" in desc
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

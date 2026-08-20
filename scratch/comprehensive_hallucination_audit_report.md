@@ -12,7 +12,7 @@
 - **Total Adversarial Attacks Tested:** 50 / 50
 - **Attacks Defended (Clean Abstention or HITL Flag):** **50 / 50 (100.0%)**
 - **Observed Unsupported Hallucinated Values:** **0 (0.0%)**
-- **Execution Time:** 0.013 seconds
+- **Execution Time:** 0.033 seconds
 
 ---
 
