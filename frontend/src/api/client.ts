@@ -81,7 +81,11 @@ export async function fetchProducts(): Promise<{
   }
 }
 
-export async function uploadEvaluatorDataset(file: File): Promise<{
+import * as XLSX from 'xlsx';
+
+export const uploadEvaluatorDataset = uploadEvaluatorFile;
+
+export async function uploadEvaluatorFile(file: File): Promise<{
   products: EnrichedProduct[];
   total: number;
   approved: number;
@@ -89,6 +93,20 @@ export async function uploadEvaluatorDataset(file: File): Promise<{
   filename: string;
   warnings?: string[];
 }> {
+  // 1. Client-Side XLSX Format & Corruption Pre-Validation
+  const isXlsx = file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls');
+  if (isXlsx) {
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: 'array' });
+      if (!workbook || !workbook.SheetNames || workbook.SheetNames.length === 0) {
+        throw new Error('Unable to parse this file — please check the format');
+      }
+    } catch (_) {
+      throw new Error('Unable to parse this file — please check the format');
+    }
+  }
+
   try {
     const formData = new FormData();
     formData.append('file', file);
@@ -104,6 +122,12 @@ export async function uploadEvaluatorDataset(file: File): Promise<{
         const errorJson = await res.json();
         if (errorJson.detail) errorMsg = errorJson.detail;
       } catch (_) {}
+      
+      // If 404 or backend unavailable, fall back to client-side parsing
+      if (res.status === 404 || res.status >= 500) {
+        console.warn('Backend API upload endpoint returned 404/500, executing client-side dataset parsing...');
+        return await parseAndEnrichFileClientSide(file);
+      }
       throw new Error(errorMsg);
     }
 
@@ -138,11 +162,13 @@ export async function uploadEvaluatorDataset(file: File): Promise<{
       warnings: data.warnings || []
     };
   } catch (err: any) {
-    throw err;
+    if (err.message.includes('Unable to parse')) throw err;
+    console.warn('Backend API server unreachable, executing client-side dataset parsing:', err);
+    return await parseAndEnrichFileClientSide(file);
   }
 }
 
-async function parseAndEnrichCsvClientSide(file: File): Promise<{
+async function parseAndEnrichFileClientSide(file: File): Promise<{
   products: EnrichedProduct[];
   total: number;
   approved: number;
@@ -150,8 +176,38 @@ async function parseAndEnrichCsvClientSide(file: File): Promise<{
   filename: string;
   warnings?: string[];
 }> {
-  const text = await file.text();
-  const lines = text.split(/\r?\n/).filter((line) => line.trim() !== '');
+  let csvText = '';
+  const isXlsx = file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls');
+
+  if (isXlsx) {
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: 'array' });
+      if (!workbook || !workbook.SheetNames || workbook.SheetNames.length === 0) {
+        throw new Error('Unable to parse this file — please check the format');
+      }
+
+      // Smart Multi-Sheet Detection: Find sheet with product headers
+      let targetSheet = workbook.Sheets[workbook.SheetNames[0]];
+      for (const name of workbook.SheetNames) {
+        const sheet = workbook.Sheets[name];
+        const sheetCsv = XLSX.utils.sheet_to_csv(sheet);
+        const firstLine = sheetCsv.split(/\r?\n/)[0] || '';
+        const headersLower = firstLine.toLowerCase();
+        if (['mfg_part_num', 'mpn', 'part_number', 'part_desc', 'description', 'sku'].some((k) => headersLower.includes(k))) {
+          targetSheet = sheet;
+          break;
+        }
+      }
+      csvText = XLSX.utils.sheet_to_csv(targetSheet);
+    } catch (err: any) {
+      throw new Error('Unable to parse this file — please check the format');
+    }
+  } else {
+    csvText = await file.text();
+  }
+
+  const lines = csvText.split(/\r?\n/).filter((line) => line.trim() !== '');
   if (lines.length === 0) {
     throw new Error('Uploaded file is empty.');
   }
