@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Dict, List, Optional
+from src.models.reason_codes import ReasonCode
 
 class ConfidenceScore(BaseModel):
     manufacturer_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -38,28 +39,32 @@ class ConfidenceScore(BaseModel):
         self.field_scores["Classpath"] = round(self.classpath_confidence, 2)
         self.field_scores["ATTRIBUTES_AVG"] = round(self.attribute_confidence, 2)
 
-        # Generate explainable HITL routing reason codes
+        # --- Critical identity field checks (using centralized reason codes) ---
+        # Unresolved manufacturer: MUST block auto-approval
         if self.manufacturer_confidence < 0.60:
-            if "UNRESOLVED_MANUFACTURER_IDENTITY" not in self.flagged_reasons:
-                self.flagged_reasons.append("UNRESOLVED_MANUFACTURER_IDENTITY")
+            if ReasonCode.UNRESOLVED_MANUFACTURER_IDENTITY not in self.flagged_reasons:
+                self.flagged_reasons.append(ReasonCode.UNRESOLVED_MANUFACTURER_IDENTITY)
             if "LOW_MANUFACTURER_CONFIDENCE: Manufacturer unverified or missing" not in self.flagged_reasons:
                 self.flagged_reasons.append("LOW_MANUFACTURER_CONFIDENCE: Manufacturer unverified or missing")
+            # Critical identity unresolved — force HITL
+            self.needs_human_review = True
         
         if self.brand_confidence <= 0.60:
-            if "UNBRANDED_CATALOG_ITEM" not in self.flagged_reasons:
+            if "UNBRANDED_CATALOG_ITEM: Item has no verified brand" not in self.flagged_reasons:
                 self.flagged_reasons.append("UNBRANDED_CATALOG_ITEM: Item has no verified brand")
         
         if self.classpath_confidence < 0.70:
-            if "CLASSIFICATION_AMBIGUOUS" not in self.flagged_reasons:
+            if "CLASSIFICATION_AMBIGUOUS: Category classification score below 70%" not in self.flagged_reasons:
                 self.flagged_reasons.append("CLASSIFICATION_AMBIGUOUS: Category classification score below 70%")
 
         if self.attribute_confidence < 0.70:
-            if "SPARSE_SPECIFICATIONS" not in self.flagged_reasons:
+            if "SPARSE_SPECIFICATIONS: Low attribute population or validation rate" not in self.flagged_reasons:
                 self.flagged_reasons.append("SPARSE_SPECIFICATIONS: Low attribute population or validation rate")
 
         if self.overall_confidence < 0.85:
             self.needs_human_review = True
-            if "OVERALL_SCORE_BELOW_THRESHOLD" not in self.flagged_reasons:
+            if "OVERALL_SCORE_BELOW_THRESHOLD: Product overall confidence < 85%" not in self.flagged_reasons:
                 self.flagged_reasons.append("OVERALL_SCORE_BELOW_THRESHOLD: Product overall confidence < 85%")
 
         return self.overall_confidence
+

@@ -8,7 +8,7 @@ export default function CatalogCalloutSection() {
   const { navigate } = useRouter();
 
   return (
-    <section id="catalog-teaser" className="catalog-callout-section">
+    <section id="catalog" className="catalog-callout-section">
       <div className="catalog-callout__inner">
         <SectionHeader
           tag="LIVE CATALOG INTELLIGENCE WORKSPACE"

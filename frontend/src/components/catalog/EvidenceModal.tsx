@@ -41,7 +41,7 @@ export default function EvidenceModal({ product, onClose }: EvidenceModalProps) 
           <div className="modal-title-group">
             <span className="modal-tag">EVIDENCE PROVENANCE GRAPH</span>
             <h3 className="modal-title">Audit Trail: {product.product_name || product.mfg_part_num}</h3>
-            <span className="modal-subtitle">MPN: <code>{product.mfg_part_num}</code> • MFR: {product.manufacturer_name}</span>
+            <span className="modal-subtitle">MPN: <code>{product.mfg_part_num}</code> • MFR: {product.manufacturer_name === 'UNKNOWN' ? '⚠ UNRESOLVED' : product.manufacturer_name}</span>
           </div>
           <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">✕</button>
         </div>

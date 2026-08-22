@@ -4,6 +4,7 @@ from src.engines.cleaning_engine import DataCleaningEngine
 from src.engines.fuzzy_matcher import FuzzyMatcher
 from src.models.product import EnrichedProduct, RawSKURecord
 from src.models.evidence import EvidenceItem
+from src.models.reason_codes import ReasonCode
 
 class EntityResolutionAgent(BaseAgent):
     def __init__(self):
@@ -44,21 +45,50 @@ class EntityResolutionAgent(BaseAgent):
             product.confidence.manufacturer_confidence = manuf_conf
             product.confidence.brand_confidence = brand_conf
 
+            # --- Manufacturer evidence and reason code logic ---
+            manufacturer_is_unresolved = (resolved_manuf == "UNKNOWN" or manuf_conf == 0.0)
+
             product.evidence_graph.product_mpn = product.mfg_part_num
-            product.evidence_graph.add_evidence(EvidenceItem(
-                field_name="MANUFACTURER_NAME",
-                value=resolved_manuf,
-                confidence=manuf_conf,
-                source_type="fuzzy_match" if manuf_conf < 1.0 else "exact_match",
-                snippet=f"Raw: {rec.part_manuf}"
-            ))
-            product.evidence_graph.add_evidence(EvidenceItem(
-                field_name="BRAND_NAME",
-                value=resolved_brand,
-                confidence=brand_conf,
-                source_type="rule_inference" if brand_conf < 0.98 else "exact_match",
-                snippet=f"Raw: {rec.e1_brand} | Desc: {rec.part_desc}"
-            ))
+            if manufacturer_is_unresolved:
+                # Record structured unresolved evidence state
+                product.evidence_graph.add_evidence(EvidenceItem(
+                    field_name="MANUFACTURER_NAME",
+                    value=None,
+                    confidence=0.0,
+                    source_type="unresolved",
+                    snippet=f"Raw: {rec.part_manuf} | Status: unresolved"
+                ))
+                # Flag with centralized reason code
+                if ReasonCode.UNRESOLVED_MANUFACTURER_IDENTITY not in product.confidence.flagged_reasons:
+                    product.confidence.flagged_reasons.append(ReasonCode.UNRESOLVED_MANUFACTURER_IDENTITY)
+                product.confidence.needs_human_review = True
+            else:
+                product.evidence_graph.add_evidence(EvidenceItem(
+                    field_name="MANUFACTURER_NAME",
+                    value=resolved_manuf,
+                    confidence=manuf_conf,
+                    source_type="fuzzy_match" if manuf_conf < 1.0 else "exact_match",
+                    snippet=f"Raw: {rec.part_manuf}"
+                ))
+
+            # --- Brand evidence and reason code logic ---
+            brand_is_unresolved = (resolved_brand == "UNKNOWN" or brand_conf == 0.0)
+            if brand_is_unresolved:
+                product.evidence_graph.add_evidence(EvidenceItem(
+                    field_name="BRAND_NAME",
+                    value=None,
+                    confidence=0.0,
+                    source_type="unresolved",
+                    snippet=f"Raw: {rec.e1_brand} | Status: unresolved"
+                ))
+            else:
+                product.evidence_graph.add_evidence(EvidenceItem(
+                    field_name="BRAND_NAME",
+                    value=resolved_brand,
+                    confidence=brand_conf,
+                    source_type="rule_inference" if brand_conf < 0.98 else "exact_match",
+                    snippet=f"Raw: {rec.e1_brand} | Desc: {rec.part_desc}"
+                ))
 
             enriched_products.append(product)
 

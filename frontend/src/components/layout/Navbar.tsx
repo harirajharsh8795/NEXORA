@@ -1,15 +1,21 @@
 import { useTheme } from '../../context/ThemeContext';
 import { useRouter } from '../../context/RouterContext';
+import type { ModalType } from '../ui/InfoModal';
 import './Navbar.css';
 
+interface NavbarProps {
+  onOpenModal?: (type: ModalType) => void;
+}
+
 const navLinks = [
-  { label: 'Features', href: '#features', route: '/' },
-  { label: 'Pipeline', href: '#pipeline', route: '/' },
-  { label: 'ROI Calculator', href: '#roi-calculator', route: '/' },
-  { label: 'Catalog', href: '/catalog', route: '/catalog' },
+  { label: 'Features', href: '#features' },
+  { label: 'Pipeline', href: '#pipeline' },
+  { label: 'ROI Calculator', href: '#roi-calculator' },
+  { label: 'Taxonomy', href: '#taxonomy' },
+  { label: 'Catalog Workspace', href: '/catalog' },
 ];
 
-export default function Navbar() {
+export default function Navbar({ onOpenModal }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const { currentPath, navigate } = useRouter();
 
@@ -36,21 +42,37 @@ export default function Navbar() {
         {/* Navigation Links */}
         <nav className="navbar__nav">
           {navLinks.map((link) => {
-            const isActive = link.route === '/catalog' ? currentPath === '/catalog' : currentPath === '/';
+            const isCatalogLink = link.href === '/catalog';
+            const isActive = isCatalogLink ? currentPath === '/catalog' : currentPath === '/';
             return (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate(link.href === '/catalog' ? '/catalog' : link.href);
+                  navigate(link.href);
                 }}
-                className={`navbar__link ${isActive && link.route === '/catalog' ? 'navbar__link--active' : ''}`}
+                className={`navbar__link ${isActive && isCatalogLink ? 'navbar__link--active' : ''}`}
               >
                 {link.label}
               </a>
             );
           })}
+
+          <button
+            onClick={() => onOpenModal && onOpenModal('docs')}
+            className="navbar__link"
+            style={{ background: 'none', border: 'none', font: 'inherit', cursor: 'pointer' }}
+          >
+            Docs
+          </button>
+          <button
+            onClick={() => onOpenModal && onOpenModal('api')}
+            className="navbar__link"
+            style={{ background: 'none', border: 'none', font: 'inherit', cursor: 'pointer' }}
+          >
+            API
+          </button>
         </nav>
 
         {/* Right side: theme toggle + CTA */}
@@ -75,4 +97,3 @@ export default function Navbar() {
     </header>
   );
 }
-

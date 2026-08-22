@@ -410,11 +410,19 @@ export default function CatalogExplorer() {
                     <div className="product-meta-lines">
                       <div className="meta-line">
                         <span className="meta-k">Manufacturer:</span>
-                        <span className="meta-v" title={product.manufacturer_name}>{product.manufacturer_name}</span>
+                        {product.manufacturer_name === 'UNKNOWN' ? (
+                          <span className="meta-v" style={{ color: '#f59e0b', fontStyle: 'italic' }} title="Manufacturer identity unresolved">⚠ UNRESOLVED</span>
+                        ) : (
+                          <span className="meta-v" title={product.manufacturer_name}>{product.manufacturer_name}</span>
+                        )}
                       </div>
                       <div className="meta-line">
                         <span className="meta-k">Brand:</span>
-                        <span className="meta-v" title={product.brand_name}>{product.brand_name}</span>
+                        {product.brand_name === 'UNKNOWN' ? (
+                          <span className="meta-v" style={{ color: '#f59e0b', fontStyle: 'italic' }} title="Brand identity unresolved">⚠ UNRESOLVED</span>
+                        ) : (
+                          <span className="meta-v" title={product.brand_name}>{product.brand_name}</span>
+                        )}
                       </div>
                       <div className="meta-line">
                         <span className="meta-k">Classpath:</span>

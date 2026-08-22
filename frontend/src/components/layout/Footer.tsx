@@ -1,27 +1,35 @@
+import { useRouter } from '../../context/RouterContext';
+import type { ModalType } from '../ui/InfoModal';
 import './Footer.css';
 
-const footerLinks = {
-  product: [
-    { label: 'Live Dashboard', href: '#catalog' },
-    { label: 'Pipeline Architecture', href: '#pipeline' },
-    { label: 'Evidence Explorer', href: '#catalog' },
-    { label: 'ROI Calculator', href: '#roi-calculator' },
-    { label: 'Taxonomy', href: '#taxonomy' },
-  ],
-  resources: [
-    { label: 'Documentation', href: '#' },
-    { label: 'API Reference', href: '#' },
-    { label: 'Case Studies', href: '#' },
-    { label: 'Blog', href: '#' },
-  ],
-  company: [
-    { label: 'About', href: '#' },
-    { label: 'Contact', href: '#' },
-    { label: 'Privacy Policy', href: '#' },
-  ],
-};
+interface FooterProps {
+  onOpenModal?: (type: ModalType) => void;
+}
 
-export default function Footer() {
+const productLinks = [
+  { label: 'Live Dashboard', href: '/catalog' },
+  { label: 'Pipeline Architecture', href: '#pipeline' },
+  { label: 'Evidence Explorer', href: '/catalog' },
+  { label: 'ROI Calculator', href: '#roi-calculator' },
+  { label: 'Taxonomy', href: '#taxonomy' },
+];
+
+const resourceLinks: { label: string; action: ModalType }[] = [
+  { label: 'Documentation', action: 'docs' },
+  { label: 'API Reference', action: 'api' },
+  { label: 'Case Studies', action: 'cases' },
+  { label: 'Blog', action: 'blog' },
+];
+
+const companyLinks: { label: string; action: ModalType }[] = [
+  { label: 'About', action: 'about' },
+  { label: 'Contact', action: 'contact' },
+  { label: 'Privacy Policy', action: 'privacy' },
+];
+
+export default function Footer({ onOpenModal }: FooterProps) {
+  const { navigate } = useRouter();
+
   return (
     <footer className="footer">
       <div className="footer__inner">
@@ -42,26 +50,46 @@ export default function Footer() {
         <div className="footer__links-group">
           <div className="footer__links-col">
             <h4 className="footer__col-title">Product</h4>
-            {footerLinks.product.map((link) => (
-              <a key={link.label} href={link.href} className="footer__link">
+            {productLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(link.href);
+                }}
+                className="footer__link"
+              >
                 {link.label}
               </a>
             ))}
           </div>
+
           <div className="footer__links-col">
             <h4 className="footer__col-title">Resources</h4>
-            {footerLinks.resources.map((link) => (
-              <a key={link.label} href={link.href} className="footer__link">
+            {resourceLinks.map((link) => (
+              <button
+                key={link.label}
+                onClick={() => onOpenModal && onOpenModal(link.action)}
+                className="footer__link"
+                style={{ background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer', textAlign: 'left' }}
+              >
                 {link.label}
-              </a>
+              </button>
             ))}
           </div>
+
           <div className="footer__links-col">
             <h4 className="footer__col-title">Company</h4>
-            {footerLinks.company.map((link) => (
-              <a key={link.label} href={link.href} className="footer__link">
+            {companyLinks.map((link) => (
+              <button
+                key={link.label}
+                onClick={() => onOpenModal && onOpenModal(link.action)}
+                className="footer__link"
+                style={{ background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer', textAlign: 'left' }}
+              >
                 {link.label}
-              </a>
+              </button>
             ))}
           </div>
         </div>
